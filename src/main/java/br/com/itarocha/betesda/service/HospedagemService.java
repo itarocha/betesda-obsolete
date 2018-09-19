@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,9 @@ import br.com.itarocha.betesda.model.TipoUtilizacaoHospedagem;
 //import br.com.itarocha.betesda.util.StrUtil;
 import br.com.itarocha.betesda.utils.StrUtil;
 
+
+import br.com.itarocha.betesda.service.H;
+
 @Service
 public class HospedagemService {
 
@@ -37,10 +41,6 @@ public class HospedagemService {
 	
 	private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-
-	public HospedagemService(EntityManager em) {
-		this.em = em;
-	}
 
 	/*
 	public Quarto create(NovoQuartoVO model) throws Exception{
@@ -131,20 +131,33 @@ public class HospedagemService {
 			LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
 			LocalDate dFim = LocalDate.parse("18/08/2018", fmt);
 			
+			StringBuilder sbH = StrUtil.loadFile("/sql/h.sql");
 			StringBuilder sbHospedagens = StrUtil.loadFile("/sql/hospedagens_por_periodo.sql");
 			StringBuilder sbHospedes = StrUtil.loadFile("/sql/hospedes_por_periodo.sql");
 			StringBuilder sbLeitos = StrUtil.loadFile("/sql/hospede_leito_por_periodo.sql");
 			
 			//System.out.println(sbHospedagens.toString());
 			
+			TypedQuery<H> qH = em.createQuery("SELECT NEW br.com.itarocha.betesda.service.H(hl.id, hl.hospede) FROM HospedeLeito hl", H.class);
+			//qH.setParameter("DATA_INI", dIni);
+			//qH.setParameter("DATA_FIM", dFim);
+			List<H> hresult = qH.getResultList();
+			
+			for (H h: hresult) {
+				System.out.println(h.hospede.getPessoa().getNome() + " - " + h.hospede.getHospedagem().getDataEntrada() + " até " + h.hospede.getHospedagem().getDataPrevistaSaida());
+			}
+
+			/*
 			// Hospedagens
-			Query qHospedagens = em.createNativeQuery(sbHospedagens.toString());
+			Query qHospedagens = em.createNativeQuery(sbHospedagens.toString(), HospedagemResult.class);
 			qHospedagens.setParameter("DATA_INI", dIni);
 			qHospedagens.setParameter("DATA_FIM", dFim);
+			List<HospedagemResult> xresult = qHospedagens.getResultList();
 			
 			// Poderia ser um Map<> de Hospedagem
 			List<HospedagemResult> lstHospedagens = new ArrayList<HospedagemResult>();
 			List<Object[]> result = qHospedagens.getResultList();
+			
 			for (Object[] o : result) {
 				lstHospedagens.add(new HospedagemResult( (BigInteger)o[0], 
 														 (BigInteger)o[1],
@@ -155,8 +168,9 @@ public class HospedagemService {
 														 ((java.sql.Date)o[6]).toLocalDate()
 														));
 			}
-
-
+			*/
+			
+/*
 			// HóspedeLeitos
 			Query qLeitos = em.createNativeQuery(sbLeitos.toString());
 			qLeitos.setParameter("DATA_INI", dIni);
@@ -212,8 +226,10 @@ public class HospedagemService {
 				System.out.println(String.format("HId: %s PessoaId: %s %s %s %s",
 							h.hospedagemId, h.pessoaId, h.nome, h.tipoHospedeId, h.descricao));
 			}
+			*/
 		} finally {
 		}
+		
 	}
 	
 /*

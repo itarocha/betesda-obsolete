@@ -1,5 +1,8 @@
 package br.com.itarocha.betesda.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +54,6 @@ public class HospedagemController {
 		
 		try {
 			Hospedagem saved;
-			HospedagemService service = new HospedagemService(em);
 			saved = service.create(model);
 		    // O model retornado vem preenchido com campos adicionais
 		    //return Response.status(200).entity(model).build();
@@ -61,14 +63,13 @@ public class HospedagemController {
 		}
 	}
 	
-	/*
-	@GET
-	@Path("/mapa" )
+	@RequestMapping(value="/mapa")
 	public List<Mapa> mapa()
 	{
 		try {
-			HospedagemService hs = new HospedagemService(em);
-		hs.getHospedagens();
+			service.getHospedagens();
+		} catch(Exception e) {
+			throw e;
 		} finally {
 			em.close();
 		}
@@ -81,7 +82,6 @@ public class HospedagemController {
 		lista.add(new Mapa(15, new String[] {"0","0","0","0","0","I","X"}));
 		return lista;
 	}
-	*/
 	
 	private class Mapa {
 		public int leito;
