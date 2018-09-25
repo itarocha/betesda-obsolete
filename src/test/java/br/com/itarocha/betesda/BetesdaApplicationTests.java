@@ -1,4 +1,6 @@
-package br.itarocha.betesda;
+package br.com.itarocha.betesda;
+
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +13,7 @@ public class BetesdaApplicationTests {
 
 	@Test
 	public void contextLoads() {
+		assertEquals(5, 5);
 	}
 
 }
