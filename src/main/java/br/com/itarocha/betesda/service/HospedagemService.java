@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.TipoHospede;
 import br.com.itarocha.betesda.model.TipoUtilizacaoHospedagem;
+import br.com.itarocha.betesda.model.hospedagem.Celula;
 import br.com.itarocha.betesda.utils.StrUtil;
 
 @Service
@@ -123,14 +125,88 @@ public class HospedagemService {
 	}
 
 	public static void main(String...args) {
+		/*
 		LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
 		LocalDate dFim = dIni.plusDays(6);
 
-		LocalDate dtmp = dIni;
-		while (dtmp.compareTo(dFim) != 1) {
-			System.out.println(dtmp);
-			dtmp = dtmp.plusDays(1);
+		Map<Integer, Celula[]> mapa = new HashMap<>();
+		Integer[] items = new Integer[] {0,1,2,3,4,5,6,7};
+		for(Integer i : Arrays.asList(items)) {
+			Celula[] cels = new Celula[] {null, null, null, null, null, null, null, null};
+			Celula cel = new Celula();
+			cels[0] = cel;
+			cel.setTipo("CAB");
+
+			LocalDate dtmp = dIni;
+			int index = 0;
+			while (dtmp.compareTo(dFim) != 1) {
+				index++;
+				//System.out.println(dtmp);
+				cel = new Celula();
+				cel.setTipo("ITE");
+				cel.setData(dtmp);
+				cels[index] = cel;
+				
+				dtmp = dtmp.plusDays(1);
+			}
+			mapa.put(i, cels);
 		}
+		
+		for (Integer i : mapa.keySet()) {
+			Celula[] celulas = mapa.get(i);
+			System.out.print(String.format("%04d ", i));
+			for (Celula c : celulas) {
+				System.out.print(c.getTipo() + " ");
+			}
+			System.out.println();
+			
+		}
+		
+		*/
+		Map<Integer, Celula[]> mapa = geraMapa(LocalDate.parse("23/09/2018", fmt), 7);
+		
+		for (Integer i : mapa.keySet()) {
+			Celula[] celulas = mapa.get(i);
+			System.out.print(String.format("%04d ", i));
+			for (Celula c : celulas) {
+				System.out.print(c.getTipo() + " ");
+			}
+			System.out.println();
+			
+		}
+		
+		
+	}
+	
+	public static Map<Integer, Celula[]> geraMapa(LocalDate dIni, Integer numeroDias){
+		Map<Integer, Celula[]> mapa = new HashMap<>();
+
+		//LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
+		LocalDate dFim = dIni.plusDays(numeroDias-1);
+
+		Integer[] items = new Integer[] {0,1,2,3,4,5,6,7};
+		for(Integer i : Arrays.asList(items)) {
+			Celula[] cels = new Celula[numeroDias+1];
+			Celula cel = new Celula();
+			cels[0] = cel;
+			cel.setTipo("CAB");
+
+			LocalDate dtmp = dIni;
+			int index = 0;
+			while (dtmp.compareTo(dFim) != 1) {
+				index++;
+				//System.out.println(dtmp);
+				cel = new Celula();
+				cel.setTipo("ITE");
+				cel.setData(dtmp);
+				cels[index] = cel;
+				
+				dtmp = dtmp.plusDays(1);
+			}
+			mapa.put(i, cels);
+		}
+		
+		return mapa;
 	}
 	
 	// http://localhost:8088/api/hospedagem/mapa
@@ -173,11 +249,16 @@ public class HospedagemService {
 			
 			for(LeitoVO l : leitos) {
 				//mapLeitos.put(key, l);
+				Celula[] celulas = new Celula[] {null, null, null, null, null, null, null, null};
+				
 				System.out.println(String.format("%s - %s (%s) - [%s]", l.getQuartoNumero(), l.getNumero(), l.getId(), l.getTipoLeito().getDescricao()));
 				HospedeLeitoVO hl = mapHospedeLeito.get(l.getId());
 				LocalDate dtmp = dIni;
 				String semana = "";
+				celulas[0] = new Celula();
+				int c = 0;
 				while (dtmp.compareTo(dFim) != 1) {
+					c++;
 					Boolean inicio = false; 
 					Boolean durante = false; 
 					Boolean fim = false;
@@ -201,6 +282,14 @@ public class HospedagemService {
 					} else {
 						semana = "";
 					}
+
+					Celula celula = new Celula();
+					celula.setData(dtmp);
+					celula.setInicio(inicio);
+					celula.setDurante(durante);
+					celula.setFim(fim);
+					celulas[c] = celula;
+
 					
 					System.out.print(dtmp + " ");
 					dtmp = dtmp.plusDays(1);
@@ -224,6 +313,7 @@ public class HospedagemService {
 				for (d : semana) {
 					Celula c = new Celula()
 					c.setTipo(Tipo.CELULA)
+					c.setLeito(leito)
 					c.setData(d.data)
 					if (hl != null){
 						HospedagemDia h = new HospedagemDia()
