@@ -22,8 +22,11 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name="hospedagem")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "hospedes"})
 public class Hospedagem {
 
 	@Id

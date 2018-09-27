@@ -1,11 +1,13 @@
 package br.com.itarocha.betesda.service;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +24,9 @@ import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.Hospede;
 import br.com.itarocha.betesda.model.HospedeLeito;
+import br.com.itarocha.betesda.model.HospedeLeitoVO;
 import br.com.itarocha.betesda.model.Leito;
+import br.com.itarocha.betesda.model.LeitoVO;
 import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.TipoHospede;
@@ -125,16 +129,152 @@ public class HospedagemService {
 		}
 		return hospedagem;
 	}
+
+	public static void main(String...args) {
+		LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
+		LocalDate dFim = dIni.plusDays(6);
+
+		LocalDate dtmp = dIni;
+		while (dtmp.compareTo(dFim) != 1) {
+			System.out.println(dtmp);
+			dtmp = dtmp.plusDays(1);
+		}
+	}
 	
-	public void getHospedagens() {
+	// http://localhost:8088/api/hospedagem/mapa
+	public List<HospedeLeitoVO> geHospedagens() {
+		try {
+			LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
+			LocalDate dFim = dIni.plusDays(6);
+			//LocalDate dFim = LocalDate.parse("18/08/2018", fmt);
+
+			// Monta lista de leitos 
+			StringBuilder sbLeitos = StrUtil.loadFile("/sql/leitos.sql");
+			TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeitos.toString(), LeitoVO.class);
+			List<LeitoVO> leitos = qLeitos.getResultList();
+			
+			// Monta lista de HospedeLeitoVO
+			StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
+			TypedQuery<HospedeLeitoVO> qHospedeLeito = em.createQuery(sbHospedeLeitos.toString(), HospedeLeitoVO.class)
+					.setParameter("DATA_INI", Date.valueOf(dIni) )
+					.setParameter("DATA_FIM", Date.valueOf(dFim));
+			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
+			
+			
+			//Map<Long, LeitoVO> mapLeitos = new HashMap<>();
+
+			
+			Map<Long, HospedeLeitoVO> mapHospedeLeito = new HashMap<>();
+			for(HospedeLeitoVO hl : hospedeLeitos) {
+				mapHospedeLeito.put(hl.getLeitoId(), hl);
+				
+				hl.getLeitoId();
+				System.out.println(String.format("%s %s %s ",
+						hl.getHospedeLeito().getDataEntrada(), 
+						hl.getHospedeLeito().getDataSaida(), 
+						hl.getLeitoId() ));
+				
+				//System.out.println(hl.getHospedeLeito().getDataEntrada() + " - " + hl.getHospedeLeito().getDataSaida());
+			}
+			
+			
+			for(LeitoVO l : leitos) {
+				//mapLeitos.put(key, l);
+				System.out.println(String.format("%s - %s (%s) - [%s]", l.getQuartoNumero(), l.getNumero(), l.getId(), l.getTipoLeito().getDescricao()));
+				HospedeLeitoVO hl = mapHospedeLeito.get(l.getId());
+				LocalDate dtmp = dIni;
+				while (dtmp.compareTo(dFim) != 1) {
+					System.out.print(dtmp + " ");
+					dtmp = dtmp.plusDays(1);
+				}
+				System.out.println("");
+				if (hl != null) {
+					System.out.println(String.format("****************************** [%s] %s",hl.getLeitoId(),  hl.getHospede().getPessoa().getNome()) );
+				}
+			}
+			
+			/*
+			
+			for (Leito leito : listaLeitos) {
+				List<Celula> celulas = new ArrayList<Celula>();
+				Celula c = new Celula()
+				c.setTipo(Tipo.TITULO)
+				c.setLeito(leito)
+				celulas.add(c)
+				
+				HL hl = Localizar Lista HospedeLeito
+				for (d : semana) {
+					Celula c = new Celula()
+					c.setTipo(Tipo.CELULA)
+					c.setData(d.data)
+					if (hl != null){
+						HospedagemDia h = new HospedagemDia()
+						h.hospedagemId = hl.hospedagemId
+						h.pessoaId = hl.pessoaId
+						h.pessoaNome = hl.pessoaNome
+						h.dataEntrada = hl.dataEntrada
+						h.dataEfetivaSaida = hl.dataEfetivaSaida
+						
+						h.inicio = (hl.dataEntrada == d.data)
+						h.fim = (hl.dataSaida == d.data)
+						h.durante = (d.data.maior(hl.dataEntrada) ) && (d.data.menor( hl.dataSaida))
+						
+						c.setHospedagem(h)
+					}
+					celulas.add(c)
+				}
+				leito.setCelulas(celulas)
+			}
+			
+			*/
+			
+			
+			
+			/*
+			StringBuilder sbH = StrUtil.loadFile("/sql/h.sql");
+			StringBuilder sbHospedagens = StrUtil.loadFile("/sql/hospedagens_por_periodo.sql");
+			StringBuilder sbHospedes = StrUtil.loadFile("/sql/hospedes_por_periodo.sql");
+			//StringBuilder sbLeitos = StrUtil.loadFile("/sql/hospede_leito_por_periodo.sql");
+			
+			//System.out.println(sbHospedagens.toString());
+			
+			TypedQuery<H> qH = em.createQuery("SELECT NEW br.com.itarocha.betesda.service.H(hl.id, hl.hospede) FROM HospedeLeito hl", H.class);
+			//qH.setParameter("DATA_INI", dIni);
+			//qH.setParameter("DATA_FIM", dFim);
+			List<H> hresult = qH.getResultList();
+			
+			for (H h: hresult) {
+				System.out.println(h.hospede.getPessoa().getNome() + " - " + h.hospede.getHospedagem().getDataEntrada() + " até " + h.hospede.getHospedagem().getDataPrevistaSaida());
+			}
+			*/
+			
+			// Provisório
+			return hospedeLeitos;
+		} finally {
+		}
+		
+	}
+	
+	public void getOldHospedagens() {
 		try {
 			LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
 			LocalDate dFim = LocalDate.parse("18/08/2018", fmt);
+
+			
+			StringBuilder sbLeitos = StrUtil.loadFile("/sql/leitos.sql");
+			TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeitos.toString(), LeitoVO.class);
+			List<LeitoVO> leitos = qLeitos.getResultList();
+			
+			for(LeitoVO l : leitos) {
+				System.out.println(String.format("%s - %s (%s) - [%s]", l.getQuartoNumero(), l.getNumero(), l.getId(), l.getTipoLeito().getDescricao()));
+			}
+			
+			
 			
 			StringBuilder sbH = StrUtil.loadFile("/sql/h.sql");
 			StringBuilder sbHospedagens = StrUtil.loadFile("/sql/hospedagens_por_periodo.sql");
 			StringBuilder sbHospedes = StrUtil.loadFile("/sql/hospedes_por_periodo.sql");
-			StringBuilder sbLeitos = StrUtil.loadFile("/sql/hospede_leito_por_periodo.sql");
+			//StringBuilder sbLeitos = StrUtil.loadFile("/sql/hospede_leito_por_periodo.sql");
 			
 			//System.out.println(sbHospedagens.toString());
 			

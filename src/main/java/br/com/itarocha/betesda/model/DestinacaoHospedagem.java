@@ -10,8 +10,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name="destinacao_hospedagem")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class DestinacaoHospedagem implements Serializable {
 
 	private static final long serialVersionUID = 397874357784755819L;

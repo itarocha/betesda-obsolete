@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemVO;
+import br.com.itarocha.betesda.model.HospedeLeitoVO;
+import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
@@ -64,10 +66,11 @@ public class HospedagemController {
 	}
 	
 	@RequestMapping(value="/mapa")
-	public List<Mapa> mapa()
+	public List<HospedeLeitoVO> mapa()
 	{
+		List<HospedeLeitoVO> listagem = new ArrayList<HospedeLeitoVO>();
 		try {
-			service.getHospedagens();
+			listagem  = service.geHospedagens();
 		} catch(Exception e) {
 			throw e;
 		} finally {
@@ -80,7 +83,9 @@ public class HospedagemController {
 		lista.add(new Mapa(10, new String[] {"X","X","X","X","X","F","0"}));
 		lista.add(new Mapa(15, new String[] {"I","X","F","0","0","0","0"}));
 		lista.add(new Mapa(15, new String[] {"0","0","0","0","0","I","X"}));
-		return lista;
+		
+		//return new ResponseEntity<List<HospedeLeitoVO>>(listagem, HttpStatus.OK);
+		return listagem;
 	}
 	
 	private class Mapa {

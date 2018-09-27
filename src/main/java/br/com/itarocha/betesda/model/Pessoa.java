@@ -22,8 +22,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Entity
 @Table(name="pessoa")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Pessoa {
 	
 	@Id
