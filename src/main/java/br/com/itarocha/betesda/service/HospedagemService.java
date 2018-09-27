@@ -2,17 +2,13 @@ package br.com.itarocha.betesda.service;
 
 import java.math.BigInteger;
 import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,21 +17,17 @@ import org.springframework.stereotype.Service;
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
 import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemVO;
-import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.Hospede;
 import br.com.itarocha.betesda.model.HospedeLeito;
 import br.com.itarocha.betesda.model.HospedeLeitoVO;
+import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.Leito;
 import br.com.itarocha.betesda.model.LeitoVO;
 import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.TipoHospede;
 import br.com.itarocha.betesda.model.TipoUtilizacaoHospedagem;
-//import br.com.itarocha.betesda.util.StrUtil;
 import br.com.itarocha.betesda.utils.StrUtil;
-
-
-import br.com.itarocha.betesda.service.H;
 
 @Service
 public class HospedagemService {
@@ -156,8 +148,9 @@ public class HospedagemService {
 			// Monta lista de HospedeLeitoVO
 			StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
 			TypedQuery<HospedeLeitoVO> qHospedeLeito = em.createQuery(sbHospedeLeitos.toString(), HospedeLeitoVO.class)
-					.setParameter("DATA_INI", Date.valueOf(dIni) )
-					.setParameter("DATA_FIM", Date.valueOf(dFim));
+					//.setParameter("DATA_INI", Date.valueOf(dIni) )
+					.setParameter("DATA_INI", dIni )
+					.setParameter("DATA_FIM", dFim );
 			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
 			
 			
@@ -183,13 +176,38 @@ public class HospedagemService {
 				System.out.println(String.format("%s - %s (%s) - [%s]", l.getQuartoNumero(), l.getNumero(), l.getId(), l.getTipoLeito().getDescricao()));
 				HospedeLeitoVO hl = mapHospedeLeito.get(l.getId());
 				LocalDate dtmp = dIni;
+				String semana = "";
 				while (dtmp.compareTo(dFim) != 1) {
+					Boolean inicio = false; 
+					Boolean durante = false; 
+					Boolean fim = false;
+					
+					if(hl != null) {
+						LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
+						LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
+
+						inicio 	= (dataEntrada.compareTo(dtmp) == 0); 
+						fim 	= (dataSaida.compareTo(dtmp) == 0);
+						durante = (dtmp.isAfter(dataEntrada) && dtmp.isBefore(dataSaida));
+
+						StringBuilder situacaoDia = new StringBuilder();
+						
+						//semana = semana + String.format("[%s I = %s , X = %s F = %s]",dtmp, inicio, durante, fim);
+						situacaoDia.append(((!inicio && !fim && !durante) ? "0" : ""));
+						situacaoDia.append(durante ? "X" : "");
+						situacaoDia.append(inicio ? "I" : "");
+						situacaoDia.append(fim ? "F" : "");
+						semana = semana + "[" + situacaoDia.toString() + "]";
+					} else {
+						semana = "";
+					}
+					
 					System.out.print(dtmp + " ");
 					dtmp = dtmp.plusDays(1);
 				}
 				System.out.println("");
 				if (hl != null) {
-					System.out.println(String.format("****************************** [%s] %s",hl.getLeitoId(),  hl.getHospede().getPessoa().getNome()) );
+					System.out.println(String.format("***** [%s] %s [%s - %s] {%s}",hl.getLeitoId(),  hl.getHospede().getPessoa().getNome(), hl.getHospedeLeito().getDataEntrada(), hl.getHospedeLeito().getDataSaida(),  semana ) );
 				}
 			}
 			

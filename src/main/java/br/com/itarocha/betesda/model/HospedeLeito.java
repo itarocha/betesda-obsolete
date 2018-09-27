@@ -1,6 +1,8 @@
 package br.com.itarocha.betesda.model;
 
-import java.util.Date;
+import java.time.LocalDate;
+
+//import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,8 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -32,15 +32,15 @@ public class HospedeLeito {
 	private Hospede hospede;
 	
 	
-	@Temporal(TemporalType.DATE)
+	//@Temporal(TemporalType.DATE)
 	@NotNull(message="Data de Entrada precisa ser informado")
 	@Column(name="data_entrada")
-	private Date dataEntrada;
+	private LocalDate dataEntrada;
 	
-	@Temporal(TemporalType.DATE)
+	//@Temporal(TemporalType.DATE)
 	@NotNull(message="Data de Saída precisa ser informado")
 	@Column(name="data_saida")
-	private Date dataSaida;
+	private LocalDate dataSaida;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="quarto_id")
@@ -68,19 +68,19 @@ public class HospedeLeito {
 		this.hospede = hospede;
 	}
 
-	public Date getDataEntrada() {
+	public LocalDate getDataEntrada() {
 		return dataEntrada;
 	}
 
-	public void setDataEntrada(Date dataEntrada) {
+	public void setDataEntrada(LocalDate dataEntrada) {
 		this.dataEntrada = dataEntrada;
 	}
 
-	public Date getDataSaida() {
+	public LocalDate getDataSaida() {
 		return dataSaida;
 	}
 
-	public void setDataSaida(Date dataSaida) {
+	public void setDataSaida(LocalDate dataSaida) {
 		this.dataSaida = dataSaida;
 	}
 

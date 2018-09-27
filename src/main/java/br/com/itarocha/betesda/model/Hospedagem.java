@@ -1,7 +1,7 @@
 package br.com.itarocha.betesda.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -18,8 +18,6 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -49,18 +47,18 @@ public class Hospedagem {
 	private DestinacaoHospedagem destinacaoHospedagem;
 			
 	@NotNull(message="Data de Entrada precisa ser informado")
-	@Temporal(TemporalType.DATE)
+	//@Temporal(TemporalType.DATE)
 	@Column(name = "data_entrada")
-	private Date dataEntrada;
+	private LocalDate dataEntrada;
 	
 	@NotNull(message="Data Prevista de Saída precisa ser informada")
-	@Temporal(TemporalType.DATE)
+	//@Temporal(TemporalType.DATE)
 	@Column(name = "data_prevista_saida")
-	private Date dataPrevistaSaida;
+	private LocalDate dataPrevistaSaida;
 	
-	@Temporal(TemporalType.DATE)
+	//@Temporal(TemporalType.DATE)
 	@Column(name = "data_efetiva_saida")
-	private Date dataEfetivaSaida;
+	private LocalDate dataEfetivaSaida;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name="tipo_utilizacao", length=1)
@@ -102,27 +100,27 @@ public class Hospedagem {
 		this.encaminhador = encaminhador;
 	}
 
-	public Date getDataEntrada() {
+	public LocalDate getDataEntrada() {
 		return this.dataEntrada;
 	}
 
-	public void setDataEntrada(Date dataEntrada) {
+	public void setDataEntrada(LocalDate dataEntrada) {
 		this.dataEntrada = dataEntrada;
 	}
 
-	public Date getDataPrevistaSaida() {
+	public LocalDate getDataPrevistaSaida() {
 		return this.dataPrevistaSaida;
 	}
 
-	public void setDataPrevistaSaida(Date dataPrevistaSaida) {
+	public void setDataPrevistaSaida(LocalDate dataPrevistaSaida) {
 		this.dataPrevistaSaida = dataPrevistaSaida;
 	}
 
-	public Date getDataEfetivaSaida() {
+	public LocalDate getDataEfetivaSaida() {
 		return dataEfetivaSaida;
 	}
 
-	public void setDataEfetivaSaida(Date dataEfetivaSaida) {
+	public void setDataEfetivaSaida(LocalDate dataEfetivaSaida) {
 		this.dataEfetivaSaida = dataEfetivaSaida;
 	}
 

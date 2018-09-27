@@ -1,7 +1,7 @@
 package br.com.itarocha.betesda.model;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
@@ -11,10 +11,10 @@ public class HospedagemVO {
 	private Long id;
 
 	@NotNull(message="Data de Entrada precisa ser informada")
-	private Date dataEntrada;
+	private LocalDate dataEntrada;
 	
 	@NotNull(message="Data Prevista de Saída precisa ser informada")
-	private Date dataPrevistaSaida;
+	private LocalDate dataPrevistaSaida;
 	
 	@NotNull(message="Destinação de Hospedagem precisa ser informada")
     private Long destinacaoHospedagemId;
@@ -36,19 +36,19 @@ public class HospedagemVO {
 		this.id = id;
 	}
 
-	public Date getDataEntrada() {
+	public LocalDate getDataEntrada() {
 		return dataEntrada;
 	}
 
-	public void setDataEntrada(Date dataEntrada) {
+	public void setDataEntrada(LocalDate dataEntrada) {
 		this.dataEntrada = dataEntrada;
 	}
 
-	public Date getDataPrevistaSaida() {
+	public LocalDate getDataPrevistaSaida() {
 		return dataPrevistaSaida;
 	}
 
-	public void setDataPrevistaSaida(Date dataPrevistaSaida) {
+	public void setDataPrevistaSaida(LocalDate dataPrevistaSaida) {
 		this.dataPrevistaSaida = dataPrevistaSaida;
 	}
 
