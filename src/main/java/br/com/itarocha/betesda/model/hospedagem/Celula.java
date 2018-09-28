@@ -9,9 +9,9 @@ public class Celula {
 	private Boolean inicio;
 	private Boolean durante;
 	private Boolean fim;
-	//private Long hospedagemId
-	//private Long hospedeId
-	//private Long pessoaId
+	private Long hospedagemId;
+	private Long hospedeId;
+	private Long pessoaId;
 	
 	public String getTipo() {
 		return tipo;
@@ -42,6 +42,24 @@ public class Celula {
 	}
 	public void setFim(Boolean fim) {
 		this.fim = fim;
+	}
+	public Long getHospedagemId() {
+		return hospedagemId;
+	}
+	public void setHospedagemId(Long hospedagemId) {
+		this.hospedagemId = hospedagemId;
+	}
+	public Long getHospedeId() {
+		return hospedeId;
+	}
+	public void setHospedeId(Long hospedeId) {
+		this.hospedeId = hospedeId;
+	}
+	public Long getPessoaId() {
+		return pessoaId;
+	}
+	public void setPessoaId(Long pessoaId) {
+		this.pessoaId = pessoaId;
 	}
 	
 	

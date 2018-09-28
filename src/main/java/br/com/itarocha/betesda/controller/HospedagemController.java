@@ -1,7 +1,9 @@
 package br.com.itarocha.betesda.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 
@@ -18,6 +20,7 @@ import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeLeitoVO;
 import br.com.itarocha.betesda.model.Pessoa;
+import br.com.itarocha.betesda.model.hospedagem.Celula;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
@@ -66,11 +69,14 @@ public class HospedagemController {
 	}
 	
 	@RequestMapping(value="/mapa")
-	public List<HospedeLeitoVO> mapa()
+	//public List<HospedeLeitoVO> mapa()
+	public Map<String, Celula[]> mapa()
 	{
-		List<HospedeLeitoVO> listagem = new ArrayList<HospedeLeitoVO>();
+		//List<HospedeLeitoVO> listagem = new ArrayList<HospedeLeitoVO>();
+		 
+		Map<String, Celula[]> listagem = new HashMap<String, Celula[]>();
 		try {
-			listagem  = service.geHospedagens();
+			listagem  = service.getHospedagens();
 		} catch(Exception e) {
 			throw e;
 		} finally {
