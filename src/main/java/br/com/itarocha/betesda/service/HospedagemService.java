@@ -98,9 +98,8 @@ public class HospedagemService {
 		return hospedagem;
 	}
 	
-	// http://localhost:8088/api/hospedagem/mapa
-	//public List<HospedeLeitoVO> getHospedagens() {
 	/*
+	http://localhost:8088/api/hospedagem/mapa
 	Deve produzir um json nesse formato:
 	{
 		celulas : [
@@ -108,7 +107,7 @@ public class HospedagemService {
 			leito : {quartoNumero, leitoNumero}, 
 			dias : [
 				{data: "2018-08-12", hospedagem: {hospedagemId, hospedeId, pessoaId, inicio, durante, fim}}, 
-				{data: "2018-08-12", hospedagem: null},
+				{data: "2018-08-13", hospedagem: null},
 				{},  {},  {},  {},  {},  {}]
 		}],
 		pessoas : [{id, nome, tipoHospede...},{},{}],
@@ -126,9 +125,8 @@ public class HospedagemService {
 			TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeitos.toString(), LeitoVO.class);
 			List<LeitoVO> leitos = qLeitos.getResultList();
 			
-			// Gerando mapa vazio
+			// Gerando mapa vazio no formato chave (quartoNumero-leitoNumero) e array de Dia
 			Map<String, Dia[]> mapa = gerarMapa(dIni, 7, leitos);
-			
 
 			// Monta lista de HospedeLeitoVO
 			StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
@@ -137,120 +135,59 @@ public class HospedagemService {
 					.setParameter("DATA_FIM", dFim );
 			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
 			
-			
 			// Popula os leitos ocupados no mapa
-			Map<Long, HospedeLeitoVO> mapHospedeLeito = new HashMap<>();
 			for(HospedeLeitoVO hl : hospedeLeitos) {
-				mapHospedeLeito.put(hl.getLeitoId(), hl);
-				
-				int c = 0;
+				int celulaIndex = 0;
 				LocalDate dtmp = dIni;
+				// loop da primeira data até a última
 				while (dtmp.compareTo(dFim) != 1) {
-					Boolean inicio = false; 
-					Boolean durante = false; 
-					Boolean fim = false;
-					
 					LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
 					LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
 
-					inicio 	= (dataEntrada.compareTo(dtmp) == 0); 
-					fim 	= (dataSaida.compareTo(dtmp) == 0);
-					durante = (dtmp.isAfter(dataEntrada) && dtmp.isBefore(dataSaida));					
+					Boolean inicio 	= (dataEntrada.compareTo(dtmp) == 0); 
+					Boolean fim 	= (dataSaida.compareTo(dtmp) == 0);
+					Boolean durante = (dtmp.isAfter(dataEntrada) && dtmp.isBefore(dataSaida));					
 					
-					// c indica o índice da célula 
 					if (inicio || durante || fim) {
-						// cria célula
-						Dia dia = new Dia();
-						dia.setData(dtmp);
 						
 						HospedagemOut hospedagem = new HospedagemOut();
-
 						hospedagem.setHospedagemId(hl.getHospedagem().getId());
 						hospedagem.setHospedeId(hl.getHospede().getId());
 						hospedagem.setPessoaId(hl.getHospede().getPessoa().getId()); // Podem ser vários
+						
 						hospedagem.setInicio(inicio);
 						hospedagem.setDurante(durante);
 						hospedagem.setFim(fim);
 
-						
+						Dia dia = new Dia();
+						dia.setData(dtmp);
 						dia.setHospedagem(hospedagem);
 
-						// localiza no mapa
-						// quartoNumero - leitoNumero
 						String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
-						
-						
-						// injeta no índice
+						// localiza no mapa para atualizar o dia correspondente que antes estava somente com a data mas hospedagem null
 						Dia[] dias =  mapa.get(key);
-						dias[c] = dia;
-						c++;
+						// injeta no índice
+						dias[celulaIndex] = dia;
+						celulaIndex++;
 					}
 					dtmp = dtmp.plusDays(1);
 				}
 
-				// Mostra hospedagens 
-				hl.getLeitoId();
-				System.out.println(String.format("%s %s %s ",
-						hl.getHospedeLeito().getDataEntrada(), 
-						hl.getHospedeLeito().getDataSaida(), 
-						hl.getLeitoId() ));
 			}
 
-			// mostra graficamente o mapa de hospedagem
-			/*
-			000005-000005 x [0] [0] [0] [0] [0] [0] [0] 
-			000005-000006 x [0] [0] [0] [I] [X] [X] [X] 
-			000005-000007 x [0] [0] [0] [0] [0] [0] [0] 
-			000005-000008 x [0] [I] [X] [X] [X] [X] [X] 
-			000005-000009 x [0] [0] [0] [0] [0] [0] [0] 
-			000006-000001 x [X] [X] [F] [0] [0] [0] [0]  
-			*/
-			
-			
 			//Montagem do MapaHospedagem
 			MapaHospedagem mh = new MapaHospedagem();
 			for (String key : mapa.keySet()) {
-				Dia[] dias = mapa.get(key);
-				System.out.print(key + " ");
+				LeitoOut leito = extractLeitoFromKey(key);
 				
-				String[] leitoArray = key.split("-");
-
-				LeitoOut leito = new LeitoOut();
-				leito.setQuartoNumero(0);
-				leito.setLeitoNumero(0);
-				if (leitoArray.length == 2) {
-					leito.setQuartoNumero(Integer.parseInt(leitoArray[0]));
-					leito.setLeitoNumero(Integer.parseInt(leitoArray[1]));
-				}
-				System.out.println(String.format("leito: {quartoNumero = %d, leitoNumero = %d}", leito.getLeitoNumero(), leito.getLeitoNumero()));
 				CelulaOut celula = new CelulaOut();
 				celula.setLeito(leito);
 				
-				// dias : []
+				Dia[] dias = mapa.get(key);
 				for (Dia d : dias) {
-
-					String toPrint = "x";
-
 					Dia dia = new Dia();
 					dia.setData(d.getData());
-
-					// hospedagem
-					StringBuilder situacaoDia = new StringBuilder();
-					
-					HospedagemOut h = d.getHospedagem();
 					celula.getDias().add(d);
-					
-					if (h != null) {
-						situacaoDia.append(((! h.getInicio() && ! h.getFim() && !h.getDurante()) ? "0" : ""));
-						situacaoDia.append( h.getDurante() ? "X" : "");
-						situacaoDia.append( h.getInicio() ? "I" : ""); 
-						situacaoDia.append( h.getFim() ? "F" : "");
-					} else {
-						situacaoDia.append("0");
-					}
-					toPrint = "[" + situacaoDia.toString() + "]";
-					System.out.print(toPrint + " ");
-					
 				}
 				System.out.println();
 				mh.getCelulas().add(celula);
@@ -260,11 +197,23 @@ public class HospedagemService {
 			
 		} finally {
 		}
-		
 	}
-	
+
+	// quartoNumero - leitoNumero "000005-000007" quarto 5, leito 7
 	private String makeLeitoKey(Integer quartoNumero, Integer leitoNumero) {
 		return String.format("%06d-%06d", quartoNumero, leitoNumero); 
+	}
+
+	private LeitoOut extractLeitoFromKey(String key) {
+		LeitoOut leito = new LeitoOut();
+		leito.setQuartoNumero(0);
+		leito.setLeitoNumero(0);
+		String[] leitoArray = key.split("-");
+		if (leitoArray.length == 2) {
+			leito.setQuartoNumero(Integer.parseInt(leitoArray[0]));
+			leito.setLeitoNumero(Integer.parseInt(leitoArray[1]));
+		}
+		return leito;
 	}
 
 	// Gera um mapa vazio com todos os leitos e datas
