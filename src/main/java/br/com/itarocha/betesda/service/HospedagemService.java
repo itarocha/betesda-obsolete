@@ -100,6 +100,22 @@ public class HospedagemService {
 	
 	// http://localhost:8088/api/hospedagem/mapa
 	//public List<HospedeLeitoVO> getHospedagens() {
+	/*
+	Deve produzir um json nesse formato:
+	{
+		celulas : [
+		{
+			leito : {quartoNumero, leitoNumero}, 
+			dias : [
+				{data: "2018-08-12", hospedagem: {hospedagemId, hospedeId, pessoaId, inicio, durante, fim}}, 
+				{data: "2018-08-12", hospedagem: null},
+				{},  {},  {},  {},  {},  {}]
+		}],
+		pessoas : [{id, nome, tipoHospede...},{},{}],
+		hospedagens : [{id, dataEntrada, dataPrevistaSaida, dataEfetivaSaida, tipoUtilizacao, entidade, encaminhador},{},{}],
+		hospedesLeitos: [{id, dataEntrada, dataSaida},{},{}]
+	}
+	*/
 	public MapaHospedagem getHospedagens() {
 		try {
 			LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
