@@ -137,12 +137,18 @@ public class HospedagemService {
 			
 			// Popula os leitos ocupados no mapa
 			for(HospedeLeitoVO hl : hospedeLeitos) {
+				LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
+				LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
 				int celulaIndex = 0;
 				LocalDate dtmp = dIni;
 				// loop da primeira data até a última
+				
+				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
+				System.out.print(" ["+key+"] ");
+
+				System.out.println(dataEntrada + " até " + dataSaida);
 				while (dtmp.compareTo(dFim) != 1) {
-					LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
-					LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
+					System.out.print(dtmp + " - ");
 
 					Boolean inicio 	= (dataEntrada.compareTo(dtmp) == 0); 
 					Boolean fim 	= (dataSaida.compareTo(dtmp) == 0);
@@ -163,15 +169,15 @@ public class HospedagemService {
 						dia.setData(dtmp);
 						dia.setHospedagem(hospedagem);
 
-						String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
 						// localiza no mapa para atualizar o dia correspondente que antes estava somente com a data mas hospedagem null
 						Dia[] dias =  mapa.get(key);
 						// injeta no índice
 						dias[celulaIndex] = dia;
-						celulaIndex++;
 					}
+					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
 				}
+				System.out.println("");
 
 			}
 
