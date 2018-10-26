@@ -102,6 +102,51 @@ public class QuartoService {
 		return leito;
 	}
 	
+	/*
+	  
+	https://docs.spring.io/spring-data/jpa/docs/current/reference/html/	 
+	  
+	 @Query("select u from User u where u.firstname = :firstname or u.lastname = :lastname")
+	  User findByLastnameOrFirstname(@Param("lastname") String lastname,
+	                                 @Param("firstname") String firstname);
+	                                 
+	@Modifying
+	@Query("update User u set u.firstname = ?1 where u.lastname = ?2")
+	int setFixedFirstnameFor(String firstname, String lastname);	
+	
+	                                 
+	interface UserRepository extends Repository<User, Long> {
+	
+	  void deleteByRoleId(long roleId);
+	
+	  @Modifying
+	  @Query("delete from User u where user.role.id = ?1")
+	  void deleteInBulkByRoleId(long roleId);
+	}	                                 
+	   
+	@Transactional
+	@Modifying
+	@Query("UPDATE Employee e SET e.salary = e.salary + e.salary * :byPercent/100  WHERE e.dept = :dept")
+	int updateDeptSalaries(@Param("dept") String dept, @Param("byPercent") int byPercent);
+	                                 
+	@Transactional(readOnly = true)
+	public interface UserRepository extends JpaRepository<User, Long> {
+	
+	  List<User> findByLastname(String lastname);
+	
+	  @Modifying
+	  @Transactional
+	  @Query("delete from User u where u.active = false")
+	  void deleteInactiveUsers();
+	}
+	     
+ 	@Query(value="select * from Users u where u.EMAIL_VERIFICATION_STATUS = 'true'", nativeQuery = true)
+  	Collection<UserEntity> findAllUsersWithConfirmedEmailAddress();
+  	
+	@Query(value=”SELECT * FROM Users u WHERE u.EMAIL_VERIFICATION_STATUS = :emailVerificationStatus ”,  nativeQuery = true)
+	Collection<UserEntity> findAllUsersWithVerifiedEmailAddress(@Param("emailVerificationStatus") boolean emailVerificationStatus);  		                                 
+	                                 
+	*/
 	public void remove(Long id) {
 		Quarto model = find(id);
 		if (model != null) {
