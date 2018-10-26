@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,12 @@ import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.SelectValueVO;
 import br.com.itarocha.betesda.model.SituacaoLeito;
 import br.com.itarocha.betesda.model.TipoLeito;
+import br.com.itarocha.betesda.repository.LeitoRepository;
 import br.com.itarocha.betesda.repository.QuartoRepository;
 
 @Service
+@Transactional
+//https://www.devmedia.com.br/conheca-o-spring-transactional-annotations/32472
 public class QuartoService {
 
 	@Autowired
@@ -29,6 +33,9 @@ public class QuartoService {
 	
 	@Autowired
 	private QuartoRepository repositorio; 
+	
+	@Autowired
+	private LeitoRepository leitoRepositorio;
 
 	public Quarto create(Quarto model) {
 		try{
@@ -87,10 +94,8 @@ public class QuartoService {
 			if (isNovo) {
 				Quarto quarto = em.find(Quarto.class, model.getQuartoId());
 				leito.setQuarto(quarto);
-				em.persist(leito);
-			} else {
-				em.merge(leito);	
 			}
+			leito = leitoRepositorio.save(leito);
 		} catch (Exception e) {
 			throw e;
 		}
@@ -106,10 +111,7 @@ public class QuartoService {
 	}
 
 	public void removeLeito(Long id) {
-		Leito model = findLeito(id);
-		if (model != null) {
-			em.remove(model);
-		}
+		leitoRepositorio.deleteById(id);
 	}
 
 	public Quarto update(EditQuartoVO model) {
@@ -134,6 +136,7 @@ public class QuartoService {
 
 	public List<Quarto> findAll() {
 		List<Quarto> lista;
+		//TODO Mover expressão SQL para repositório
 		TypedQuery query = em.createQuery("SELECT q FROM Quarto q FETCH ALL PROPERTIES ORDER BY q.numero", Quarto.class);
 		lista = query.getResultList();
 		return lista;
@@ -143,6 +146,7 @@ public class QuartoService {
 		List<Quarto> lista = new ArrayList<Quarto>();
 		DestinacaoHospedagem obj = em.find(DestinacaoHospedagem.class, id);
 		if (obj != null) {
+			//TODO Mover expressão SQL para repositório
 			TypedQuery query = em.createQuery("SELECT q FROM Quarto q FETCH ALL PROPERTIES WHERE q.destinacaoHospedagem = :obj ORDER BY q.numero", Quarto.class);
 			lista = query.setParameter("obj", obj).getResultList();
 		}
@@ -151,7 +155,7 @@ public class QuartoService {
 
 	public List<Leito> findLeitosByQuarto(Long quartoId) {
 		Quarto q = em.find(Quarto.class, quartoId);
-		
+		//TODO Mover expressão SQL para repositório
 		TypedQuery _query = em.createQuery("SELECT e FROM Leito e WHERE e.quarto = :quarto", Leito.class);
 		List<Leito> lst = _query.setParameter("quarto", q).getResultList();
 		return lst;
@@ -165,6 +169,7 @@ public class QuartoService {
 
 	public List<SelectValueVO> listTipoLeito() {
 		List<SelectValueVO> retorno = new ArrayList<SelectValueVO>();
+		//TODO Mover expressão SQL para repositório
 		em.createQuery("SELECT o FROM TipoLeito o ORDER BY o.descricao",TipoLeito.class)
 						.getResultList()
 						.forEach(x -> retorno.add(new SelectValueVO(x.getId(), x.getDescricao())));
@@ -172,6 +177,7 @@ public class QuartoService {
 	}
 
 	public boolean existeOutroLeitoComEsseNumero(Long leito_id, Long quartoId, Integer numero) {
+		//TODO Mover expressão SQL para repositório
 		TypedQuery _query = em.createQuery("SELECT o "
 										+ "FROM Leito o "
 										+ "WHERE (o.quarto.id = :quartoId) "
@@ -186,6 +192,7 @@ public class QuartoService {
 	}
 
 	public boolean existeOutroLeitoComEsseNumero(Long quartoId, Integer numero) {
+		//TODO Mover expressão SQL para repositório
 		TypedQuery _query = em.createQuery("SELECT o "
 										+ "FROM Leito o "
 										+ "WHERE (o.quarto.id = :quartoId) "
@@ -198,6 +205,7 @@ public class QuartoService {
 	}
 
 	public boolean existeOutroQuartoComEsseNumero(Long id, Integer numero) {
+		//TODO Mover expressão SQL para repositório
 		TypedQuery _query = em.createQuery("SELECT o FROM Quarto o WHERE (o.id <> :id) AND (o.numero = :numero)", Quarto.class);
 		List<Quarto> lst = _query.setParameter("id", id)
 								.setParameter("numero", numero)
@@ -207,6 +215,7 @@ public class QuartoService {
 	}
 	
 	public boolean existeOutroQuartoComEsseNumero(Integer numero) {
+		//TODO Mover expressão SQL para repositório
 		TypedQuery _query = em.createQuery("SELECT o FROM Quarto o WHERE (o.numero = :numero)", Quarto.class);
 		List<Quarto> lst = _query.setParameter("numero", numero)
 								.getResultList();
