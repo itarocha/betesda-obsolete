@@ -3,7 +3,8 @@ FROM        HospedeLeito hospedeLeito
 INNER JOIN  hospedeLeito.leito leito
 INNER JOIN  hospedeLeito.hospede hospede
 INNER JOIN  hospede.hospedagem hospedagem
-WHERE       :DATA_INI BETWEEN hospedeLeito.dataEntrada AND hospedeLeito.dataSaida 
-OR          :DATA_FIM BETWEEN hospedeLeito.dataEntrada AND hospedeLeito.dataSaida 
+WHERE       ((hospedeLeito.dataEntrada BETWEEN :DATA_INI AND :DATA_FIM) OR (hospedeLeito.dataSaida BETWEEN :DATA_INI AND :DATA_FIM))
+OR          ((hospedeLeito.dataEntrada <= :DATA_INI) AND (hospedeLeito.dataSaida >= :DATA_FIM))
 ORDER BY    leito.id
+
 

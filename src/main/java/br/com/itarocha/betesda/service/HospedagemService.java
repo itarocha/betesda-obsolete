@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
@@ -13,6 +14,7 @@ import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
 import br.com.itarocha.betesda.model.Hospedagem;
@@ -32,13 +34,46 @@ import br.com.itarocha.betesda.model.hospedagem.Dia;
 import br.com.itarocha.betesda.model.hospedagem.HospedagemOut;
 import br.com.itarocha.betesda.model.hospedagem.LeitoOut;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
+import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
+import br.com.itarocha.betesda.repository.HospedagemRepository;
+import br.com.itarocha.betesda.repository.HospedeLeitoRepository;
+import br.com.itarocha.betesda.repository.HospedeRepository;
+import br.com.itarocha.betesda.repository.LeitoRepository;
+import br.com.itarocha.betesda.repository.PessoaRepository;
+import br.com.itarocha.betesda.repository.QuartoRepository;
+import br.com.itarocha.betesda.repository.TipoHospedeRepository;
 import br.com.itarocha.betesda.utils.StrUtil;
 
 @Service
+@Transactional
 public class HospedagemService {
 
 	@Autowired
 	private EntityManager em;
+	
+	@Autowired
+	private DestinacaoHospedagemRepository destinacaoHospedagemRepo;
+	
+	@Autowired
+	private HospedagemRepository hospedagemRepo;
+	
+	@Autowired
+	private PessoaRepository pessoaRepo;
+	
+	@Autowired
+	private TipoHospedeRepository tipoHospedeRepo;
+	
+	@Autowired
+	private QuartoRepository quartoRepo;
+	
+	@Autowired
+	private LeitoRepository leitoRepo;
+	
+	@Autowired
+	private HospedeLeitoRepository hospedeLeitoRepo;
+	
+	@Autowired
+	private HospedeRepository hospedeRepo;
 	
 	private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -51,29 +86,32 @@ public class HospedagemService {
 			hospedagem.setDataEntrada(model.getDataEntrada());
 			hospedagem.setDataPrevistaSaida(model.getDataPrevistaSaida());
 			
-			DestinacaoHospedagem dest = em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
-			hospedagem.setDestinacaoHospedagem(dest);
-			model.setDestinacaoHospedagemDescricao(dest.getDescricao());
+			Optional<DestinacaoHospedagem> dest = destinacaoHospedagemRepo.findById(model.getDestinacaoHospedagemId()) ;// em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
+			hospedagem.setDestinacaoHospedagem(dest.get());
+			model.setDestinacaoHospedagemDescricao(dest.get().getDescricao());
 			
 			TipoUtilizacaoHospedagem tu = TipoUtilizacaoHospedagem.valueOf(model.getTipoUtilizacao());
 			hospedagem.setTipoUtilizacao(tu);
-			em.persist(hospedagem);
+			hospedagem = hospedagemRepo.save(hospedagem);
+			
+			//em.persist(hospedagem);
 			model.setId(hospedagem.getId()); 
 			
 			for (HospedeVO hvo: model.getHospedes()) {
 				Hospede h = new Hospede();
 				h.setHospedagem(hospedagem);
-				Pessoa p = em.find(Pessoa.class, hvo.getPessoaId());
-				// se p == null throw
-				h.setPessoa(p);
-				hvo.setPessoaId(p.getId());
-				hvo.setPessoaNome(p.getNome());
-				hvo.setPessoaDataNascimento(p.getDataNascimento());
 				
-				TipoHospede th = em.find(TipoHospede.class, hvo.getTipoHospedeId());
-				h.setTipoHospede(th);
-				hvo.setTipoHospedeDescricao(th.getDescricao());
-				em.persist(h);
+				Optional<Pessoa> p = pessoaRepo.findById(hvo.getPessoaId());
+				// se p == null throw
+				h.setPessoa(p.get());
+				hvo.setPessoaId(p.get().getId());
+				hvo.setPessoaNome(p.get().getNome());
+				hvo.setPessoaDataNascimento(p.get().getDataNascimento());
+				
+				Optional<TipoHospede> th = tipoHospedeRepo.findById(hvo.getTipoHospedeId());
+				h.setTipoHospede(th.get());
+				hvo.setTipoHospedeDescricao(th.get().getDescricao());
+				h = hospedeRepo.save(h);
 				hvo.setId(h.getId());
 				
 				hospedagem.getHospedes().add(h);
@@ -81,13 +119,14 @@ public class HospedagemService {
 				hl.setHospede(h);
 				hl.setDataEntrada(hospedagem.getDataEntrada());
 				hl.setDataSaida(hospedagem.getDataPrevistaSaida());
-				Quarto quarto = em.find(Quarto.class, hvo.getAcomodacao().getQuartoId());
-				hvo.getAcomodacao().setQuartoNumero(quarto.getNumero());
-				hl.setQuarto(quarto);
-				Leito leito = em.find(Leito.class, hvo.getAcomodacao().getLeitoId());
-				hl.setLeito(leito);
-				hvo.getAcomodacao().setLeitoNumero(leito.getNumero());
-				em.persist(hl);
+				Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
+				hvo.getAcomodacao().setQuartoNumero(quarto.get().getNumero());
+				hl.setQuarto(quarto.get());
+				Optional<Leito> leito = leitoRepo.findById(hvo.getAcomodacao().getLeitoId());
+				hl.setLeito(leito.get());
+				hvo.getAcomodacao().setLeitoNumero(leito.get().getNumero());
+				
+				hospedeLeitoRepo.save(hl);
 				hvo.getAcomodacao().setId(hl.getId());
 				
 				h.getLeitos().add(hl);
@@ -117,7 +156,8 @@ public class HospedagemService {
 	*/
 	public MapaHospedagem getHospedagens() {
 		try {
-			LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
+			//LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
+			LocalDate dIni = LocalDate.parse("21/10/2018", fmt);
 			LocalDate dFim = dIni.plusDays(6);
 
 			// Monta lista de leitos 
@@ -177,7 +217,7 @@ public class HospedagemService {
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
 				}
-				System.out.println("");
+				//System.out.println("");
 
 			}
 
@@ -195,7 +235,7 @@ public class HospedagemService {
 					dia.setData(d.getData());
 					celula.getDias().add(d);
 				}
-				System.out.println();
+				//System.out.println();
 				mh.getCelulas().add(celula);
 			}
 			
