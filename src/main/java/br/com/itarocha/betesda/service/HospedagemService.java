@@ -42,6 +42,7 @@ import br.com.itarocha.betesda.repository.LeitoRepository;
 import br.com.itarocha.betesda.repository.PessoaRepository;
 import br.com.itarocha.betesda.repository.QuartoRepository;
 import br.com.itarocha.betesda.repository.TipoHospedeRepository;
+import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
 
 @Service
@@ -154,11 +155,13 @@ public class HospedagemService {
 		hospedesLeitos: [{id, dataEntrada, dataSaida},{},{}]
 	}
 	*/
-	public MapaHospedagem getHospedagens() {
+	public MapaHospedagem getHospedagens(LocalDate dataBase) {
 		try {
-			//LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
-			LocalDate dIni = LocalDate.parse("21/10/2018", fmt);
+			LocalDate dIni = LocalDateUtils.primeiroDiaDaSemana(dataBase);
 			LocalDate dFim = dIni.plusDays(6);
+			
+			//LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
+			//LocalDate dIni = LocalDate.parse("21/10/2018", fmt);
 
 			// Monta lista de leitos 
 			StringBuilder sbLeitos = StrUtil.loadFile("/sql/leitos.sql");
@@ -206,7 +209,7 @@ public class HospedagemService {
 						hospedagem.setFim(fim);
 
 						Dia dia = new Dia();
-						dia.setData(dtmp);
+						//dia.setData(dtmp);
 						dia.setHospedagem(hospedagem);
 
 						// localiza no mapa para atualizar o dia correspondente que antes estava somente com a data mas hospedagem null
@@ -223,6 +226,8 @@ public class HospedagemService {
 
 			//Montagem do MapaHospedagem
 			MapaHospedagem mh = new MapaHospedagem();
+			mh.setDataIni(dIni);
+			mh.setDataFim(dFim);
 			for (String key : mapa.keySet()) {
 				LeitoOut leito = extractLeitoFromKey(key);
 				
@@ -232,13 +237,17 @@ public class HospedagemService {
 				Dia[] dias = mapa.get(key);
 				for (Dia d : dias) {
 					Dia dia = new Dia();
-					dia.setData(d.getData());
+					//dia.setData(d.getData());
 					celula.getDias().add(d);
 				}
 				//System.out.println();
 				mh.getCelulas().add(celula);
 			}
-			
+			LocalDate dtmp = dIni;
+			while (dtmp.compareTo(dFim) != 1) {
+				mh.getDias().add(dtmp);
+				dtmp = dtmp.plusDays(1);
+			}
 			return mh;
 			
 		} finally {
@@ -285,7 +294,7 @@ public class HospedagemService {
 			int index = 0;
 			while (dtmp.compareTo(dFim) != 1) {
 				Dia cel = new Dia();
-				cel.setData(dtmp);
+				//cel.setData(dtmp);
 				cels[index] = cel;
 				dtmp = dtmp.plusDays(1);
 				index++;

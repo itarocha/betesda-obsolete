@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.controller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,24 +62,23 @@ public class HospedagemController {
 		try {
 			Hospedagem saved;
 			saved = service.create(model);
-		    // O model retornado vem preenchido com campos adicionais
-		    //return Response.status(200).entity(model).build();
 		    return new ResponseEntity<HospedagemVO>(model, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@RequestMapping(value="/mapa")
-	//public List<HospedeLeitoVO> mapa()
-	public MapaHospedagem mapa()
+	@RequestMapping(value="/mapa", method = RequestMethod.POST)
+	public MapaHospedagem mapa(@RequestBody MapaHospedagemRequest model)
 	{
+		System.out.println("Showing mapa de hospedagem. Data = " + model.data);
+		
 		//List<HospedeLeitoVO> listagem = new ArrayList<HospedeLeitoVO>();
 		 
 		//Map<String, Dia[]> listagem = new HashMap<String, Dia[]>();
 		MapaHospedagem listagem = new MapaHospedagem();
 		try {
-			listagem  = service.getHospedagens();
+			listagem  = service.getHospedagens(model.data);
 		} catch(Exception e) {
 			throw e;
 		} finally {
@@ -104,6 +104,10 @@ public class HospedagemController {
 			this.leito = leito;
 			this.semana = semana;
 		}
+	}
+	
+	private static class MapaHospedagemRequest{
+		public LocalDate data;
 	}
 /*
 	
