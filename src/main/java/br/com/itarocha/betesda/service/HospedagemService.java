@@ -2,6 +2,7 @@ package br.com.itarocha.betesda.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -178,6 +179,11 @@ public class HospedagemService {
 					.setParameter("DATA_FIM", dFim );
 			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
 			
+			LocalDate hoje = LocalDate.now();
+
+			//TODO: Completar com o tipo específico de hospedagem
+			List<Object> listaHospedagens = new ArrayList<Object>();
+			
 			// Popula os leitos ocupados no mapa
 			for(HospedeLeitoVO hl : hospedeLeitos) {
 				LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
@@ -189,6 +195,22 @@ public class HospedagemService {
 				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
 				System.out.print(" ["+key+"] ");
 
+				// Encapsular todo mundo e montar uma lista de hospedagens
+				hl.getHospedagem().getId();
+				hl.getHospedagem().getDataEntrada();
+				hl.getHospedagem().getDataEfetivaSaida();
+				hl.getHospedagem().getDataPrevistaSaida();
+				String status = "emAberto";
+				if (hl.getHospedagem().getDataEfetivaSaida() != null) {
+					status = "encerrada";
+				} else if (hl.getHospedagem().getDataPrevistaSaida().isAfter(hoje) ) {
+					status = "vencida";
+				} else {
+					status = "emAberto";
+				}
+				
+				//TODO: adicionar listaHospedagens
+				
 				System.out.println(dataEntrada + " até " + dataSaida);
 				while (dtmp.compareTo(dFim) != 1) {
 					System.out.print(dtmp + " - ");
