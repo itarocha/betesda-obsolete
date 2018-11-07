@@ -10,6 +10,8 @@ public class MapaHospedagem {
 
 	private LocalDate dataFim;
 	
+	private List<HospedagemHeader> hospedagens = new ArrayList<HospedagemHeader>();
+	
 	private List<CelulaOut> celulas = new ArrayList<CelulaOut>();
 	
 	private List<LocalDate> dias = new ArrayList<LocalDate>();
@@ -28,6 +30,14 @@ public class MapaHospedagem {
 
 	public void setDataFim(LocalDate dataFim) {
 		this.dataFim = dataFim;
+	}
+
+	public List<HospedagemHeader> getHospedagens() {
+		return hospedagens;
+	}
+
+	public void setHospedagens(List<HospedagemHeader> hospedagens) {
+		this.hospedagens = hospedagens;
 	}
 
 	public List<CelulaOut> getCelulas() {

@@ -1,6 +1,6 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
-public class HospedagemOut {
+public class HospedagemInfo {
 
 	private Long hospedagemId;
 	private Long hospedeId;

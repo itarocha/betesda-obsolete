@@ -32,7 +32,8 @@ import br.com.itarocha.betesda.model.TipoHospede;
 import br.com.itarocha.betesda.model.TipoUtilizacaoHospedagem;
 import br.com.itarocha.betesda.model.hospedagem.CelulaOut;
 import br.com.itarocha.betesda.model.hospedagem.Dia;
-import br.com.itarocha.betesda.model.hospedagem.HospedagemOut;
+import br.com.itarocha.betesda.model.hospedagem.HospedagemHeader;
+import br.com.itarocha.betesda.model.hospedagem.HospedagemInfo;
 import br.com.itarocha.betesda.model.hospedagem.LeitoOut;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
@@ -179,7 +180,7 @@ public class HospedagemService {
 					.setParameter("DATA_FIM", dFim );
 			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
 			
-			LocalDate hoje = LocalDate.now();
+			List<HospedagemHeader> hospedagensHeaders = new ArrayList<HospedagemHeader>();
 
 			//TODO: Completar com o tipo específico de hospedagem
 			List<Object> listaHospedagens = new ArrayList<Object>();
@@ -195,23 +196,14 @@ public class HospedagemService {
 				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
 				System.out.print(" ["+key+"] ");
 
-				// Encapsular todo mundo e montar uma lista de hospedagens
-				hl.getHospedagem().getId();
-				hl.getHospedagem().getDataEntrada();
-				hl.getHospedagem().getDataEfetivaSaida();
-				hl.getHospedagem().getDataPrevistaSaida();
-				String status = "emAberto";
-				if (hl.getHospedagem().getDataEfetivaSaida() != null) {
-					status = "encerrada";
-				} else if (hl.getHospedagem().getDataPrevistaSaida().isAfter(hoje) ) {
-					status = "vencida";
-				} else {
-					status = "emAberto";
-				}
+				HospedagemHeader hh = new HospedagemHeader();
+				hh.setHospedagemId(hl.getHospedagem().getId());
+				hh.setDataEntrada(dataEntrada);
+				hh.setDataPrevistaSaida(hl.getHospedagem().getDataPrevistaSaida());
+				hh.setDataEfetivaSaida(hl.getHospedagem().getDataEfetivaSaida());
+				hospedagensHeaders.add(hh);
 				
-				//TODO: adicionar listaHospedagens
-				
-				System.out.println(dataEntrada + " até " + dataSaida);
+				//System.out.println(dataEntrada + " até " + dataSaida);
 				while (dtmp.compareTo(dFim) != 1) {
 					System.out.print(dtmp + " - ");
 
@@ -221,7 +213,7 @@ public class HospedagemService {
 					
 					if (inicio || durante || fim) {
 						
-						HospedagemOut hospedagem = new HospedagemOut();
+						HospedagemInfo hospedagem = new HospedagemInfo();
 						hospedagem.setHospedagemId(hl.getHospedagem().getId());
 						hospedagem.setHospedeId(hl.getHospede().getId());
 						hospedagem.setPessoaId(hl.getHospede().getPessoa().getId()); // Podem ser vários
@@ -250,6 +242,7 @@ public class HospedagemService {
 			MapaHospedagem mh = new MapaHospedagem();
 			mh.setDataIni(dIni);
 			mh.setDataFim(dFim);
+			mh.setHospedagens(hospedagensHeaders);
 			for (String key : mapa.keySet()) {
 				LeitoOut leito = extractLeitoFromKey(key);
 				
@@ -276,6 +269,75 @@ public class HospedagemService {
 		}
 	}
 
+	//TODO Implementar transferencia
+	public void transferirHospedagem(Long hospedagemId, Long leitoId, LocalDate dataApartir) {
+		/*
+		* hospedagem = getHospedagem(hospedagemId)
+		* Condição: se hospedagem.status == aberta
+		* Condição: Verificar se não existe hospedagemLeito em (leito, dataApartir, hospedagem.dataPrevistaSaida) !!!
+		* hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
+		* hospedagemLeito.setDataSaída(dataApartir -1)
+		* Cria um novo HospedeLeito com hospedagemId, leito, dataApartir e dataSaida = hospedagem.dataPrevistaSaida
+		*/
+		
+	}
+	
+	//TODO Implementar encerrarHospedagem
+	public void encerrarHospedagem(Long hospedagemId, LocalDate dataEncerramento) {
+		/*
+		* hospedagem = getHospedagem(hospedagemId)
+		* Condição: se hospedagem.status == aberta
+		* Condição: dataEncerramento >= hospedagem.dataEntrada
+		* hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
+		* hospedagemLeito.setDataSaída(dataEncerramento)
+		* hospedagem.setDataPrevistaSaida(dataEncerramento)
+		*/
+		Optional<Hospedagem> opt  = hospedagemRepo.findById(hospedagemId);
+		if (opt.isPresent()) {
+			Hospedagem h = opt.get();
+			if ((h.getDataEfetivaSaida() != null)) {
+				System.out.println("Erro. Hospedagem deve ter status = emAberto"); 
+				return;
+			}
+			
+			if (dataEncerramento.isBefore(h.getDataEntrada())) {
+				System.out.println("Erro. Data de encerramento deve ser superior a data de entrada"); 
+				return;
+			}
+
+			// hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
+			// hospedagemLeito.setDataSaída(dataEncerramento)
+			
+			h.setDataEfetivaSaida(dataEncerramento);
+			hospedagemRepo.save(h);
+		}
+	} 
+	
+	//TODO Implementar renovarHospedagem
+	public void renovarHospedagem(LocalDate novaDataPrevistaSaida) {
+		/*
+		* Somente se hospedagem.status == aberta
+		* hospedagem = getHospedagem(hospedagemId)
+		* Condição: novaDataPrevistaSaida > hospedagem.dataPrevistaSaida
+		* hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
+		* Condição: Verificar se não existe hospedagemLeito em (hospedagemLeito.leito, hospedagem.dataPrevistaSaida + 1, novaDataPrevistaSaida) !!!
+		* hospedagemLeito.setDataSaída(novaDataPrevistaSaida)
+		* hospedagem.setDataPrevistaSaida(novaDataPrevistaSaida)
+		 */
+		
+	}
+	
+	//TODO Implementar createNaoAtendimento
+	public void createNaoAtendimento(Long hospedagemId, LocalDate dataNaoAtendimento) {
+		
+	}
+	
+	//TODO Implementar removeNaoAtendimento
+	public void removeNaoAtendimento(Long hospedagemId, Long naoAtendimentoId) {
+		
+	}
+	
+	
 	// quartoNumero - leitoNumero "000005-000007" quarto 5, leito 7
 	private String makeLeitoKey(Integer quartoNumero, Integer leitoNumero) {
 		return String.format("%06d-%06d", quartoNumero, leitoNumero); 
