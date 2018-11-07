@@ -294,6 +294,7 @@ public class HospedagemService {
 		*/
 		Optional<Hospedagem> opt  = hospedagemRepo.findById(hospedagemId);
 		if (opt.isPresent()) {
+			
 			Hospedagem h = opt.get();
 			if ((h.getDataEfetivaSaida() != null)) {
 				System.out.println("Erro. Hospedagem deve ter status = emAberto"); 
@@ -305,8 +306,13 @@ public class HospedagemService {
 				return;
 			}
 
-			// hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
-			// hospedagemLeito.setDataSaída(dataEncerramento)
+			// id = 16 quando hospedeId = 16. Hospedagem.id = 14
+			List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedagemId(hospedagemId);
+			for (HospedeLeito hl : listaHospedeLeito) {
+				System.out.println("hospede.Id = " + hl.getHospede().getId() + " Id = " + hl.getId() + " dataEntrada = "+hl.getDataEntrada());
+				hl.setDataSaida(dataEncerramento);
+				hospedeLeitoRepo.save(hl);
+			}
 			
 			h.setDataEfetivaSaida(dataEncerramento);
 			hospedagemRepo.save(h);
