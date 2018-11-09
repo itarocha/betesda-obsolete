@@ -187,6 +187,8 @@ public class HospedagemService {
 			
 			// Popula os leitos ocupados no mapa
 			for(HospedeLeitoVO hl : hospedeLeitos) {
+				Hospedagem hspd = hl.getHospedagem();
+				
 				LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
 				LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
 				int celulaIndex = 0;
@@ -194,13 +196,9 @@ public class HospedagemService {
 				// loop da primeira data até a última
 				
 				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
-				System.out.print(" ["+key+"] ");
+				//System.out.print(" ["+key+"] ");
 
-				HospedagemHeader hh = new HospedagemHeader();
-				hh.setHospedagemId(hl.getHospedagem().getId());
-				hh.setDataEntrada(dataEntrada);
-				hh.setDataPrevistaSaida(hl.getHospedagem().getDataPrevistaSaida());
-				hh.setDataEfetivaSaida(hl.getHospedagem().getDataEfetivaSaida());
+				HospedagemHeader hh = new HospedagemHeader(hspd.getId(), dataEntrada, hspd.getDataPrevistaSaida(), hspd.getDataEfetivaSaida());
 				hospedagensHeaders.add(hh);
 				
 				//System.out.println(dataEntrada + " até " + dataSaida);
@@ -213,18 +211,19 @@ public class HospedagemService {
 					
 					if (inicio || durante || fim) {
 						
-						HospedagemInfo hospedagem = new HospedagemInfo();
-						hospedagem.setHospedagemId(hl.getHospedagem().getId());
-						hospedagem.setHospedeId(hl.getHospede().getId());
-						hospedagem.setPessoaId(hl.getHospede().getPessoa().getId()); // Podem ser vários
+						HospedagemInfo hospedagemInfo = new HospedagemInfo();
+						hospedagemInfo.setHospedagemId(hl.getHospedagem().getId());
+						hospedagemInfo.setHospedeLeitoId(hl.getHospedeLeito().getId());
+						hospedagemInfo.setHospedeId(hl.getHospede().getId());
+						hospedagemInfo.setPessoaId(hl.getHospede().getPessoa().getId()); // Podem ser vários
 						
-						hospedagem.setInicio(inicio);
-						hospedagem.setDurante(durante);
-						hospedagem.setFim(fim);
+						hospedagemInfo.setInicio(inicio);
+						hospedagemInfo.setDurante(durante);
+						hospedagemInfo.setFim(fim);
 
 						Dia dia = new Dia();
 						//dia.setData(dtmp);
-						dia.setHospedagem(hospedagem);
+						dia.setHospedagem(hospedagemInfo);
 
 						// localiza no mapa para atualizar o dia correspondente que antes estava somente com a data mas hospedagem null
 						Dia[] dias =  mapa.get(key);
@@ -306,10 +305,9 @@ public class HospedagemService {
 				return;
 			}
 
-			// id = 16 quando hospedeId = 16. Hospedagem.id = 14
 			List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedagemId(hospedagemId);
 			for (HospedeLeito hl : listaHospedeLeito) {
-				System.out.println("hospede.Id = " + hl.getHospede().getId() + " Id = " + hl.getId() + " dataEntrada = "+hl.getDataEntrada());
+				// System.out.println("hospede.Id = " + hl.getHospede().getId() + " Id = " + hl.getId() + " dataEntrada = "+hl.getDataEntrada());
 				hl.setDataSaida(dataEncerramento);
 				hospedeLeitoRepo.save(hl);
 			}

@@ -3,6 +3,7 @@ package br.com.itarocha.betesda.model.hospedagem;
 public class HospedagemInfo {
 
 	private Long hospedagemId;
+	private Long hospedeLeitoId;
 	private Long hospedeId;
 	private Long pessoaId;
 	private Boolean inicio;
@@ -44,5 +45,11 @@ public class HospedagemInfo {
 	}
 	public void setFim(Boolean fim) {
 		this.fim = fim;
+	}
+	public Long getHospedeLeitoId() {
+		return this.hospedeLeitoId;
+	}
+	public void setHospedeLeitoId(Long id) {
+		this.hospedeLeitoId = id;
 	}
 }

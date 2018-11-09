@@ -53,6 +53,14 @@ public class HospedagemController {
 		return listagem;
 	}
 	
+	@RequestMapping(value="/mapa/hospedagem_info", method = RequestMethod.POST)
+	public String getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
+	{
+		System.out.println("Recebido: "+model.hospedeLeitoId);
+		
+		return "Ok";
+	}
+
 	@RequestMapping(value="/mapa/testes", method = RequestMethod.POST)
 	public String testes(@RequestBody OperacoesRequest model)
 	{
@@ -70,5 +78,8 @@ public class HospedagemController {
 		public LocalDate data;
 		public Long hospedagemId;
 	}
-	
+
+	private static class HospdeagemInfoRequest{
+		public Long hospedeLeitoId;
+	}
 }

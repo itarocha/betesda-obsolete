@@ -8,8 +8,13 @@ public class HospedagemHeader {
 	private LocalDate dataEntrada;
 	private LocalDate dataPrevistaSaida;
 	private LocalDate dataEfetivaSaida;
-	//private String status;
 	
+	public HospedagemHeader(Long id, LocalDate dataEntrada, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
+		this.hospedagemId = id;
+		this.dataEntrada = dataEntrada;
+		this.dataPrevistaSaida = dataPrevistaSaida;
+		this.dataEfetivaSaida = dataEfetivaSaida;
+	}
 	public Long getHospedagemId() {
 		return hospedagemId;
 	}
