@@ -1,9 +1,9 @@
 package br.com.itarocha.betesda.model;
 
-import java.time.LocalDate;
+//import java.time.LocalDate;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+//import com.fasterxml.jackson.annotation.JsonAutoDetect;
+//import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 //@JsonAutoDetect(fieldVisibility = Visibility.ANY)

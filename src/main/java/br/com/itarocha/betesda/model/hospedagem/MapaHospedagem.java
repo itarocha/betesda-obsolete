@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.itarocha.betesda.model.HospedeHospedagemVO;
+
 public class MapaHospedagem {
 
 	private LocalDate dataIni;
@@ -15,7 +17,18 @@ public class MapaHospedagem {
 	private List<CelulaOut> celulas = new ArrayList<CelulaOut>();
 	
 	private List<LocalDate> dias = new ArrayList<LocalDate>();
+	
+	private List<HospedeHospedagemVO> hospedes = new ArrayList<HospedeHospedagemVO>(); 
 
+	public MapaHospedagem() {
+		
+	}
+	
+	public MapaHospedagem(LocalDate dataIni, LocalDate dataFim) {
+		this.dataIni = dataIni;
+		this.dataFim = dataFim;
+	}
+	
 	public LocalDate getDataIni() {
 		return dataIni;
 	}
@@ -54,6 +67,14 @@ public class MapaHospedagem {
 
 	public void setDias(List<LocalDate> dias) {
 		this.dias = dias;
+	}
+
+	public List<HospedeHospedagemVO> getHospedes(){
+		return this.hospedes;
+	}
+	
+	public void setHospedes(List<HospedeHospedagemVO> hospedes) {
+		this.hospedes = hospedes;
 	}
 	
 	

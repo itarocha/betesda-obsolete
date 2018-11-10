@@ -21,6 +21,7 @@ import br.com.itarocha.betesda.model.DestinacaoHospedagem;
 import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.Hospede;
+import br.com.itarocha.betesda.model.HospedeHospedagemVO;
 import br.com.itarocha.betesda.model.HospedeLeito;
 import br.com.itarocha.betesda.model.HospedeLeitoVO;
 import br.com.itarocha.betesda.model.HospedeVO;
@@ -162,17 +163,23 @@ public class HospedagemService {
 			LocalDate dIni = LocalDateUtils.primeiroDiaDaSemana(dataBase);
 			LocalDate dFim = dIni.plusDays(6);
 			
-			//LocalDate dIni = LocalDate.parse("12/08/2018", fmt);
-			//LocalDate dIni = LocalDate.parse("21/10/2018", fmt);
-
 			// Monta lista de leitos 
 			StringBuilder sbLeitos = StrUtil.loadFile("/sql/leitos.sql");
 			TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeitos.toString(), LeitoVO.class);
 			List<LeitoVO> leitos = qLeitos.getResultList();
-			
-			// Gerando mapa vazio no formato chave (quartoNumero-leitoNumero) e array de Dia
-			Map<String, Dia[]> mapa = gerarMapa(dIni, 7, leitos);
+			Map<String, Dia[]> mapaLeitos = gerarMapaLeitosVazio(leitos, 7);
 
+			StringBuilder sbHospedes = StrUtil.loadFile("/sql/hospedes_por_periodo.sql");
+			TypedQuery<HospedeHospedagemVO> qHospedes = em.createQuery(sbHospedes.toString(), HospedeHospedagemVO.class)
+					.setParameter("DATA_INI", dIni )
+					.setParameter("DATA_FIM", dFim );
+			List<HospedeHospedagemVO> hospedes = qHospedes.getResultList();
+			System.out.println("-----------------------------");
+			for (HospedeHospedagemVO h : hospedes) {
+				System.out.println(h.getHospede().getPessoa().getNome() + " - " + h.getHospedagem().getId() + " " + h.getHospedagem().getDataEntrada() + " até " + h.getHospedagem().getDataPrevistaSaida());
+			}
+			
+			
 			// Monta lista de HospedeLeitoVO
 			StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
 			TypedQuery<HospedeLeitoVO> qHospedeLeito = em.createQuery(sbHospedeLeitos.toString(), HospedeLeitoVO.class)
@@ -182,12 +189,11 @@ public class HospedagemService {
 			
 			List<HospedagemHeader> hospedagensHeaders = new ArrayList<HospedagemHeader>();
 
-			//TODO: Completar com o tipo específico de hospedagem
-			List<Object> listaHospedagens = new ArrayList<Object>();
 			
 			// Popula os leitos ocupados no mapa
 			for(HospedeLeitoVO hl : hospedeLeitos) {
 				Hospedagem hspd = hl.getHospedagem();
+				Pessoa p = hl.getHospede().getPessoa(); 
 				
 				LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
 				LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
@@ -195,22 +201,16 @@ public class HospedagemService {
 				LocalDate dtmp = dIni;
 				// loop da primeira data até a última
 				
-				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
-				//System.out.print(" ["+key+"] ");
-
-				HospedagemHeader hh = new HospedagemHeader(hspd.getId(), dataEntrada, hspd.getDataPrevistaSaida(), hspd.getDataEfetivaSaida());
+				HospedagemHeader hh = new HospedagemHeader(hspd.getId(), p.getId(), dataEntrada, hspd.getDataPrevistaSaida(), hspd.getDataEfetivaSaida());
 				hospedagensHeaders.add(hh);
-				
-				//System.out.println(dataEntrada + " até " + dataSaida);
-				while (dtmp.compareTo(dFim) != 1) {
-					System.out.print(dtmp + " - ");
 
+				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
+				while (dtmp.compareTo(dFim) != 1) {
 					Boolean inicio 	= (dataEntrada.compareTo(dtmp) == 0); 
 					Boolean fim 	= (dataSaida.compareTo(dtmp) == 0);
 					Boolean durante = (dtmp.isAfter(dataEntrada) && dtmp.isBefore(dataSaida));					
 					
 					if (inicio || durante || fim) {
-						
 						HospedagemInfo hospedagemInfo = new HospedagemInfo();
 						hospedagemInfo.setHospedagemId(hl.getHospedagem().getId());
 						hospedagemInfo.setHospedeLeitoId(hl.getHospedeLeito().getId());
@@ -222,47 +222,36 @@ public class HospedagemService {
 						hospedagemInfo.setFim(fim);
 
 						Dia dia = new Dia();
-						//dia.setData(dtmp);
 						dia.setHospedagem(hospedagemInfo);
 
 						// localiza no mapa para atualizar o dia correspondente que antes estava somente com a data mas hospedagem null
-						Dia[] dias =  mapa.get(key);
+						Dia[] dias =  mapaLeitos.get(key);
 						// injeta no índice
 						dias[celulaIndex] = dia;
 					}
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
 				}
-				//System.out.println("");
-
 			}
 
-			//Montagem do MapaHospedagem
-			MapaHospedagem mh = new MapaHospedagem();
-			mh.setDataIni(dIni);
-			mh.setDataFim(dFim);
-			mh.setHospedagens(hospedagensHeaders);
-			for (String key : mapa.keySet()) {
-				LeitoOut leito = extractLeitoFromKey(key);
-				
-				CelulaOut celula = new CelulaOut();
-				celula.setLeito(leito);
-				
-				Dia[] dias = mapa.get(key);
+			MapaHospedagem mapaHospedagem = new MapaHospedagem(dIni, dFim);
+			mapaHospedagem.setHospedagens(hospedagensHeaders);
+			mapaHospedagem.setHospedes(hospedes);
+			for (String key : mapaLeitos.keySet()) {
+				CelulaOut celula = new CelulaOut(extractLeitoFromKey(key));
+			
+				Dia[] dias = mapaLeitos.get(key);
 				for (Dia d : dias) {
-					Dia dia = new Dia();
-					//dia.setData(d.getData());
 					celula.getDias().add(d);
 				}
-				//System.out.println();
-				mh.getCelulas().add(celula);
+				mapaHospedagem.getCelulas().add(celula);
 			}
 			LocalDate dtmp = dIni;
 			while (dtmp.compareTo(dFim) != 1) {
-				mh.getDias().add(dtmp);
+				mapaHospedagem.getDias().add(dtmp);
 				dtmp = dtmp.plusDays(1);
 			}
-			return mh;
+			return mapaHospedagem;
 			
 		} finally {
 		}
@@ -359,30 +348,39 @@ public class HospedagemService {
 		return leito;
 	}
 
-	// Gera um mapa vazio com todos os leitos e datas
+	private Map<String, Dia[]> gerarMapaLeitosVazio(List<LeitoVO> leitos, int numeroDias){
+		Map<String, Dia[]> mapa = new HashMap<>();
+		for(LeitoVO leito : leitos) {
+			String key = makeLeitoKey(leito.getQuartoNumero(), leito.getNumero()); 
+			Dia[] cels = new Dia[numeroDias];
+			for (int i = 0; i < numeroDias; i++) {
+				cels[i] = new Dia();
+			}
+			mapa.put(key, cels);
+		}
+		Map<String, Dia[]> retorno = mapa.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+		return retorno;
+	}
+	
+	
+/*
+  
 	private Map<String, Dia[]> gerarMapa(LocalDate dIni, Integer numeroDias, List<LeitoVO> leitos){
-		
-		/*
-		Customer james = customers.stream()
-		  .filter(customer -> "James".equals(customer.getName()))
-		  .findAny()
-		  .orElse(null);
-		*/
 		
 		Map<String, Dia[]> mapa = new HashMap<>();
 		LocalDate dFim = dIni.plusDays(numeroDias-1);
 		
 		for(LeitoVO leito : leitos) {
 			Dia[] cels = new Dia[numeroDias];
-			//Dia cel = new Dia();
-			//cels[0] = cel;
 			String key = makeLeitoKey(leito.getQuartoNumero(), leito.getNumero()); 
 
 			LocalDate dtmp = dIni;
 			int index = 0;
 			while (dtmp.compareTo(dFim) != 1) {
 				Dia cel = new Dia();
-				//cel.setData(dtmp);
 				cels[index] = cel;
 				dtmp = dtmp.plusDays(1);
 				index++;
@@ -395,9 +393,9 @@ public class HospedagemService {
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 		return retorno;
 	}
-	
-	
-	
+ 
+  	
+ */
 	
 	
 	

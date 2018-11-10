@@ -5,12 +5,14 @@ import java.time.LocalDate;
 public class HospedagemHeader {
 	
 	private Long hospedagemId;
+	private Long pessoaId;
 	private LocalDate dataEntrada;
 	private LocalDate dataPrevistaSaida;
 	private LocalDate dataEfetivaSaida;
 	
-	public HospedagemHeader(Long id, LocalDate dataEntrada, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
+	public HospedagemHeader(Long id, Long pessoaId, LocalDate dataEntrada, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
 		this.hospedagemId = id;
+		this.pessoaId = pessoaId;
 		this.dataEntrada = dataEntrada;
 		this.dataPrevistaSaida = dataPrevistaSaida;
 		this.dataEfetivaSaida = dataEfetivaSaida;
@@ -20,6 +22,12 @@ public class HospedagemHeader {
 	}
 	public void setHospedagemId(Long hospedagemId) {
 		this.hospedagemId = hospedagemId;
+	}
+	public Long getPessoaId() {
+		return pessoaId;
+	}
+	public void setPessoaId(Long pessoaId) {
+		this.pessoaId = pessoaId;
 	}
 	public LocalDate getDataEntrada() {
 		return dataEntrada;

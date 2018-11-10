@@ -8,6 +8,10 @@ public class CelulaOut {
 	private LeitoOut leito;
 	private List<Dia> dias = new ArrayList<Dia>();
 	
+	public CelulaOut(LeitoOut leito) {
+		this.leito = leito;
+	}
+	
 	public LeitoOut getLeito() {
 		return leito;
 	}
