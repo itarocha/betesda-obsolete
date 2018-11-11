@@ -201,10 +201,11 @@ public class HospedagemService {
 				LocalDate dtmp = dIni;
 				// loop da primeira data até a última
 				
-				HospedagemHeader hh = new HospedagemHeader(hspd.getId(), p.getId(), dataEntrada, hspd.getDataPrevistaSaida(), hspd.getDataEfetivaSaida());
+				HospedagemHeader hh = new HospedagemHeader(hspd.getId(), p.getId(), p.getNome(), dataEntrada, hspd.getDataPrevistaSaida(), hspd.getDataEfetivaSaida());
 				hospedagensHeaders.add(hh);
 
 				String key = makeLeitoKey(hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
+				Boolean ponta = true;
 				while (dtmp.compareTo(dFim) != 1) {
 					Boolean inicio 	= (dataEntrada.compareTo(dtmp) == 0); 
 					Boolean fim 	= (dataSaida.compareTo(dtmp) == 0);
@@ -212,6 +213,7 @@ public class HospedagemService {
 					
 					if (inicio || durante || fim) {
 						HospedagemInfo hospedagemInfo = new HospedagemInfo();
+						hospedagemInfo.setPonta(ponta);
 						hospedagemInfo.setHospedagemId(hl.getHospedagem().getId());
 						hospedagemInfo.setHospedeLeitoId(hl.getHospedeLeito().getId());
 						hospedagemInfo.setHospedeId(hl.getHospede().getId());
@@ -228,6 +230,7 @@ public class HospedagemService {
 						Dia[] dias =  mapaLeitos.get(key);
 						// injeta no índice
 						dias[celulaIndex] = dia;
+						ponta = false;
 					}
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);

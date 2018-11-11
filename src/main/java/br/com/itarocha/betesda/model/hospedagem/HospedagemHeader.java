@@ -6,13 +6,15 @@ public class HospedagemHeader {
 	
 	private Long hospedagemId;
 	private Long pessoaId;
+	private String pessoaNome;
 	private LocalDate dataEntrada;
 	private LocalDate dataPrevistaSaida;
 	private LocalDate dataEfetivaSaida;
 	
-	public HospedagemHeader(Long id, Long pessoaId, LocalDate dataEntrada, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
+	public HospedagemHeader(Long id, Long pessoaId, String pessoaNome, LocalDate dataEntrada, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
 		this.hospedagemId = id;
 		this.pessoaId = pessoaId;
+		this.pessoaNome = pessoaNome;
 		this.dataEntrada = dataEntrada;
 		this.dataPrevistaSaida = dataPrevistaSaida;
 		this.dataEfetivaSaida = dataEfetivaSaida;
@@ -28,6 +30,12 @@ public class HospedagemHeader {
 	}
 	public void setPessoaId(Long pessoaId) {
 		this.pessoaId = pessoaId;
+	}
+	public String getPessoaNome() {
+		return pessoaNome;
+	}
+	public void setPessoaNome(String pessoaNome) {
+		this.pessoaNome = pessoaNome;
 	}
 	public LocalDate getDataEntrada() {
 		return dataEntrada;

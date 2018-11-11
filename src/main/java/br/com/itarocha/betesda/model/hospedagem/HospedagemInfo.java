@@ -9,6 +9,7 @@ public class HospedagemInfo {
 	private Boolean inicio;
 	private Boolean durante;
 	private Boolean fim;
+	private Boolean ponta;
 	
 	public Long getHospedagemId() {
 		return hospedagemId;
@@ -45,6 +46,12 @@ public class HospedagemInfo {
 	}
 	public void setFim(Boolean fim) {
 		this.fim = fim;
+	}
+	public Boolean getPonta() {
+		return this.ponta;
+	}
+	public void setPonta(Boolean ponta) {
+		this.ponta = ponta;
 	}
 	public Long getHospedeLeitoId() {
 		return this.hospedeLeitoId;
