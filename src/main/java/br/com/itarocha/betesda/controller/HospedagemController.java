@@ -1,6 +1,7 @@
 package br.com.itarocha.betesda.controller;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,22 @@ public class HospedagemController {
 		service.encerrarHospedagem(model.hospedagemId, model.data);
 		
 		return "Ok";
+	}
+
+	@RequestMapping(value="/xis")
+	public String xis()
+	{
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		/* 2018-08-14 ~ 2018-08-22 leito_id = 62  */
+		LocalDate dIni = LocalDate.parse("14/08/2018", fmt);
+		LocalDate dFim = LocalDate.parse("22/08/2018", fmt);
+		Long leitoId = 62L; // deve retornar false porque contém 2 utilizações (no teste)
+
+		String retorno = service.leitoLivreNoPeriodo(leitoId, dIni, dFim) ? "true" : "false";
+		
+		Long pessoaId = 6L;
+		service.pessoaLivre(pessoaId);
+		return retorno;
 	}
 
 	private static class MapaHospedagemRequest{

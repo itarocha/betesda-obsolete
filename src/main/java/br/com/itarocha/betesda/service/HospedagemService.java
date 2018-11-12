@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.service;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -366,6 +368,42 @@ public class HospedagemService {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 		return retorno;
+	}
+
+	public boolean leitoLivreNoPeriodo(Long leitoId, LocalDate dataIni, LocalDate dataFim) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT count(*) "); 
+		sb.append("FROM   hospede_leito hl "); 
+		sb.append("WHERE  hl.leito_id = :leitoId  "); 
+		sb.append("AND    (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim))  "); 
+		sb.append("OR     ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim)))  ");
+		
+		Query query = em.createNativeQuery(sb.toString());
+		Long qtd = ((Number)query.setParameter("leitoId", leitoId)
+								 .setParameter("dataIni", dataIni)
+								 .setParameter("dataFim", dataFim)
+								 .getSingleResult()).longValue();
+		
+		//int count = ((Number)qtd.get[0]).intValue();
+		//System.out.println(qtd);
+		return qtd <= 0; 
+	}
+
+	public boolean pessoaLivre(Long pessoaId) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT count(*) ");
+		sb.append("FROM   hospede h ");
+		sb.append("INNER JOIN hospedagem hpd ");
+		sb.append("ON    hpd.id = h.hospedagem_id ");
+		sb.append("WHERE pessoa_id = :pessoaId ");
+		sb.append("AND   hpd.data_efetiva_saida is null");
+		
+		Query query = em.createNativeQuery(sb.toString());
+		Long qtd = ((Number)query.setParameter("pessoaId", pessoaId)
+								 .getSingleResult()).longValue();
+		
+		//System.out.println("pessoaLivre.qtd = "+qtd);
+		return qtd <= 0; 
 	}
 	
 	
