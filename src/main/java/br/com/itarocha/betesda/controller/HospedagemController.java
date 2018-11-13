@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.itarocha.betesda.model.HospedagemVO;
+import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
@@ -29,6 +30,38 @@ public class HospedagemController {
 	public ResponseEntity<?> gravar(@RequestBody HospedagemVO model) {
 		ItaValidator<HospedagemVO> v = new ItaValidator<HospedagemVO>(model);
 		v.validate();
+		
+		if (model.getHospedes().size() == 0) {
+			v.addError("id", "É necessário pelo menos um hóspede");
+		} else {
+			for (HospedeVO h : model.getHospedes()) {
+				if ("T".equals(model.getTipoUtilizacao()) && (h.getAcomodacao() == null)) {
+					v.addError("id", String.format("É necessário informar o Leito para o Hóspede [%s]", h.getPessoaNome()));
+				}
+				
+				if (!service.pessoaLivre(h.getPessoaId())) {
+					v.addError("id", String.format("[%s] está utilizando uma Hospedagem ainda pendente", h.getPessoaNome()));
+				}
+
+				if ("T".equals(model.getTipoUtilizacao()) && (h.getAcomodacao() != null) && 
+						(h.getAcomodacao().getLeitoId() != null) && 
+						(model.getDataEntrada() != null) && (model.getDataPrevistaSaida() != null) )
+				{
+					Long leitoId = h.getAcomodacao().getLeitoId();
+					LocalDate dataIni = model.getDataEntrada();
+					LocalDate dataFim = model.getDataPrevistaSaida();
+					Integer leitoNumero = h.getAcomodacao().getLeitoNumero();
+					Integer quartoNumero = h.getAcomodacao().getQuartoNumero();
+					
+					if (!service.leitoLivreNoPeriodo(leitoId, dataIni, dataFim)) {
+						v.addError("id", String.format("Quarto %s Leito %s está ocupado no perído", quartoNumero, leitoNumero ));
+					}
+					
+					
+				}
+			}
+		}
+		
 		if (!v.hasErrors() ) {
 			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}

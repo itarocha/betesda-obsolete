@@ -1,6 +1,5 @@
 package br.com.itarocha.betesda.service;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -92,7 +91,7 @@ public class HospedagemService {
 			hospedagem.setDataEntrada(model.getDataEntrada());
 			hospedagem.setDataPrevistaSaida(model.getDataPrevistaSaida());
 			
-			Optional<DestinacaoHospedagem> dest = destinacaoHospedagemRepo.findById(model.getDestinacaoHospedagemId()) ;// em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
+			Optional<DestinacaoHospedagem> dest = destinacaoHospedagemRepo.findById(model.getDestinacaoHospedagemId());// em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
 			hospedagem.setDestinacaoHospedagem(dest.get());
 			model.setDestinacaoHospedagemDescricao(dest.get().getDescricao());
 			
