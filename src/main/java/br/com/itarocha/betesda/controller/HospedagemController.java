@@ -86,6 +86,20 @@ public class HospedagemController {
 		
 		return listagem;
 	}
+
+	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)
+	public ResponseEntity<?> encerramento(@RequestBody OperacoesRequest model)
+	{
+		//System.out.println("Recebido: "+model.hospedagemId + " e "+ model.data);
+		try {
+			service.encerrarHospedagem(model.hospedagemId, model.data);
+			return new ResponseEntity<String>("ok", HttpStatus.OK);
+		} catch(Exception e) {
+			return new ResponseEntity<String>("erro", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	
 	
 	@RequestMapping(value="/mapa/hospedagem_info", method = RequestMethod.POST)
 	public String getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
