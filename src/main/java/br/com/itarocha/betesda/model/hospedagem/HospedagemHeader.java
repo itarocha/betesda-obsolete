@@ -1,23 +1,33 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import br.com.itarocha.betesda.service.DiaHospedeLeito;
 
 public class HospedagemHeader {
 	
+	private Long id; // hospedeLeitoId
 	private Long hospedagemId;
 	private Long pessoaId;
 	private String pessoaNome;
-	private LocalDate dataEntrada;
-	private LocalDate dataPrevistaSaida;
-	private LocalDate dataEfetivaSaida;
+	private String status;
+	private Integer firstIndex;
+	private List<DiaHospedeLeito> dias = new ArrayList<DiaHospedeLeito>();
 	
-	public HospedagemHeader(Long id, Long pessoaId, String pessoaNome, LocalDate dataEntrada, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
-		this.hospedagemId = id;
+	public HospedagemHeader(Long id, Long hospedagemId, Long pessoaId, String pessoaNome, String status) {
+		this.id = id;
+		this.hospedagemId = hospedagemId;
 		this.pessoaId = pessoaId;
 		this.pessoaNome = pessoaNome;
-		this.dataEntrada = dataEntrada;
-		this.dataPrevistaSaida = dataPrevistaSaida;
-		this.dataEfetivaSaida = dataEfetivaSaida;
+		this.status = status;
+		this.firstIndex = -1;
+	}
+	public Long getId() {
+		return this.id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 	public Long getHospedagemId() {
 		return hospedagemId;
@@ -37,35 +47,25 @@ public class HospedagemHeader {
 	public void setPessoaNome(String pessoaNome) {
 		this.pessoaNome = pessoaNome;
 	}
-	public LocalDate getDataEntrada() {
-		return dataEntrada;
-	}
-	public void setDataEntrada(LocalDate dataEntrada) {
-		this.dataEntrada = dataEntrada;
-	}
-	public LocalDate getDataPrevistaSaida() {
-		return dataPrevistaSaida;
-	}
-	public void setDataPrevistaSaida(LocalDate dataPrevistaSaida) {
-		this.dataPrevistaSaida = dataPrevistaSaida;
-	}
-	public LocalDate getDataEfetivaSaida() {
-		return dataEfetivaSaida;
-	}
-	public void setDataEfetivaSaida(LocalDate dataEfetivaSaida) {
-		this.dataEfetivaSaida = dataEfetivaSaida;
-	}
+	
 	public String getStatus() {
-		LocalDate hoje = LocalDate.now();
-		String status = "aberta";
-		if (this.getDataEfetivaSaida() != null) {
-			status = "encerrada";
-		} else if (this.getDataPrevistaSaida().isBefore(hoje) ) {
-			status = "vencida";
-		} else {
-			status = "aberta";
-		}
 		return status;
 	}
 
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public List<DiaHospedeLeito> getDias() {
+		return dias;
+	}
+	public void setDias(List<DiaHospedeLeito> dias) {
+		this.dias = dias;
+	}
+	public Integer getFirstIndex() {
+		return firstIndex;
+	}
+	public void setFirstIndex(Integer firstIndex) {
+		this.firstIndex = firstIndex;
+	}
 }

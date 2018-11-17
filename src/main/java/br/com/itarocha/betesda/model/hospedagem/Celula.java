@@ -1,15 +1,13 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class CelulaOut {
+public class Celula {
 	
 	private LeitoOut leito;
-	private List<Dia> dias = new ArrayList<Dia>();
+	private Long[] dias;
 	
-	public CelulaOut(LeitoOut leito) {
+	public Celula(LeitoOut leito, Long[] dias) {
 		this.leito = leito;
+		this.dias = dias;
 	}
 	
 	public LeitoOut getLeito() {
@@ -18,10 +16,10 @@ public class CelulaOut {
 	public void setLeito(LeitoOut leito) {
 		this.leito = leito;
 	}
-	public List<Dia> getDias() {
+	public Long[] getDias() {
 		return dias;
 	}
-	public void setDias(List<Dia> dias) {
+	public void setDias(Long[] dias) {
 		this.dias = dias;
 	}
 	

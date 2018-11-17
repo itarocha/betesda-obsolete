@@ -2,8 +2,16 @@ package br.com.itarocha.betesda.model.hospedagem;
 
 public class LeitoOut {
 
+	private Long leitoId;
 	private Integer quartoNumero;
 	private Integer leitoNumero;
+	
+	public Long getLeitoId() {
+		return leitoId;
+	}
+	public void setLeitoId(Long leitoId) {
+		this.leitoId = leitoId;
+	}
 	
 	public Integer getQuartoNumero() {
 		return quartoNumero;
