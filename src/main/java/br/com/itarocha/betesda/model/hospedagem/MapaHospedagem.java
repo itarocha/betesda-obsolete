@@ -19,6 +19,19 @@ public class MapaHospedagem {
 	private List<LocalDate> dias = new ArrayList<LocalDate>();
 	
 	private List<HospedeHospedagemVO> hospedes = new ArrayList<HospedeHospedagemVO>(); 
+	
+	Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
+	Integer[] qtdTotaisPendentes 	= {0,0,0,0,0,0,0};
+	Integer[] qtdTotaisEncerradas 	= {0,0,0,0,0,0,0};
+
+	// Parciais somente quando fizer o select dos sem leito
+	Integer[] qtdParciais 			= {0,0,0,0,0,0,0};
+	Integer[] qtdParciaisPendentes 	= {0,0,0,0,0,0,0};
+	Integer[] qtdParciaisEncerradas = {0,0,0,0,0,0,0};
+	
+	Integer[] qtdLeitos 			= {0,0,0,0,0,0,0};
+	Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
+	Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
 
 	public MapaHospedagem() {
 		
@@ -76,6 +89,77 @@ public class MapaHospedagem {
 	public void setHospedes(List<HospedeHospedagemVO> hospedes) {
 		this.hospedes = hospedes;
 	}
-	
+
+	public Integer[] getQtdTotais() {
+		return qtdTotais;
+	}
+
+	public void setQtdTotais(Integer[] qtdTotais) {
+		this.qtdTotais = qtdTotais;
+	}
+
+	public Integer[] getQtdTotaisPendentes() {
+		return qtdTotaisPendentes;
+	}
+
+	public void setQtdTotaisPendentes(Integer[] qtdTotaisPendentes) {
+		this.qtdTotaisPendentes = qtdTotaisPendentes;
+	}
+
+	public Integer[] getQtdTotaisEncerradas() {
+		return qtdTotaisEncerradas;
+	}
+
+	public void setQtdTotaisEncerradas(Integer[] qtdTotaisEncerradas) {
+		this.qtdTotaisEncerradas = qtdTotaisEncerradas;
+	}
+
+	public Integer[] getQtdParciais() {
+		return qtdParciais;
+	}
+
+	public void setQtdParciais(Integer[] qtdParciais) {
+		this.qtdParciais = qtdParciais;
+	}
+
+	public Integer[] getQtdParciaisPendentes() {
+		return qtdParciaisPendentes;
+	}
+
+	public void setQtdParciaisPendentes(Integer[] qtdParciaisPendentes) {
+		this.qtdParciaisPendentes = qtdParciaisPendentes;
+	}
+
+	public Integer[] getQtdParciaisEncerradas() {
+		return qtdParciaisEncerradas;
+	}
+
+	public void setQtdParciaisEncerradas(Integer[] qtdParciaisEncerradas) {
+		this.qtdParciaisEncerradas = qtdParciaisEncerradas;
+	}
+
+	public Integer[] getQtdLeitos() {
+		return qtdLeitos;
+	}
+
+	public void setQtdLeitos(Integer[] qtdLeitos) {
+		this.qtdLeitos = qtdLeitos;
+	}
+
+	public Integer[] getQtdLeitosOcupados() {
+		return qtdLeitosOcupados;
+	}
+
+	public void setQtdLeitosOcupados(Integer[] qtdLeitosOcupados) {
+		this.qtdLeitosOcupados = qtdLeitosOcupados;
+	}
+
+	public Integer[] getQtdLeitosLivres() {
+		return qtdLeitosLivres;
+	}
+
+	public void setQtdLeitosLivres(Integer[] qtdLeitosLivres) {
+		this.qtdLeitosLivres = qtdLeitosLivres;
+	}
 	
 }
