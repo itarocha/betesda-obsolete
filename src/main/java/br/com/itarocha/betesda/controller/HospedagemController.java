@@ -2,6 +2,7 @@ package br.com.itarocha.betesda.controller;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.itarocha.betesda.model.Hospedagem;
+import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
@@ -102,11 +105,12 @@ public class HospedagemController {
 	
 	
 	@RequestMapping(value="/mapa/hospedagem_info", method = RequestMethod.POST)
-	public String getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
+	public HospedagemFullVO getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
 	{
-		System.out.println("Recebido: "+model.hospedeLeitoId);
-		
-		return "Ok";
+		//System.out.println("Recebido: "+model.hospedeLeitoId);
+		HospedagemFullVO h = service.getHospedagemPorHospedeLeitoId(model.hospedeLeitoId);
+		return h;
+		//return new Hospedagem();
 	}
 
 	@RequestMapping(value="/mapa/testes", method = RequestMethod.POST)

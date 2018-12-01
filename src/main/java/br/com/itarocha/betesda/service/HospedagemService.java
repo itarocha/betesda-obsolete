@@ -18,7 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
+import br.com.itarocha.betesda.model.Encaminhador;
+import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.Hospedagem;
+import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.Hospede;
 import br.com.itarocha.betesda.model.HospedeHospedagemVO;
@@ -307,6 +310,24 @@ public class HospedagemService {
 		}
 	}
 
+	public HospedagemFullVO getHospedagemPorHospedeLeitoId(Long hospedeLeitoId) {
+		Hospedagem h = hospedagemRepo.findHospedagemByHospedeLeitoId(hospedeLeitoId);
+		HospedagemFullVO retorno = new HospedagemFullVO();
+		
+		retorno.setId(h.getId());
+		retorno.setEntidade(h.getEntidade());
+		retorno.setEncaminhador(h.getEncaminhador());
+		retorno.setDestinacaoHospedagem(h.getDestinacaoHospedagem());
+		retorno.setDataEntrada(h.getDataEntrada());
+		retorno.setDataPrevistaSaida(h.getDataPrevistaSaida());
+		retorno.setDataEfetivaSaida(h.getDataEfetivaSaida());
+		retorno.setTipoUtilizacao(h.getTipoUtilizacao());
+		retorno.setObservacoes(h.getObservacoes());
+		retorno.setHospedes(h.getHospedes());
+		return retorno;
+	}
+	
+	
 	//TODO Implementar transferencia
 	public void transferirHospedagem(Long hospedagemId, Long leitoId, LocalDate dataApartir) {
 		/*

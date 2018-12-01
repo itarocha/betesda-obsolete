@@ -15,7 +15,7 @@ public class LocalDateUtils {
 		return primeiroDia.plusDays(7);
 	}
 	
-	public static void main(String[] args) {
+	public static void xxxxmain(String[] args) {
 		LocalDate agora = LocalDate.now();
 		//agora = LocalDate.of(2016, 2, 8);  
 		//DateTimeConstants.
