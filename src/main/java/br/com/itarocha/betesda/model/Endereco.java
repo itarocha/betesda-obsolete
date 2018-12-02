@@ -8,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -50,6 +51,9 @@ public class Endereco {
 	private double latitude;
 	
 	private double longitude;
+	
+	@Transient
+	private String descricao;
 	
 	public Endereco(){
 		this.cidade = "Uberlândia";
@@ -150,6 +154,29 @@ public class Endereco {
 	
 	@Override
 	public String toString(){
-		return this.logradouro + ", "+ this.numero + ", "+this.bairro+", "+ this.cidade + ", "+ this.getUf();
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.logradouro + ", ");
+		sb.append("Nro. "+this.numero + ", ");
+		
+		if ((this.complemento != null) &&  (!this.complemento.isEmpty()) ) {
+			sb.append(this.complemento + ", ");
+		}
+
+		if ((this.bairro != null) &&  (!this.bairro.isEmpty()) ) {
+			sb.append("Bairro: "+this.bairro + ", ");
+		}
+		
+		if ((this.cep != null) &&  (!this.cep.isEmpty()) ) {
+			sb.append("CEP: "+this.cep + ", ");
+		}
+
+		sb.append(this.cidade + " - ");
+		sb.append(this.uf);
+		
+		return sb.toString();
+	}
+	
+	public String getDescricao() {
+		return this.toString();
 	}
 }

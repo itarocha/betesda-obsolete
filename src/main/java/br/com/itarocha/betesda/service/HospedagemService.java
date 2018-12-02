@@ -324,6 +324,24 @@ public class HospedagemService {
 		retorno.setTipoUtilizacao(h.getTipoUtilizacao());
 		retorno.setObservacoes(h.getObservacoes());
 		retorno.setHospedes(h.getHospedes());
+		
+		
+		StringBuilder sbLeito = StrUtil.loadFile("/sql/leito_by_hospede_leito_id.sql");
+		TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeito.toString(), LeitoVO.class);
+
+		
+		for (Hospede hospede: h.getHospedes()) {
+			for (HospedeLeito hl : hospede.getLeitos()) {
+
+				
+				// buscar no banco...
+				
+				LeitoVO leito = qLeitos.setParameter("id", hl.getId()) .getSingleResult();
+
+				hl.setQuartoNumero( leito.getQuartoNumero() );
+				hl.setLeitoNumero( leito.getNumero() );
+			}
+		}
 		return retorno;
 	}
 	

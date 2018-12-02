@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -32,12 +33,10 @@ public class HospedeLeito {
 	private Hospede hospede;
 	
 	
-	//@Temporal(TemporalType.DATE)
 	@NotNull(message="Data de Entrada precisa ser informado")
 	@Column(name="data_entrada")
 	private LocalDate dataEntrada;
 	
-	//@Temporal(TemporalType.DATE)
 	@NotNull(message="Data de Saída precisa ser informado")
 	@Column(name="data_saida")
 	private LocalDate dataSaida;
@@ -51,6 +50,12 @@ public class HospedeLeito {
 	@JoinColumn(name="leito_id")
 	@NotNull(message="Leito precisa ser informado")
 	private Leito leito;
+	
+	@Transient
+	private Integer quartoNumero;
+	
+	@Transient
+	private Integer leitoNumero;
 
 	public Long getId() {
 		return id;
@@ -100,4 +105,19 @@ public class HospedeLeito {
 		this.leito = leito;
 	}
 
+	public Integer getQuartoNumero() {
+		return quartoNumero;
+	}
+
+	public void setQuartoNumero(Integer quartoNumero) {
+		this.quartoNumero = quartoNumero;
+	}
+
+	public Integer getLeitoNumero() {
+		return leitoNumero;
+	}
+
+	public void setLeitoNumero(Integer leitoNumero) {
+		this.leitoNumero = leitoNumero;
+	}
 }
