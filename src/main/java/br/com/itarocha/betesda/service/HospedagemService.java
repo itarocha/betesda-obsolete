@@ -51,7 +51,7 @@ import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
 
 @Service
-@Transactional
+@Transactional /* todo (rollbackForClassName)*/
 public class HospedagemService {
 
 	@Autowired
@@ -118,21 +118,30 @@ public class HospedagemService {
 				hvo.setId(h.getId());
 				
 				hospedagem.getHospedes().add(h);
-				HospedeLeito hl = new HospedeLeito();
-				hl.setHospede(h);
-				hl.setDataEntrada(hospedagem.getDataEntrada());
-				hl.setDataSaida(hospedagem.getDataPrevistaSaida());
-				Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
-				hvo.getAcomodacao().setQuartoNumero(quarto.get().getNumero());
-				hl.setQuarto(quarto.get());
-				Optional<Leito> leito = leitoRepo.findById(hvo.getAcomodacao().getLeitoId());
-				hl.setLeito(leito.get());
-				hvo.getAcomodacao().setLeitoNumero(leito.get().getNumero());
 				
-				hospedeLeitoRepo.save(hl);
-				hvo.getAcomodacao().setId(hl.getId());
-				
-				h.getLeitos().add(hl);
+			    if ((hvo.getAcomodacao() != null) && (TipoUtilizacaoHospedagem.T.equals(hospedagem.getTipoUtilizacao())) ) {
+			    	
+			    	Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
+			    	Optional<Leito> leito = leitoRepo.findById(hvo.getAcomodacao().getLeitoId());
+
+			    	if (quarto.isPresent() && leito.isPresent()) {
+			    		HospedeLeito hl = new HospedeLeito();
+			    		hl.setHospede(h);
+			    		hl.setDataEntrada(hospedagem.getDataEntrada());
+			    		hl.setDataSaida(hospedagem.getDataPrevistaSaida());
+
+			    		hvo.getAcomodacao().setQuartoNumero(quarto.get().getNumero());
+			    		hl.setQuarto(quarto.get());
+
+			    		hvo.getAcomodacao().setLeitoNumero(leito.get().getNumero());
+			    		hl.setLeito(leito.get());
+
+			    		hospedeLeitoRepo.save(hl);
+			    		hvo.getAcomodacao().setId(hl.getId());
+			    		
+			    		h.getLeitos().add(hl);
+			    	}
+			    }	 
 			}
 		} catch (Exception e) {
 			throw e;
@@ -157,7 +166,6 @@ public class HospedagemService {
 		try {
 			LocalDate dIni = LocalDateUtils.primeiroDiaDaSemana(dataBase);
 			LocalDate dFim = dIni.plusDays(6);
-			LocalDate hoje = LocalDate.now();
 			/*
 			System.out.println("-----------------------------");
 			System.out.println(dIni + " até " + dFim);
@@ -192,11 +200,24 @@ public class HospedagemService {
 					.setParameter("DATA_INI", dIni )
 					.setParameter("DATA_FIM", dFim );
 			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
+			
+			// Hóspedes parciais - imbutir na saída
+			StringBuilder sbHospedeLeitosParciais = StrUtil.loadFile("/sql/hospedes_parciais.sql");
+			TypedQuery<HospedeHospedagemVO> qHospedeLeitoParciais = em.createQuery(sbHospedeLeitosParciais.toString(), HospedeHospedagemVO.class)
+					.setParameter("DATA_INI", dIni )
+					.setParameter("DATA_FIM", dFim );
+			List<HospedeHospedagemVO> hospedeLeitosParciais = qHospedeLeitoParciais.getResultList();
+			for (HospedeHospedagemVO hospede: hospedeLeitosParciais) {
+				System.out.println("PARCIAL: "+hospede.getHospede().getPessoa().getNome());
+			}
+			
+			
 			//qtdLeitosOcupados = hospedeLeitos.size();
 			//qtdLeitosLivres = qtdLeitos - qtdLeitosOcupados;
 			
 			List<HospedagemHeader> hospedagensHeaders = new ArrayList<HospedagemHeader>();
 
+			LocalDate hoje = LocalDate.now();
 			// Popula os leitos ocupados no mapa
 			for(HospedeLeitoVO hl : hospedeLeitos) {
 				HospedeLeito hospedeLeito = hl.getHospedeLeito();
@@ -208,14 +229,7 @@ public class HospedagemService {
 				int celulaIndex = 0;
 				LocalDate dtmp = dIni;
 				
-				String status = "aberta";
-				if (hospedagem.getDataEfetivaSaida() != null) {
-					status = "encerrada";
-				} else if (hospedagem.getDataPrevistaSaida().isBefore(hoje) ) {
-					status = "vencida";
-				} else {
-					status = "aberta";
-				}
+				String status = resolveStatusHospedagem(hoje, hospedagem.getDataPrevistaSaida(), hospedagem.getDataEfetivaSaida());
 				
 				HospedagemHeader hh = new HospedagemHeader(hospedeLeito.getId(), hospedagem.getId(), p.getId(), p.getNome(), status);
 				hospedagensHeaders.add(hh);
@@ -310,6 +324,18 @@ public class HospedagemService {
 		}
 	}
 
+	private String resolveStatusHospedagem(LocalDate hoje, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
+		String status = "aberta";
+		if (dataEfetivaSaida != null) {
+			status = "encerrada";
+		} else if (dataPrevistaSaida.isBefore(hoje) ) {
+			status = "vencida";
+		} else {
+			status = "aberta";
+		}
+		return status;
+	}
+
 	public HospedagemFullVO getHospedagemPorHospedeLeitoId(Long hospedeLeitoId) {
 		Hospedagem h = hospedagemRepo.findHospedagemByHospedeLeitoId(hospedeLeitoId);
 		HospedagemFullVO retorno = new HospedagemFullVO();
@@ -329,6 +355,9 @@ public class HospedagemService {
 		StringBuilder sbLeito = StrUtil.loadFile("/sql/leito_by_hospede_leito_id.sql");
 		TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeito.toString(), LeitoVO.class);
 
+		
+		String status = resolveStatusHospedagem(LocalDate.now(), h.getDataPrevistaSaida(), h.getDataEfetivaSaida());
+		retorno.setStatus(status);
 		
 		for (Hospede hospede: h.getHospedes()) {
 			for (HospedeLeito hl : hospede.getLeitos()) {
@@ -510,151 +539,5 @@ public class HospedagemService {
 		return qtd <= 0; 
 	}
 	
-	
-/*
-  
-	private Map<String, Dia[]> gerarMapa(LocalDate dIni, Integer numeroDias, List<LeitoVO> leitos){
-		
-		Map<String, Dia[]> mapa = new HashMap<>();
-		LocalDate dFim = dIni.plusDays(numeroDias-1);
-		
-		for(LeitoVO leito : leitos) {
-			Dia[] cels = new Dia[numeroDias];
-			String key = makeLeitoKey(leito.getQuartoNumero(), leito.getNumero()); 
-
-			LocalDate dtmp = dIni;
-			int index = 0;
-			while (dtmp.compareTo(dFim) != 1) {
-				Dia cel = new Dia();
-				cels[index] = cel;
-				dtmp = dtmp.plusDays(1);
-				index++;
-			}
-			mapa.put(key, cels);
-		}
-		Map<String, Dia[]> retorno = mapa.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-		return retorno;
-	}
- 
-  	
- */
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	/*
-	
-	private static class HospedagemResult {
-		public BigInteger hospedagemId;
-		public BigInteger destinacaoHospedagemId;
-		public String tipoUtilizacao;
-		public LocalDate dataEntrada;
-		public LocalDate dataPrevistaSaida;
-		public LocalDate dataEfetivaSaida;
-		public LocalDate dataSaida;
-		
-		public HospedagemResult(BigInteger hospedagemId, BigInteger destinacaoHospedagemId, String tipoUtiliacao, LocalDate dataEntrada, 
-				LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida, LocalDate dataSaida ){
-			this.hospedagemId = hospedagemId;
-			this.destinacaoHospedagemId = destinacaoHospedagemId;
-			this.tipoUtilizacao = tipoUtiliacao;
-			this.dataEntrada = dataEntrada;
-			this.dataPrevistaSaida = dataPrevistaSaida;
-			this.dataEfetivaSaida = dataEfetivaSaida;
-			this.dataSaida = dataSaida;
-		}
-	}
-	
-	private static class LeitoResult {
-		public BigInteger hospedagemId;
-		public BigInteger hospedeId;
-		public BigInteger pessoaId;
-        public LocalDate dataEntrada;
-        public LocalDate dataSaida;
-        public BigInteger quartoId;
-        public Integer quartoNumero;
-        public BigInteger leitoId;
-        public Integer leitoNumero;
-
-        public LeitoResult(BigInteger hospedagemId, BigInteger hospedeId, BigInteger pessoaId, LocalDate dataEntrada, LocalDate dataSaida, 
-        		BigInteger quartoId, Integer quartoNumero, BigInteger leitoId, Integer leitoNumero) {
-
-        	this.hospedagemId = hospedagemId;
-    		this.hospedeId = hospedeId;
-    		this.pessoaId = pessoaId;
-    		this.dataEntrada = dataEntrada;
-    		this.dataSaida = dataSaida;
-    		this.quartoId = quartoId;
-    		this.quartoNumero = quartoNumero;
-    		this.leitoId = leitoId;
-    		this.leitoNumero = leitoNumero;
-        }
-	}
-	
-	private static class HospedeResult {
-		public BigInteger hospedagemId;
-		public BigInteger pessoaId;
-        public String nome;
-        public BigInteger tipoHospedeId;
-        public String descricao;
-
-        public HospedeResult(BigInteger hospedagemId, BigInteger pessoaId, String nome, BigInteger tipoHospedeId, String descricao) {
-        	this.hospedagemId = hospedagemId; 
-        	this.pessoaId = pessoaId;
-        	this.nome = nome;
-        	this.tipoHospedeId = tipoHospedeId;
-        	this.descricao = descricao;
-        }
-	}
-	*/
 }
-
-
-
-/*
-SELECT      hl.quarto_id
-, q.numero quarto_numero
-, hl.leito_id
-, l.numero leito_numero
-, h.id hospedagem_id
-, h.id hospede_id  
-, h.destinacao_hospedagem_id
-, dh.descricao destinacao_hospedagem_descricao
-, h.tipo_utilizacao
-, h.data_entrada
-, h.data_prevista_saida
-, h.data_efetiva_saida
-, COALESCE(h.data_efetiva_saida, h.data_prevista_saida) data_saida
-, hpd.pessoa_id
-, hl.data_entrada data_entrada_leito
-, hl.data_saida data_saida_leito
-FROM        hospedagem h
-INNER JOIN  hospede hpd
-ON          hpd.hospedagem_id = h.id
-INNER JOIN  hospede_leito hl
-ON          hl.hospede_id = hpd.id
-INNER JOIN  quarto q
-ON          q.id = hl.quarto_id
-INNER JOIN  leito l
-ON          l.id = hl.leito_id
-INNER JOIN  destinacao_hospedagem dh
-ON          dh.id = h.destinacao_hospedagem_id
-WHERE       ('2018-08-12' BETWEEN hl.data_entrada AND hl.data_saida 
-OR           '2018-08-18' BETWEEN hl.data_entrada AND hl.data_saida)
-ORDER BY    q.numero
-, l.numero
-*/
-
 

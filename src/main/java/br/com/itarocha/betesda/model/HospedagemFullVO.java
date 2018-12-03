@@ -7,22 +7,15 @@ import java.util.List;
 public class HospedagemFullVO {
 
 	private Long id;
-
 	private Entidade entidade;
-	
 	private Encaminhador encaminhador;
-
 	private DestinacaoHospedagem destinacaoHospedagem;
-			
 	private LocalDate dataEntrada;
-	
 	private LocalDate dataPrevistaSaida;
-	
 	private LocalDate dataEfetivaSaida;
-
 	private TipoUtilizacaoHospedagem tipoUtilizacao;
-	
 	private String observacoes;
+	private String status;
 	
 	private List<Hospede> hospedes = new ArrayList<Hospede>();
 	
@@ -108,5 +101,13 @@ public class HospedagemFullVO {
 
 	public void setHospedes(List<Hospede> hospedes) {
 		this.hospedes = hospedes;
+	}
+
+	public String getStatus() {
+		return this.status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
