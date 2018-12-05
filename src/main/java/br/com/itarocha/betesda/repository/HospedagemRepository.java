@@ -20,4 +20,8 @@ public interface HospedagemRepository extends JpaRepository<Hospedagem, Long> {
 			") ")
 	public Hospedagem findHospedagemByHospedeLeitoId(@Param("hospedeLeitoId") Long hospedeLeitoId);
 	
+	@Query("SELECT  hospedagem " + 
+			"FROM   Hospedagem hospedagem FETCH ALL PROPERTIES " +
+			"WHERE  hospedagem.id = :hospedagemId")
+	public Hospedagem findHospedagemByHospedagemId(@Param("hospedagemId") Long hospedagemId);
 }

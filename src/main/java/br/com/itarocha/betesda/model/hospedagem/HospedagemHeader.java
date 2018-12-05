@@ -6,8 +6,8 @@ import java.util.List;
 import br.com.itarocha.betesda.service.DiaHospedeLeito;
 
 public class HospedagemHeader {
-	
-	private Long id; // hospedeLeitoId
+	private String identificador;
+	private Long id; // hospedeLeitoId ou hospedagemId
 	private Long hospedagemId;
 	private Long pessoaId;
 	private String pessoaNome;
@@ -15,13 +15,22 @@ public class HospedagemHeader {
 	private Integer firstIndex;
 	private List<DiaHospedeLeito> dias = new ArrayList<DiaHospedeLeito>();
 	
-	public HospedagemHeader(Long id, Long hospedagemId, Long pessoaId, String pessoaNome, String status) {
+	public HospedagemHeader(String identificador, Long id, Long hospedagemId, Long pessoaId, String pessoaNome, String status) {
+		
+		this.identificador = identificador;
+		
 		this.id = id;
 		this.hospedagemId = hospedagemId;
 		this.pessoaId = pessoaId;
 		this.pessoaNome = pessoaNome;
 		this.status = status;
 		this.firstIndex = -1;
+	}
+	public String getIdentificador() {
+		return identificador;
+	}
+	public void setIdentificador(String identificador) {
+		this.identificador = identificador;
 	}
 	public Long getId() {
 		return this.id;

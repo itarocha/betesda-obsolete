@@ -108,7 +108,7 @@ public class HospedagemController {
 	public HospedagemFullVO getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
 	{
 		//System.out.println("Recebido: "+model.hospedeLeitoId);
-		HospedagemFullVO h = service.getHospedagemPorHospedeLeitoId(model.hospedeLeitoId);
+		HospedagemFullVO h = service.getHospedagemPorHospedeLeitoId(model.hospedagemId);
 		return h;
 		//return new Hospedagem();
 	}
@@ -148,6 +148,6 @@ public class HospedagemController {
 	}
 
 	private static class HospdeagemInfoRequest{
-		public Long hospedeLeitoId;
+		public Long hospedagemId;
 	}
 }

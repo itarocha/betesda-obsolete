@@ -166,75 +166,84 @@ public class HospedagemService {
 		try {
 			LocalDate dIni = LocalDateUtils.primeiroDiaDaSemana(dataBase);
 			LocalDate dFim = dIni.plusDays(6);
-			/*
-			System.out.println("-----------------------------");
-			System.out.println(dIni + " até " + dFim);
-			*/
 			
 			// Monta lista de leitos 
 			StringBuilder sbLeitos = StrUtil.loadFile("/sql/leitos.sql");
 			TypedQuery<LeitoVO> qLeitos = em.createQuery(sbLeitos.toString(), LeitoVO.class);
 			List<LeitoVO> leitos = qLeitos.getResultList();
+
+			// Hóspedes parciais - imbutir na saída
+			StringBuilder sbHospedeLeitosParciais = StrUtil.loadFile("/sql/hospedes_parciais.sql");
+			TypedQuery<HospedeLeitoVO> qHospedeLeitoParciais = em.createQuery(sbHospedeLeitosParciais.toString(), HospedeLeitoVO.class)
+					.setParameter("DATA_INI", dIni )
+					.setParameter("DATA_FIM", dFim )
+					.setParameter("TIPO_UTILIZACAO", TipoUtilizacaoHospedagem.P);
+			List<HospedeLeitoVO> hospedesParciais = qHospedeLeitoParciais.getResultList();
+			
 			for (int x = 0; x < 7; x++) {
 				qtdLeitos[x] = leitos.size();
 				qtdLeitosLivres[x] = leitos.size();
 			}
 			
-			Map<String, Long[]> mapaLeitosNew = gerarMapaLeitosNewVazio(leitos, 7);
+			Map<String, String[]> mapa = gerarMapaVazio(leitos, hospedesParciais, 7);
 
 			StringBuilder sbHospedes = StrUtil.loadFile("/sql/hospedes_por_periodo.sql");
 			TypedQuery<HospedeHospedagemVO> qHospedes = em.createQuery(sbHospedes.toString(), HospedeHospedagemVO.class)
 															.setParameter("DATA_INI", dIni )
 															.setParameter("DATA_FIM", dFim );
 			List<HospedeHospedagemVO> hospedes = qHospedes.getResultList();
-			/*
-			System.out.println("-----------------------------");
-			for (HospedeHospedagemVO h : hospedes) {
-				System.out.println(h.getHospede().getPessoa().getNome() + " - hospedagemId = " + h.getHospedagem().getId() + " hospedeId = " + h.getHospede().getId() + " " + h.getHospedagem().getDataEntrada() + " até " + h.getHospedagem().getDataPrevistaSaida());
-			}
-			System.out.println("-----------------------------");
-			*/
+
 			// Monta lista de HospedeLeitoVO
 			StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
 			TypedQuery<HospedeLeitoVO> qHospedeLeito = em.createQuery(sbHospedeLeitos.toString(), HospedeLeitoVO.class)
 					.setParameter("DATA_INI", dIni )
 					.setParameter("DATA_FIM", dFim );
-			List<HospedeLeitoVO> hospedeLeitos = qHospedeLeito.getResultList();
-			
-			// Hóspedes parciais - imbutir na saída
-			StringBuilder sbHospedeLeitosParciais = StrUtil.loadFile("/sql/hospedes_parciais.sql");
-			TypedQuery<HospedeHospedagemVO> qHospedeLeitoParciais = em.createQuery(sbHospedeLeitosParciais.toString(), HospedeHospedagemVO.class)
-					.setParameter("DATA_INI", dIni )
-					.setParameter("DATA_FIM", dFim );
-			List<HospedeHospedagemVO> hospedeLeitosParciais = qHospedeLeitoParciais.getResultList();
-			for (HospedeHospedagemVO hospede: hospedeLeitosParciais) {
-				System.out.println("PARCIAL: "+hospede.getHospede().getPessoa().getNome());
+			List<HospedeLeitoVO> listaHospedes = qHospedeLeito.getResultList();
+
+			for (HospedeLeitoVO hospede: hospedesParciais) {
+				System.out.println("PARCIAL: "+dIni + " - "+dFim + " ... " + hospede.getHospede().getId() + " - " + hospede.getHospede().getPessoa().getNome());
+				listaHospedes.add(hospede);
 			}
-			
-			
-			//qtdLeitosOcupados = hospedeLeitos.size();
-			//qtdLeitosLivres = qtdLeitos - qtdLeitosOcupados;
 			
 			List<HospedagemHeader> hospedagensHeaders = new ArrayList<HospedagemHeader>();
 
 			LocalDate hoje = LocalDate.now();
+			
 			// Popula os leitos ocupados no mapa
-			for(HospedeLeitoVO hl : hospedeLeitos) {
-				HospedeLeito hospedeLeito = hl.getHospedeLeito();
-				Hospedagem hospedagem = hl.getHospedagem();
+			for(HospedeLeitoVO hl : listaHospedes) {
+				Hospedagem hospedagem = hl.getHospedagem(); 
 				Pessoa p = hl.getHospede().getPessoa(); 
 				
-				LocalDate dataEntrada = hl.getHospedeLeito().getDataEntrada(); 
-				LocalDate dataSaida = hl.getHospedeLeito().getDataSaida(); 
 				int celulaIndex = 0;
 				LocalDate dtmp = dIni;
 				
 				String status = resolveStatusHospedagem(hoje, hospedagem.getDataPrevistaSaida(), hospedagem.getDataEfetivaSaida());
 				
-				HospedagemHeader hh = new HospedagemHeader(hospedeLeito.getId(), hospedagem.getId(), p.getId(), p.getNome(), status);
-				hospedagensHeaders.add(hh);
+				LocalDate dataEntrada = null;
+				LocalDate dataSaida = null;
+				String key = null;
+				String identificador = null;
+				Long id = null;
+				if ("T".equals(hl.getTipoUtilizacao())) {
+					dataEntrada = hl.getHospedeLeito().getDataEntrada(); //* 
+					dataSaida = hl.getHospedeLeito().getDataSaida();  //*
+					Integer quartoNumero = hl.getHospedeLeito().getQuarto().getNumero();  //*
+					Integer leitoNumero = hl.getHospedeLeito().getLeito().getNumero();  //*
+					key = makeLeitoKey(hl.getHospedeLeito().getLeito().getId(), quartoNumero, leitoNumero);  //*
+					id = hl.getHospedeLeito().getId(); //*
+					identificador =  String.format("T%06d", id); // T000000 Total
+				} else {
+					dataEntrada = hl.getHospedagem().getDataEntrada(); 
+					dataSaida = hl.getHospedagem().getDataEfetivaSaida() == null ? hl.getHospedagem().getDataPrevistaSaida() : hl.getHospedagem().getDataEfetivaSaida(); 
+					Integer quartoNumero = 9999;
+					Integer leitoNumero = 9999;
+					key = makeLeitoKey(hl.getHospede().getId(), quartoNumero, leitoNumero);
+					id = hl.getHospede().getId();
+					identificador =  String.format("P%06d", hl.getHospede().getId()); // P000000 Parcial
+				}
 				
-				String key = makeLeitoKey(hl.getHospedeLeito().getLeito().getId(), hl.getHospedeLeito().getQuarto().getNumero(), hl.getHospedeLeito().getLeito().getNumero());
+				HospedagemHeader hh = new HospedagemHeader(identificador, id, hospedagem.getId(), p.getId(), p.getNome(), status);  //*
+				hospedagensHeaders.add(hh);
 				while (dtmp.compareTo(dFim) != 1) {
 					String tipo = "";
 					if (dataEntrada.compareTo(dtmp) == 0) {
@@ -247,8 +256,8 @@ public class HospedagemService {
 					
 					if (!"".equals(tipo)) {
 						hh.getDias().add(new DiaHospedeLeito(celulaIndex, tipo));
-						Long[] idias =  mapaLeitosNew.get(key);
-						idias[celulaIndex] = hl.getHospedeLeito().getId();
+						String[] idias =  mapa.get(key);
+						idias[celulaIndex] = identificador; 
 						if (hh.getFirstIndex() == -1) {
 							hh.setFirstIndex(celulaIndex);
 						}
@@ -261,23 +270,16 @@ public class HospedagemService {
 							qtdTotaisPendentes[celulaIndex]++;
 						}
 					}
-					qtdLeitosOcupados[celulaIndex] = qtdTotais[celulaIndex];
+					if ("T".equals(hl.getTipoUtilizacao())) {
+						qtdLeitosOcupados[celulaIndex] = qtdTotais[celulaIndex];
+					}
+
 					//qtdLeitosLivres[celulaIndex] = qtdLeitos[celulaIndex] - qtdLeitosOcupados[celulaIndex];
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
 				}
 			}
-
-			/*
-			for (String s : mapaLeitosNew.keySet()) {
-				Long[] dias = mapaLeitosNew.get(s);
-				System.out.print(s + " ");
-				for(Long i : dias) {
-					System.out.print(String.format("%03d ",i));
-				}
-				System.out.println("");
-			}
-			*/
+			
 			
 			MapaHospedagem mapaHospedagem = new MapaHospedagem(dIni, dFim);
 			mapaHospedagem.setHospedagens(hospedagensHeaders);
@@ -296,19 +298,8 @@ public class HospedagemService {
 			mapaHospedagem.setQtdLeitosOcupados(qtdLeitosOcupados);
 			mapaHospedagem.setQtdLeitosLivres(qtdLeitosLivres);
 
-			/*
-			for (String key : mapaLeitos.keySet()) {
-				CelulaOut celula = new CelulaOut(extractLeitoFromKey(key));
-			
-				Dia[] dias = mapaLeitos.get(key);
-				for (Dia d : dias) {
-					celula.getDias().add(d);
-				}
-				mapaHospedagem.getCelulas().add(celula);
-			}
-			*/
-			for (String key : mapaLeitosNew.keySet()) {
-				Celula celula = new Celula(extractLeitoFromKey(key), mapaLeitosNew.get(key));
+			for (String key : mapa.keySet()) {
+				Celula celula = new Celula(extractLeitoFromKey(key), mapa.get(key));
 				mapaHospedagem.getCelulas().add(celula);
 			}
 			
@@ -336,8 +327,8 @@ public class HospedagemService {
 		return status;
 	}
 
-	public HospedagemFullVO getHospedagemPorHospedeLeitoId(Long hospedeLeitoId) {
-		Hospedagem h = hospedagemRepo.findHospedagemByHospedeLeitoId(hospedeLeitoId);
+	public HospedagemFullVO getHospedagemPorHospedeLeitoId(Long hospedagemId) {
+		Hospedagem h = hospedagemRepo.findHospedagemByHospedagemId(hospedagemId);
 		HospedagemFullVO retorno = new HospedagemFullVO();
 		
 		retorno.setId(h.getId());
@@ -449,18 +440,16 @@ public class HospedagemService {
 	}
 	
 	
-	// quartoNumero - leitoNumero "000005-000007-000072" quarto 5, leito 7, leitoId = 72
-	private String makeLeitoKey(Long leitoId, Integer quartoNumero, Integer leitoNumero) {
-		return String.format("%06d-%06d-%06d", quartoNumero, leitoNumero, leitoId); 
-	}
 
 	private LeitoOut extractLeitoFromKey(String key) {
 		LeitoOut leito = new LeitoOut();
+		leito.setKey("xxx");
 		leito.setLeitoId(0L);
 		leito.setQuartoNumero(0);
 		leito.setLeitoNumero(0);
 		String[] leitoArray = key.split("-");
 		if (leitoArray.length == 3) {
+			leito.setKey(key);
 			leito.setQuartoNumero(Integer.parseInt(leitoArray[0]));
 			leito.setLeitoNumero(Integer.parseInt(leitoArray[1]));
 			leito.setLeitoId(Long.parseLong(leitoArray[2]));
@@ -468,22 +457,38 @@ public class HospedagemService {
 		return leito;
 	}
 
-	private Map<String, Long[]> gerarMapaLeitosNewVazio(List<LeitoVO> leitos, int numeroDias){
-		Map<String, Long[]> mapa = new HashMap<>();
+	private Map<String, String[]> gerarMapaVazio(List<LeitoVO> leitos, List<HospedeLeitoVO> hospedesParciais, int numeroDias){
+		Map<String, String[]> mapa = new HashMap<>();
 		for(LeitoVO leito : leitos) {
 			String key = makeLeitoKey(leito.getId(), leito.getQuartoNumero(), leito.getNumero()); 
-			Long[] cels = new Long[numeroDias];
+			String[] cels = new String[numeroDias];
 			for (int i = 0; i < numeroDias; i++) {
-				cels[i] = 0L;
+				cels[i] = "x";
 			}
 			mapa.put(key, cels);
 		}
-		Map<String, Long[]> retorno = mapa.entrySet().stream()
+	
+		for (HospedeLeitoVO hospede: hospedesParciais) {
+			String key = makeLeitoKey(hospede.getHospede().getId(), 9999, 9999); 
+			String[] cels = new String[numeroDias];
+			for (int i = 0; i < numeroDias; i++) {
+				cels[i] = "x";
+			}
+			mapa.put(key, cels);
+		}
+		
+		Map<String, String[]> retorno = mapa.entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                         (oldValue, newValue) -> oldValue, LinkedHashMap::new));
 		return retorno;
 	}
+	
+	// quartoNumero - leitoNumero "000005-000007-000072" quarto 5, leito 7, leitoId = 72
+	private String makeLeitoKey(Long leitoId, Integer quartoNumero, Integer leitoNumero) {
+		return String.format("%06d-%06d-%06d", quartoNumero, leitoNumero, leitoId); 
+	}
+	
 	/*
 	private Map<String, Dia[]> gerarMapaLeitosVazio(List<LeitoVO> leitos, int numeroDias){
 		Map<String, Dia[]> mapa = new HashMap<>();

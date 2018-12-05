@@ -3,9 +3,16 @@ package br.com.itarocha.betesda.model.hospedagem;
 public class LeitoOut {
 
 	private Long leitoId;
+	private String key;
 	private Integer quartoNumero;
 	private Integer leitoNumero;
 	
+	public String getKey() {
+		return key;
+	}
+	public void setKey(String key) {
+		this.key = key;
+	}
 	public Long getLeitoId() {
 		return leitoId;
 	}

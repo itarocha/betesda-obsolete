@@ -1,4 +1,4 @@
-SELECT      new br.com.itarocha.betesda.model.HospedeLeitoVO(hospedagem, hospede, hospedeLeito, leito.id) 
+SELECT      new br.com.itarocha.betesda.model.HospedeLeitoVO('T', hospedagem, hospede, hospedeLeito) 
 FROM        HospedeLeito hospedeLeito
 INNER JOIN  hospedeLeito.leito leito
 INNER JOIN  hospedeLeito.hospede hospede
