@@ -150,16 +150,18 @@ public class HospedagemService {
 	}
 	
 	public MapaHospedagem getHospedagens(LocalDate dataBase) {
-		Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
-		Integer[] qtdTotaisPendentes 	= {0,0,0,0,0,0,0};
-		Integer[] qtdTotaisEncerradas 	= {0,0,0,0,0,0,0};
+		//Integer[] qtdTotais 		= {0,0,0,0,0,0,0};
+		//Integer[] qtdVencidos 	= {0,0,0,0,0,0,0};
+		//Integer[] qtdPendentes 	= {0,0,0,0,0,0,0};
+		//Integer[] qtdEncerrados 	= {0,0,0,0,0,0,0};
 
 		// Parciais somente quando fizer o select dos sem leito
-		Integer[] qtdParciais 			= {0,0,0,0,0,0,0};
+		Integer[] qtdParciaisTotais		= {0,0,0,0,0,0,0};
+		Integer[] qtdParciaisVencidos	= {0,0,0,0,0,0,0};
 		Integer[] qtdParciaisPendentes 	= {0,0,0,0,0,0,0};
-		Integer[] qtdParciaisEncerradas = {0,0,0,0,0,0,0};
+		Integer[] qtdParciaisEncerrados = {0,0,0,0,0,0,0};
 		
-		Integer[] qtdLeitos 			= {0,0,0,0,0,0,0};
+		Integer[] qtdLeitosTotais		= {0,0,0,0,0,0,0};
 		Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
 		Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
 		
@@ -181,7 +183,7 @@ public class HospedagemService {
 			List<HospedeLeitoVO> hospedesParciais = qHospedeLeitoParciais.getResultList();
 			
 			for (int x = 0; x < 7; x++) {
-				qtdLeitos[x] = leitos.size();
+				qtdLeitosTotais[x] = leitos.size();
 				qtdLeitosLivres[x] = leitos.size();
 			}
 			
@@ -217,6 +219,7 @@ public class HospedagemService {
 				int celulaIndex = 0;
 				LocalDate dtmp = dIni;
 				
+				/* IMPORTANTE: STATUS = (ABERTA/ENCERRADA/VENCIDA)*/
 				String status = resolveStatusHospedagem(hoje, hospedagem.getDataPrevistaSaida(), hospedagem.getDataEfetivaSaida());
 				
 				LocalDate dataEntrada = null;
@@ -224,6 +227,7 @@ public class HospedagemService {
 				String key = null;
 				String identificador = null;
 				Long id = null;
+				/* IMPORTANTE: TIPOUTILIZACAO (T/P) */
 				if ("T".equals(hl.getTipoUtilizacao())) {
 					dataEntrada = hl.getHospedeLeito().getDataEntrada(); //* 
 					dataSaida = hl.getHospedeLeito().getDataSaida();  //*
@@ -231,6 +235,7 @@ public class HospedagemService {
 					Integer leitoNumero = hl.getHospedeLeito().getLeito().getNumero();  //*
 					key = makeLeitoKey(hl.getHospedeLeito().getLeito().getId(), quartoNumero, leitoNumero);  //*
 					id = hl.getHospedeLeito().getId(); //*
+					/* IMPORTANTE: IDENTIFICADOR */
 					identificador =  String.format("T%06d", id); // T000000 Total
 				} else {
 					dataEntrada = hl.getHospedagem().getDataEntrada(); 
@@ -239,6 +244,7 @@ public class HospedagemService {
 					Integer leitoNumero = 9999;
 					key = makeLeitoKey(hl.getHospede().getId(), quartoNumero, leitoNumero);
 					id = hl.getHospede().getId();
+					/* IMPORTANTE: IDENTIFICADOR */
 					identificador =  String.format("P%06d", hl.getHospede().getId()); // P000000 Parcial
 				}
 				
@@ -246,6 +252,7 @@ public class HospedagemService {
 				hospedagensHeaders.add(hh);
 				while (dtmp.compareTo(dFim) != 1) {
 					String tipo = "";
+					/* IMPORTANTE: TIPO = (INICIO/DURANTE/FIM) */
 					if (dataEntrada.compareTo(dtmp) == 0) {
 						tipo = "inicio";
 					} else if (dataSaida.compareTo(dtmp) == 0) {
@@ -261,19 +268,29 @@ public class HospedagemService {
 						if (hh.getFirstIndex() == -1) {
 							hh.setFirstIndex(celulaIndex);
 						}
-
-						qtdTotais[celulaIndex]++;
-						qtdLeitosLivres[celulaIndex]--;
-						if ("encerrada".equals(status)) {
-							qtdTotaisEncerradas[celulaIndex]++;
-						} else {
-							qtdTotaisPendentes[celulaIndex]++;
+						
+						if ("T".equals(hl.getTipoUtilizacao())) {
+							qtdLeitosLivres[celulaIndex]--;
+							qtdLeitosOcupados[celulaIndex]++;
 						}
+						
+						/*
+						if ("T".equals(hl.getTipoUtilizacao())) {
+							//qtdLeitosTotais[celulaIndex]++;
+							qtdLeitosLivres[celulaIndex]--;
+							if ("encerrada".equals(status)) {
+								qtdLeitosEncerradas[celulaIndex]++;
+							} else {
+								qtdTotaisPendentes[celulaIndex]++;
+							}
+						}
+						*/
 					}
+					/*
 					if ("T".equals(hl.getTipoUtilizacao())) {
 						qtdLeitosOcupados[celulaIndex] = qtdTotais[celulaIndex];
 					}
-
+					*/	
 					//qtdLeitosLivres[celulaIndex] = qtdLeitos[celulaIndex] - qtdLeitosOcupados[celulaIndex];
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
@@ -285,16 +302,16 @@ public class HospedagemService {
 			mapaHospedagem.setHospedagens(hospedagensHeaders);
 			mapaHospedagem.setHospedes(hospedes);
 			
-			mapaHospedagem.setQtdTotais(qtdTotais);
-			mapaHospedagem.setQtdTotaisPendentes(qtdTotaisPendentes);
-			mapaHospedagem.setQtdTotaisEncerradas(qtdTotaisEncerradas);
+			//mapaHospedagem.setQtdTotais(qtdTotais);
+			//mapaHospedagem.setQtdTotaisPendentes(qtdTotaisPendentes);
+			//mapaHospedagem.setQtdTotaisEncerradas(qtdTotaisEncerradas);
 
 			// Parciais somente quando fizer o select dos sem leito
-			mapaHospedagem.setQtdParciais(qtdParciais);
-			mapaHospedagem.setQtdParciaisPendentes(qtdParciaisPendentes);
-			mapaHospedagem.setQtdParciaisEncerradas(qtdParciaisEncerradas);
+			//mapaHospedagem.setQtdParciais(qtdParciais);
+			//mapaHospedagem.setQtdParciaisPendentes(qtdParciaisPendentes);
+			//mapaHospedagem.setQtdParciaisEncerradas(qtdParciaisEncerradas);
 			
-			mapaHospedagem.setQtdLeitos(qtdLeitos);
+			mapaHospedagem.setQtdLeitosTotais(qtdLeitosTotais);
 			mapaHospedagem.setQtdLeitosOcupados(qtdLeitosOcupados);
 			mapaHospedagem.setQtdLeitosLivres(qtdLeitosLivres);
 

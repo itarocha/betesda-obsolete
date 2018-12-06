@@ -20,16 +20,16 @@ public class MapaHospedagem {
 	
 	private List<HospedeHospedagemVO> hospedes = new ArrayList<HospedeHospedagemVO>(); 
 	
-	Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
-	Integer[] qtdTotaisPendentes 	= {0,0,0,0,0,0,0};
-	Integer[] qtdTotaisEncerradas 	= {0,0,0,0,0,0,0};
+	//Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
+	//Integer[] qtdTotaisPendentes 	= {0,0,0,0,0,0,0};
+	//Integer[] qtdTotaisEncerradas 	= {0,0,0,0,0,0,0};
 
 	// Parciais somente quando fizer o select dos sem leito
 	Integer[] qtdParciais 			= {0,0,0,0,0,0,0};
 	Integer[] qtdParciaisPendentes 	= {0,0,0,0,0,0,0};
 	Integer[] qtdParciaisEncerradas = {0,0,0,0,0,0,0};
 	
-	Integer[] qtdLeitos 			= {0,0,0,0,0,0,0};
+	Integer[] qtdLeitosTotais		= {0,0,0,0,0,0,0};
 	Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
 	Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
 
@@ -90,6 +90,7 @@ public class MapaHospedagem {
 		this.hospedes = hospedes;
 	}
 
+	/*
 	public Integer[] getQtdTotais() {
 		return qtdTotais;
 	}
@@ -113,7 +114,8 @@ public class MapaHospedagem {
 	public void setQtdTotaisEncerradas(Integer[] qtdTotaisEncerradas) {
 		this.qtdTotaisEncerradas = qtdTotaisEncerradas;
 	}
-
+	*/
+	
 	public Integer[] getQtdParciais() {
 		return qtdParciais;
 	}
@@ -138,12 +140,12 @@ public class MapaHospedagem {
 		this.qtdParciaisEncerradas = qtdParciaisEncerradas;
 	}
 
-	public Integer[] getQtdLeitos() {
-		return qtdLeitos;
+	public Integer[] getQtdLeitosTotais() {
+		return qtdLeitosTotais;
 	}
 
-	public void setQtdLeitos(Integer[] qtdLeitos) {
-		this.qtdLeitos = qtdLeitos;
+	public void setQtdLeitosTotais(Integer[] qtdLeitosTotais) {
+		this.qtdLeitosTotais = qtdLeitosTotais;
 	}
 
 	public Integer[] getQtdLeitosOcupados() {
