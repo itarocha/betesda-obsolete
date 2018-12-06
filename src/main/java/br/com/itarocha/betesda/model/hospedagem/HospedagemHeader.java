@@ -1,9 +1,9 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 
-import br.com.itarocha.betesda.service.DiaHospedeLeito;
+//import br.com.itarocha.betesda.service.DiaHospedeLeito;
 
 public class HospedagemHeader {
 	private String identificador;
@@ -11,11 +11,11 @@ public class HospedagemHeader {
 	private Long hospedagemId;
 	private Long pessoaId;
 	private String pessoaNome;
-	private String status;
+	private CellStatusHospedagem status;
 	private Integer firstIndex;
-	private List<DiaHospedeLeito> dias = new ArrayList<DiaHospedeLeito>();
+	//private List<DiaHospedeLeito> dias = new ArrayList<DiaHospedeLeito>();
 	
-	public HospedagemHeader(String identificador, Long id, Long hospedagemId, Long pessoaId, String pessoaNome, String status) {
+	public HospedagemHeader(String identificador, Long id, Long hospedagemId, Long pessoaId, String pessoaNome, CellStatusHospedagem status) {
 		
 		this.identificador = identificador;
 		
@@ -57,20 +57,22 @@ public class HospedagemHeader {
 		this.pessoaNome = pessoaNome;
 	}
 	
-	public String getStatus() {
+	public CellStatusHospedagem getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(CellStatusHospedagem status) {
 		this.status = status;
 	}
 
+	/*
 	public List<DiaHospedeLeito> getDias() {
 		return dias;
 	}
 	public void setDias(List<DiaHospedeLeito> dias) {
 		this.dias = dias;
 	}
+	*/
 	public Integer getFirstIndex() {
 		return firstIndex;
 	}

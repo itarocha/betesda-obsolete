@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.itarocha.betesda.model.HospedeHospedagemVO;
-
 public class MapaHospedagem {
 
 	private LocalDate dataIni;
@@ -18,20 +16,19 @@ public class MapaHospedagem {
 	
 	private List<LocalDate> dias = new ArrayList<LocalDate>();
 	
-	private List<HospedeHospedagemVO> hospedes = new ArrayList<HospedeHospedagemVO>(); 
-	
-	//Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
-	//Integer[] qtdTotaisPendentes 	= {0,0,0,0,0,0,0};
-	//Integer[] qtdTotaisEncerradas 	= {0,0,0,0,0,0,0};
+	private Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
+	private Integer[] qtdVencidos 			= {0,0,0,0,0,0,0};
+	private Integer[] qtdPendentes 			= {0,0,0,0,0,0,0};
+	private Integer[] qtdEncerrados 		= {0,0,0,0,0,0,0};
 
-	// Parciais somente quando fizer o select dos sem leito
-	Integer[] qtdParciais 			= {0,0,0,0,0,0,0};
-	Integer[] qtdParciaisPendentes 	= {0,0,0,0,0,0,0};
-	Integer[] qtdParciaisEncerradas = {0,0,0,0,0,0,0};
+	private Integer[] qtdParciaisTotais		= {0,0,0,0,0,0,0};
+	private Integer[] qtdParciaisVencidos	= {0,0,0,0,0,0,0};
+	private Integer[] qtdParciaisPendentes 	= {0,0,0,0,0,0,0};
+	private Integer[] qtdParciaisEncerrados = {0,0,0,0,0,0,0};
 	
-	Integer[] qtdLeitosTotais		= {0,0,0,0,0,0,0};
-	Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
-	Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
+	private Integer[] qtdLeitosTotais		= {0,0,0,0,0,0,0};
+	private Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
+	private Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
 
 	public MapaHospedagem() {
 		
@@ -82,15 +79,6 @@ public class MapaHospedagem {
 		this.dias = dias;
 	}
 
-	public List<HospedeHospedagemVO> getHospedes(){
-		return this.hospedes;
-	}
-	
-	public void setHospedes(List<HospedeHospedagemVO> hospedes) {
-		this.hospedes = hospedes;
-	}
-
-	/*
 	public Integer[] getQtdTotais() {
 		return qtdTotais;
 	}
@@ -99,29 +87,44 @@ public class MapaHospedagem {
 		this.qtdTotais = qtdTotais;
 	}
 
-	public Integer[] getQtdTotaisPendentes() {
-		return qtdTotaisPendentes;
+	public Integer[] getQtdVencidos() {
+		return qtdVencidos;
 	}
 
-	public void setQtdTotaisPendentes(Integer[] qtdTotaisPendentes) {
-		this.qtdTotaisPendentes = qtdTotaisPendentes;
+	public void setQtdVencidos(Integer[] qtdVencidos) {
+		this.qtdVencidos = qtdVencidos;
 	}
 
-	public Integer[] getQtdTotaisEncerradas() {
-		return qtdTotaisEncerradas;
+	public Integer[] getQtdPendentes() {
+		return qtdPendentes;
 	}
 
-	public void setQtdTotaisEncerradas(Integer[] qtdTotaisEncerradas) {
-		this.qtdTotaisEncerradas = qtdTotaisEncerradas;
-	}
-	*/
-	
-	public Integer[] getQtdParciais() {
-		return qtdParciais;
+	public void setQtdPendentes(Integer[] qtdPendentes) {
+		this.qtdPendentes = qtdPendentes;
 	}
 
-	public void setQtdParciais(Integer[] qtdParciais) {
-		this.qtdParciais = qtdParciais;
+	public Integer[] getQtdEncerrados() {
+		return qtdEncerrados;
+	}
+
+	public void setQtdEncerrados(Integer[] qtdEncerrados) {
+		this.qtdEncerrados = qtdEncerrados;
+	}
+
+	public Integer[] getQtdParciaisTotais() {
+		return qtdParciaisTotais;
+	}
+
+	public void setQtdParciaisTotais(Integer[] qtdParciaisTotais) {
+		this.qtdParciaisTotais = qtdParciaisTotais;
+	}
+
+	public Integer[] getQtdParciaisVencidos() {
+		return qtdParciaisVencidos;
+	}
+
+	public void setQtdParciaisVencidos(Integer[] qtdParciaisVencidos) {
+		this.qtdParciaisVencidos = qtdParciaisVencidos;
 	}
 
 	public Integer[] getQtdParciaisPendentes() {
@@ -132,12 +135,12 @@ public class MapaHospedagem {
 		this.qtdParciaisPendentes = qtdParciaisPendentes;
 	}
 
-	public Integer[] getQtdParciaisEncerradas() {
-		return qtdParciaisEncerradas;
+	public Integer[] getQtdParciaisEncerrados() {
+		return qtdParciaisEncerrados;
 	}
 
-	public void setQtdParciaisEncerradas(Integer[] qtdParciaisEncerradas) {
-		this.qtdParciaisEncerradas = qtdParciaisEncerradas;
+	public void setQtdParciaisEncerrados(Integer[] qtdParciaisEncerrados) {
+		this.qtdParciaisEncerrados = qtdParciaisEncerrados;
 	}
 
 	public Integer[] getQtdLeitosTotais() {
@@ -163,5 +166,5 @@ public class MapaHospedagem {
 	public void setQtdLeitosLivres(Integer[] qtdLeitosLivres) {
 		this.qtdLeitosLivres = qtdLeitosLivres;
 	}
-	
+
 }

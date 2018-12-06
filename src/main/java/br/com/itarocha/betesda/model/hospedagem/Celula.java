@@ -3,11 +3,12 @@ package br.com.itarocha.betesda.model.hospedagem;
 public class Celula {
 	
 	private LeitoOut leito;
-	private String[] dias;
+
+	private Cell[] cells;
 	
-	public Celula(LeitoOut leito, String[] dias) {
+	public Celula(LeitoOut leito, Cell[] cells) {
 		this.leito = leito;
-		this.dias = dias;
+		this.cells = cells;
 	}
 	
 	public LeitoOut getLeito() {
@@ -18,12 +19,11 @@ public class Celula {
 		this.leito = leito;
 	}
 	
-	public String[] getDias() {
-		return dias;
+	public Cell[] getCells() {
+		return cells;
 	}
 	
-	public void setDias(String[] dias) {
-		this.dias = dias;
+	public void setCells(Cell[] cells) {
+		this.cells = cells;
 	}
-	
 }

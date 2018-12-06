@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.itarocha.betesda.model.hospedagem.CellStatusHospedagem;
+
 public class HospedagemFullVO {
 
 	private Long id;
@@ -15,7 +17,7 @@ public class HospedagemFullVO {
 	private LocalDate dataEfetivaSaida;
 	private TipoUtilizacaoHospedagem tipoUtilizacao;
 	private String observacoes;
-	private String status;
+	private CellStatusHospedagem status;
 	
 	private List<Hospede> hospedes = new ArrayList<Hospede>();
 	
@@ -103,11 +105,11 @@ public class HospedagemFullVO {
 		this.hospedes = hospedes;
 	}
 
-	public String getStatus() {
+	public CellStatusHospedagem getStatus() {
 		return this.status;
 	}
 	
-	public void setStatus(String status) {
+	public void setStatus(CellStatusHospedagem status) {
 		this.status = status;
 	}
 }
