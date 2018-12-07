@@ -72,6 +72,9 @@ public class Hospedagem {
 	@OneToMany(mappedBy = "hospedagem",fetch=FetchType.LAZY)
 	private List<Hospede> hospedes = new ArrayList<Hospede>();
 	
+	@OneToMany(mappedBy = "hospedagem",fetch=FetchType.LAZY)
+	private List<HospedagemTipoServico> servicos = new ArrayList<HospedagemTipoServico>();
+	
 	public Hospedagem() {
 		this.tipoUtilizacao = TipoUtilizacaoHospedagem.T;
 	}
@@ -154,5 +157,13 @@ public class Hospedagem {
 
 	public void setHospedes(List<Hospede> hospedes) {
 		this.hospedes = hospedes;
+	}
+
+	public List<HospedagemTipoServico> getServicos() {
+		return servicos;
+	}
+
+	public void setServicos(List<HospedagemTipoServico> servicos) {
+		this.servicos = servicos;
 	}
 }

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
 import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemFullVO;
+import br.com.itarocha.betesda.model.HospedagemTipoServico;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.Hospede;
 import br.com.itarocha.betesda.model.HospedeLeito;
@@ -30,6 +31,7 @@ import br.com.itarocha.betesda.model.LeitoVO;
 import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.TipoHospede;
+import br.com.itarocha.betesda.model.TipoServico;
 import br.com.itarocha.betesda.model.TipoUtilizacaoHospedagem;
 import br.com.itarocha.betesda.model.hospedagem.Cell;
 import br.com.itarocha.betesda.model.hospedagem.CellAndamento;
@@ -41,12 +43,14 @@ import br.com.itarocha.betesda.model.hospedagem.LeitoOut;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
 import br.com.itarocha.betesda.repository.HospedagemRepository;
+import br.com.itarocha.betesda.repository.HospedagemTipoServicoRepository;
 import br.com.itarocha.betesda.repository.HospedeLeitoRepository;
 import br.com.itarocha.betesda.repository.HospedeRepository;
 import br.com.itarocha.betesda.repository.LeitoRepository;
 import br.com.itarocha.betesda.repository.PessoaRepository;
 import br.com.itarocha.betesda.repository.QuartoRepository;
 import br.com.itarocha.betesda.repository.TipoHospedeRepository;
+import br.com.itarocha.betesda.repository.TipoServicoRepository;
 import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
 
@@ -83,6 +87,12 @@ public class HospedagemService {
 	@Autowired
 	private HospedeRepository hospedeRepo;
 	
+	@Autowired
+	private TipoServicoRepository tipoServicoRepo;
+	
+	@Autowired
+	private HospedagemTipoServicoRepository hospedagemTipoServicoRepo;
+
 	public Hospedagem create(HospedagemVO model) throws Exception {
 		Hospedagem hospedagem = null;
 		try {
@@ -143,7 +153,22 @@ public class HospedagemService {
 			    		
 			    		h.getLeitos().add(hl);
 			    	}
+			    }
+			    
+			    if ((model.getServicos().length > 0) && (TipoUtilizacaoHospedagem.P.equals(hospedagem.getTipoUtilizacao())) ) {
+			    	
+			    	for (Long tipoServicoId : model.getServicos()) {
+			    		Optional<TipoServico> ts = tipoServicoRepo.findById(tipoServicoId);
+			    		if (ts.isPresent()) {
+				    		HospedagemTipoServico servico = new HospedagemTipoServico();
+				    		servico.setTipoServico(ts.get());
+				    		servico.setHospedagem(hospedagem);
+				    		hospedagemTipoServicoRepo.save(servico);
+				    		hospedagem.getServicos().add(servico);
+			    		}
+			    	}
 			    }	 
+			    
 			}
 		} catch (Exception e) {
 			throw e;
@@ -246,13 +271,10 @@ public class HospedagemService {
 						xdias[celulaIndex].setUtilizacao(utilizacao);
 						xdias[celulaIndex].setStatus(statusHospedagem);
 						
-						
 						if (hh.getFirstIndex() == -1) {
 							hh.setFirstIndex(celulaIndex);
 							xdias[celulaIndex].setFirstIndex(true);
 						}
-						
-						
 					}
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
@@ -300,13 +322,13 @@ public class HospedagemService {
 		for (Celula c : mapaHospedagem.getCelulas()) {
 			for (int x = 0; x < QTD_DIAS; x++) {
 				qtdLeitosTotais[x] = qtdLeitos;
-				qtdLeitosLivres[x] = qtdLeitos;
 			}
 			for (int i = 0; i < QTD_DIAS; i++) {
 				Cell cell = c.getCells()[i];
-				if (CellUtilizacao.TOTAL.equals(cell.getUtilizacao())) {
+				if (!CellUtilizacao.VAZIO.equals(cell.getUtilizacao())) {
 					qtdTotais[i]++;
-					qtdLeitosLivres[i]--;
+				}
+				if (CellUtilizacao.TOTAL.equals(cell.getUtilizacao())) {
 					qtdLeitosOcupados[i]++;
 				}
 				if (CellUtilizacao.PARCIAL.equals(cell.getUtilizacao())) {
@@ -333,6 +355,9 @@ public class HospedagemService {
 		
 		mapaHospedagem.setQtdLeitosTotais(qtdLeitosTotais);
 		mapaHospedagem.setQtdLeitosOcupados(qtdLeitosOcupados);
+		for (int x = 0; x < QTD_DIAS; x++) {
+			qtdLeitosLivres[x] = qtdLeitos - qtdLeitosOcupados[x];
+		}
 		mapaHospedagem.setQtdLeitosLivres(qtdLeitosLivres);
 	}
 
