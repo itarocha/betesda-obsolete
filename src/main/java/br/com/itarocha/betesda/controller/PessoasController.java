@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.itarocha.betesda.model.Pessoa;
+import br.com.itarocha.betesda.model.SituacaoLeito;
 import br.com.itarocha.betesda.service.PessoaService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
@@ -25,8 +26,8 @@ import br.com.itarocha.betesda.util.validation.ItaValidator;
 @RequestMapping("/api/pessoas")
 public class PessoasController {
 
-	@Autowired
-	private EntityManager em;
+	//@Autowired
+	//private EntityManager em;
 	
 	@Autowired
 	private PessoaService service;
@@ -41,7 +42,7 @@ public class PessoasController {
 				return new ResponseEntity<String>("não encontrado", HttpStatus.NOT_FOUND);
 			}
 		} finally {
-			em.close();
+			//em.close();
 		}
 	}
 
@@ -67,16 +68,35 @@ public class PessoasController {
 		
 		try {
 			Pessoa saved = null;
-			if (model.getId() == null) {
-				saved = service.create(model);
-			} else {
-				saved = service.update(model);
-			}
+			saved = service.create(model);
 		    return new ResponseEntity<Pessoa>(saved, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	/*
+	  
+	@RequestMapping(method = RequestMethod.POST)
+	public ResponseEntity<?> gravar(@RequestBody SituacaoLeito model) {
+		ItaValidator<SituacaoLeito> v = new ItaValidator<SituacaoLeito>(model);
+		v.validate();
+		if (!v.hasErrors() ) {
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		try {
+			SituacaoLeito saved = null;
+			saved = service.create(model);
+		    return new ResponseEntity<SituacaoLeito>(saved, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	  
+	 
+	  
+	 */
 	
 	@RequestMapping(value = "{id}", method=RequestMethod.DELETE)
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {

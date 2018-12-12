@@ -9,25 +9,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.itarocha.betesda.model.Pessoa;
+import br.com.itarocha.betesda.repository.EnderecoRepository;
 import br.com.itarocha.betesda.repository.PessoaRepository;
 
 @Service
 public class PessoaService {
 
 	@Autowired
-	protected EntityManager em;
-	
+	private EntityManager em;
+
 	@Autowired
 	private PessoaRepository repositorio;
+
+	@Autowired
+	private EnderecoRepository enderecoRepo;
 
 	public PessoaService() {
 	}
 
 	public Pessoa create(Pessoa model) {
 		try{
-			//return repositorio.save(model);
-			em.persist(model.getEndereco());
-			em.persist(model);
+			enderecoRepo.save(model.getEndereco());
+			repositorio.save(model);
 		}catch(Exception e){
 			throw new IllegalArgumentException(e.getMessage());
 		}

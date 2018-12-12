@@ -13,12 +13,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 //import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Entity
 @Table(name="leito")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "quarto"}) // "leitos", 
 public class Leito implements Serializable{
 	
 	private static final long serialVersionUID = 5765750404479537331L;
@@ -27,7 +28,6 @@ public class Leito implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@JsonIgnore
 	@ManyToOne(fetch=FetchType.LAZY)
 	@JoinColumn(name="quarto_id")
 	@NotNull
@@ -55,12 +55,10 @@ public class Leito implements Serializable{
 		this.id = id;
 	}
 
-	//@JsonIgnore
 	public Quarto getQuarto() {
 		return this.quarto;
 	}
 
-	//@JsonIgnore
 	public void setQuarto(Quarto quarto) {
 		this.quarto = quarto;
 	}
