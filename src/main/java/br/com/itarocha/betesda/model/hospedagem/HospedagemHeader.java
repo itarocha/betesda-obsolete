@@ -1,9 +1,9 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
-//import java.util.ArrayList;
-//import java.util.List;
+import java.time.LocalDate;
 
-//import br.com.itarocha.betesda.service.DiaHospedeLeito;
+import br.com.itarocha.betesda.model.DestinacaoHospedagem;
+import br.com.itarocha.betesda.model.TipoUtilizacaoHospedagem;
 
 public class HospedagemHeader {
 	private String identificador;
@@ -13,6 +13,16 @@ public class HospedagemHeader {
 	private String pessoaNome;
 	private CellStatusHospedagem status;
 	private Integer firstIndex;
+	
+	
+	private LocalDate dataEntrada;
+	private LocalDate dataEfetivaSaida;
+	private LocalDate dataPrevistaSaida;
+	
+	private TipoUtilizacaoHospedagem tipoUtilizacao;
+	private DestinacaoHospedagem destinacaoHospedagem;
+	
+	
 	//private List<DiaHospedeLeito> dias = new ArrayList<DiaHospedeLeito>();
 	
 	public HospedagemHeader(String identificador, Long id, Long hospedagemId, Long pessoaId, String pessoaNome, CellStatusHospedagem status) {
@@ -65,6 +75,36 @@ public class HospedagemHeader {
 		this.status = status;
 	}
 
+	public LocalDate getDataEntrada() {
+		return dataEntrada;
+	}
+	public void setDataEntrada(LocalDate dataEntrada) {
+		this.dataEntrada = dataEntrada;
+	}
+	public LocalDate getDataEfetivaSaida() {
+		return dataEfetivaSaida;
+	}
+	public void setDataEfetivaSaida(LocalDate dataEfetivaSaida) {
+		this.dataEfetivaSaida = dataEfetivaSaida;
+	}
+	public LocalDate getDataPrevistaSaida() {
+		return dataPrevistaSaida;
+	}
+	public void setDataPrevistaSaida(LocalDate dataPrevistaSaida) {
+		this.dataPrevistaSaida = dataPrevistaSaida;
+	}
+	public TipoUtilizacaoHospedagem getTipoUtilizacao() {
+		return tipoUtilizacao;
+	}
+	public void setTipoUtilizacao(TipoUtilizacaoHospedagem tipoUtilizacao) {
+		this.tipoUtilizacao = tipoUtilizacao;
+	}
+	public DestinacaoHospedagem getDestinacaoHospedagem() {
+		return destinacaoHospedagem;
+	}
+	public void setDestinacaoHospedagem(DestinacaoHospedagem destinacaoHospedagem) {
+		this.destinacaoHospedagem = destinacaoHospedagem;
+	}
 	/*
 	public List<DiaHospedeLeito> getDias() {
 		return dias;

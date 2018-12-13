@@ -13,25 +13,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.itarocha.betesda.model.Pessoa;
-import br.com.itarocha.betesda.service.PessoaService;
+import br.com.itarocha.betesda.model.Entidade;
+import br.com.itarocha.betesda.service.EntidadeService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/pessoas")
-public class PessoasController {
+@RequestMapping("/api/entidades")
+public class EntidadesController {
 
 	@Autowired
-	private PessoaService service;
+	private EntidadeService service;
 	
 	@RequestMapping(value="{id}")
 	public ResponseEntity<?> getById(@PathVariable("id") Long id) {
 		try {
-			Optional<Pessoa> model = service.find(id);
+			Optional<Entidade> model = service.find(id);
 			if (model.isPresent()) {
-				return new ResponseEntity<Pessoa>(model.get(), HttpStatus.OK);
+				return new ResponseEntity<Entidade>(model.get(), HttpStatus.OK);
 			} else {
 				return new ResponseEntity<String>("não encontrado", HttpStatus.NOT_FOUND);
 			}
@@ -42,28 +42,28 @@ public class PessoasController {
 
 	@RequestMapping
 	public ResponseEntity<?> listar() {
-		List<Pessoa> lista = service.findAll();
-		return new ResponseEntity<List<Pessoa>>(lista, HttpStatus.OK);
+		List<Entidade> lista = service.findAll();
+		return new ResponseEntity<List<Entidade>>(lista, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/consultar/{texto}")
 	public ResponseEntity<?> consultar(@PathVariable("texto") String texto) {
-		List<Pessoa> lista = service.consultar(texto);
-		return new ResponseEntity<List<Pessoa>>(lista, HttpStatus.OK);
+		List<Entidade> lista = service.consultar(texto);
+		return new ResponseEntity<List<Entidade>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> gravar(@RequestBody Pessoa model) {
-		ItaValidator<Pessoa> v = new ItaValidator<Pessoa>(model);
+	public ResponseEntity<?> gravar(@RequestBody Entidade model) {
+		ItaValidator<Entidade> v = new ItaValidator<Entidade>(model);
 		v.validate();
 		if (!v.hasErrors() ) {
 			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		try {
-			Pessoa saved = null;
+			Entidade saved = null;
 			saved = service.create(model);
-		    return new ResponseEntity<Pessoa>(saved, HttpStatus.OK);
+		    return new ResponseEntity<Entidade>(saved, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

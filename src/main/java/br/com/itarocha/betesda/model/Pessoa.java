@@ -41,7 +41,6 @@ public class Pessoa {
 	private String nome;
 
 	@NotNull(message="Data de Nascimento é obrigatório")
-	//@Temporal(TemporalType.DATE)
 	private LocalDate dataNascimento;
 
 	@Enumerated(EnumType.STRING)

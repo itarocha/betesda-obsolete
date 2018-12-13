@@ -249,6 +249,13 @@ public class HospedagemService {
 				}
 				
 				HospedagemHeader hh = new HospedagemHeader(identificador, id, hospedagem.getId(), p.getId(), p.getNome(), statusHospedagem);
+				
+				hh.setDataEntrada(hospedagem.getDataEntrada());
+				hh.setDataEfetivaSaida(hospedagem.getDataEfetivaSaida());
+				hh.setDataPrevistaSaida(hospedagem.getDataPrevistaSaida());
+				hh.setTipoUtilizacao(hospedagem.getTipoUtilizacao()); //
+				hh.setDestinacaoHospedagem(hospedagem.getDestinacaoHospedagem());
+				
 				hospedagensHeaders.add(hh);
 				while (dtmp.compareTo(dFim) != 1) {
 					CellAndamento andamento = CellAndamento.VAZIO;
