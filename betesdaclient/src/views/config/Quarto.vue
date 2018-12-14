@@ -127,7 +127,7 @@ export default {
   methods: {
 
     getData(evt) {
-      let uri = petra.base_uri + "/quarto";
+      let uri = petra.base_uri + "/app/quarto";
       axios
         .get(uri)
         .then(response => {
@@ -215,7 +215,7 @@ export default {
 
     onDeleteQuarto(evt) {
       //this.errors.nome = [];
-      let uri = petra.base_uri + "/quarto/" + this.formQuarto.id;
+      let uri = petra.base_uri + "/app/quarto/" + this.formQuarto.id;
       axios
         .delete(uri)
         .then(response => {
@@ -234,7 +234,7 @@ export default {
 
     onDeleteLeito(evt) {
       //this.errors.nome = [];
-      let uri = petra.base_uri + "/quarto/leito/" + this.formLeito.id;
+      let uri = petra.base_uri + "/app/quarto/leito/" + this.formLeito.id;
       axios
         .delete(uri)
         .then(response => {

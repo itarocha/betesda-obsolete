@@ -89,7 +89,7 @@ export default {
         this.dados = []
         return
       }
-      let uri = petra.base_uri+"/pessoas/consultar/"+this.searchText; 
+      let uri = petra.base_uri+"/app/pessoas/consultar/"+this.searchText; 
       axios.get(uri).then(response => {
         this.dados = response.data;
       });        
@@ -122,7 +122,7 @@ export default {
 
     loadListas(evt) {
       this.itensDestinacaoHospedagem = [];
-      let uri = petra.base_uri + "/quarto/listas";
+      let uri = petra.base_uri + "/app/quarto/listas";
       axios.get(uri).then(response => {
         this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem;
         this.itensTipoLeito = response.data.listaTipoLeito;
@@ -132,7 +132,7 @@ export default {
     },
 
     onChangeText: _.debounce((e) => {
-        let uri = petra.base_uri+"/pessoas/consultar/" +e.target.value
+        let uri = petra.base_uri+"/app/pessoas/consultar/" +e.target.value
         
         axios.get(uri).then(response => {
           this.dados = response.data;

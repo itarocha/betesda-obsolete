@@ -18,7 +18,7 @@ import br.com.itarocha.betesda.util.validation.ItaValidator;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/situacao_leito")
+@RequestMapping("/api/app/situacao_leito")
 public class SituacaoLeitoController {
 
 	@Autowired

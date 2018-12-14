@@ -78,7 +78,7 @@ export default {
 
   methods: {
       getData(evt) {
-        let uri = petra.base_uri+"/situacao_leito"; 
+        let uri = petra.base_uri+"/app/situacao_leito"; 
         axios.get(uri).then(response => {
           this.dados = response.data;
         });      
@@ -103,7 +103,7 @@ export default {
       },
 
       onDelete(evt) {
-        let uri = petra.base_uri+"/situacao_leito/"+this.form.id;
+        let uri = petra.base_uri+"/app/situacao_leito/"+this.form.id;
         axios.delete(uri)
             .then(response => { 
               this.$store.dispatch('setAcao','')

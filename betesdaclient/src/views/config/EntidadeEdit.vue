@@ -170,7 +170,7 @@ export default {
     save(evt) {
       this.errors = [];
 
-      let uri = petra.base_uri+"/entidades";
+      let uri = petra.base_uri+"/app/entidades";
       axios.post(uri, this.form)
           .then(response => { 
             this.dialogVisible = false

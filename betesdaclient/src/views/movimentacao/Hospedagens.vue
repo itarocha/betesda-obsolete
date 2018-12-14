@@ -353,7 +353,7 @@ export default {
     },
 
     getData(data) {
-      let uri = petra.base_uri + "/hospedagem/mapa"
+      let uri = petra.base_uri + "/app/hospedagem/mapa"
 
       var dados = {
         data : data

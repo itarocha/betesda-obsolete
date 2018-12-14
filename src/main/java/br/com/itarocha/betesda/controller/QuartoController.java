@@ -29,7 +29,7 @@ import br.com.itarocha.betesda.util.validation.ItaValidator;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/quarto")
+@RequestMapping("/api/app/quarto")
 public class QuartoController {
 
 	@Autowired

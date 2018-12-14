@@ -81,7 +81,7 @@ export default {
 
     loadListas(evt) {
       this.itensDestinacaoHospedagem = [];
-      let uri = petra.base_uri + "/quarto/listas";
+      let uri = petra.base_uri + "/app/quarto/listas";
       axios.get(uri).then(response => {
         this.itensDestinacaoHospedagem =
           response.data.listaDestinacaoHospedagem;
@@ -98,7 +98,7 @@ export default {
     save(evt) {
       this.errors.descricao = [];
 
-      let uri = petra.base_uri+"/quarto/alterar";
+      let uri = petra.base_uri+"/app/quarto/alterar";
       axios.post(uri, this.form)
           .then(response => { 
             this.dialogVisible = false

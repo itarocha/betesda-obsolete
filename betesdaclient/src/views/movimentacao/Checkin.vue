@@ -524,7 +524,7 @@ export default {
         toSave.hospedes.push(hospede)
       }
 
-      let uri = petra.base_uri+"/hospedagem";
+      let uri = petra.base_uri+"/app/hospedagem";
       axios.post(uri, toSave)
           .then(response => { 
             console.log("RETORNO DA HOSPEDAGEM: ", response.data)
@@ -555,7 +555,7 @@ export default {
 
     loadListas() {
       this.itensDestinacaoHospedagem = [];
-      let uri = petra.base_uri + "/quarto/listas";
+      let uri = petra.base_uri + "/app/quarto/listas";
       axios.get(uri).then(response => {
         this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem;
         this.itensTipoLeito = response.data.listaTipoLeito;

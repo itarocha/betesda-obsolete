@@ -20,7 +20,7 @@ import br.com.itarocha.betesda.util.validation.ItaValidator;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/entidades")
+@RequestMapping("/api/app/entidades")
 public class EntidadesController {
 
 	@Autowired

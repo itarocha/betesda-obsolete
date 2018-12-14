@@ -11,6 +11,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+
+// Olha só de onde eu tirei: https://github.com/callicoder/spring-security-react-ant-design-polls-app
+// https://java.jsonwebtoken.io/
+// https://github.com/jwtk/jjwt
+
 @SpringBootApplication
 @EnableJpaRepositories
 @ComponentScan({"br.com.itarocha.betesda.controller",

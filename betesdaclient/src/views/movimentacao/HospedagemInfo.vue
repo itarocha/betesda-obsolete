@@ -195,7 +195,7 @@ export default {
         hospedagemId : hospedagemId
       }
 
-      let uri = petra.base_uri+"/hospedagem/mapa/hospedagem_info";
+      let uri = petra.base_uri+"/app/hospedagem/mapa/hospedagem_info";
       axios.post(uri, dados)
           .then(response => { 
             console.log("RETORNOU ", response.data)
@@ -220,7 +220,7 @@ export default {
     },
 
     encerrarHospedagem(hospedagemId, data) {
-      let uri = petra.base_uri + "/hospedagem/mapa/encerramento";
+      let uri = petra.base_uri + "/app/hospedagem/mapa/encerramento";
 
       var dados = {
         hospedagemId : hospedagemId,
@@ -251,7 +251,7 @@ export default {
     save(evt) {
       //this.errors.descricao = [];
       /*
-      let uri = petra.base_uri+"/destinacao_hospedagem";
+      let uri = petra.base_uri+"/app/destinacao_hospedagem";
       axios.post(uri, this.form)
           .then(response => { 
             this.dialogVisible = false
