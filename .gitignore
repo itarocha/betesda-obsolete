@@ -8,6 +8,7 @@ trash.txt
 
 betesdaclient/dist/**
 betesdaclient/node_modules/**
+betesdabuilder/output/**
 
 
 # Compiled class file
