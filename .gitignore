@@ -5,6 +5,11 @@ target/
 /target/**
 trash.txt
 
+
+betesdaclient/dist/**
+betesdaclient/node_modules/**
+
+
 # Compiled class file
 *.class
 
