@@ -1,10 +1,129 @@
 var moment = require('moment')
 moment.locale('pt-br');
 
+var base_uri =  'http://localhost:8088/api'
+//base_uri: 'http://petrasistemas.com.br:8080/betesda/api',
+
 export default {
 
-    //base_uri: 'http://petrasistemas.com.br:8080/betesda/api',
-    base_uri: 'http://localhost:8088/api',
+    //base_uri: 'http://localhost:8088/api',
+    base_uri,
+
+    showMessageInfo(texto){
+      var mensagem = {
+        text : texto,
+        type : 'info'
+      }
+      store.dispatch('showFlashMessage', mensagem)
+    },
+
+    showMessageWarning(texto){
+      var mensagem = {
+        text : texto,
+        type : 'warning'
+      }
+      store.dispatch('showFlashMessage', mensagem)
+    },
+
+    showMessageError(texto){
+      var mensagem = {
+        text : texto,
+        type : 'error'
+      }
+      store.dispatch('showFlashMessage', mensagem)
+    },
+
+    showMessageSuccess(texto){
+      var mensagem = {
+        text : texto,
+        type : 'success'
+      }
+      store.dispatch('showFlashMessage', mensagem)
+    },
+
+    resolveToken(){
+      var token = localStorage.getItem('accessToken') || null
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+    },
+
+    axiosGet(endpoint){
+      this.resolveToken()
+      return new Promise((resolve, reject) => {
+          axios.get(`${base_uri}${endpoint}`)
+          .then(response => {
+            resolve(response)
+          }).catch(error => {
+            if (error.response.status == 401){
+              this.showMessageError("Erro: "+error.response.data.message)
+            }
+            reject(error)
+          })
+      })
+    },
+
+    axiosPost(endpoint, data){
+      this.resolveToken()
+      return new Promise((resolve, reject) => {
+          axios.post(base_uri+endpoint, data)
+          .then(response => {
+            resolve(response)
+          }).catch(error => {
+            if (error.response.status == 401){
+              this.showMessageError("Erro: "+error.response.data.message)
+            }
+            reject(error)
+          })
+      })
+    },
+
+    axiosDelete(endpoint){
+      this.resolveToken()
+      return new Promise((resolve, reject) => {
+          axios.delete(base_uri+endpoint)
+          .then(response => {
+            resolve(response)
+          }).catch(error => {
+            if (error.response.status == 401){
+              this.showMessageError("Erro: "+error.response.data.message)
+            }
+            reject(error)
+          })
+      })
+    },
+
+
+    /*
+    axios.get('https://appdividend.com', {
+    headers: {
+      Authorization: 'Bearer ' + token //the token is a variable which holds the token
+    }
+    });
+
+    let config = {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      responseType: 'blob'
+    };
+
+    axios.post('https://appdividend.com', data, config)
+        .then((response) => {
+            console.log(response.data);
+    });
+
+    #Axios Response Object
+    When the HTTP request is successful sent, than then() callback will receive a response object with the following properties:
+
+    -data: the payload returned from the server. By default, Axios expects JSON and will parse this back into a JavaScript object for you.
+    -status: the HTTP code returned from the server.
+    -statusText: the HTTP status message returned by the server.
+    -headers: all the headers sent back by the server.
+    -config: the original request configuration.
+    -request: the actual XMLHttpRequest object (when running in a browser).
+
+    axios.defaults.baseURL = 'https://api.example.com';
+    axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+
+*/
 
     tratarErros(error, debug){
         if (error.response) {

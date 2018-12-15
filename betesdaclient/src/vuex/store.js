@@ -7,7 +7,11 @@ export default new Vuex.Store({
     state:{
         token: localStorage.getItem('accessToken') || null,
         snackbar : false,
-        flashMessageText : 'Hello World',
+
+        flashMessage : {
+            text : 'Hello World',
+            type : 'info'
+        },
         tela: {
             descricao : '',
             acao : ''
@@ -38,8 +42,8 @@ export default new Vuex.Store({
         setSnackbar(state, valor){
             state.snackbar = valor
         },
-        setFlashMessageText(state, valor){
-            state.flashMessageText = valor
+        setFlashMessage(state, flashMessage){
+            state.flashMessage = flashMessage
         },
         retrieveToken(state, token){
             state.token = token
@@ -49,7 +53,7 @@ export default new Vuex.Store({
         destroyToken(state){
             state.token = null
             //axios.defaults.headers.common['Authorization'] = null
-            delete axios.defaults.headers.common['authorization'];
+            delete axios.defaults.headers.common['Authorization'];
         }
     },
     actions:{ // asyncronous
@@ -94,10 +98,14 @@ export default new Vuex.Store({
         setSnackbar(state, valor){
             state.commit('setSnackbar', valor)
         },
-        showFlashMessage(state, mensagem){
-            state.commit('setFlashMessageText', mensagem);
+        showFlashMessage(state, flashMessage){
+            state.commit('setFlashMessage', {
+                text : flashMessage.text,
+                type : flashMessage.type
+            });
             state.commit('setSnackbar', true);
         },
+
     },
     getters:{
         loggedIn(state){
@@ -111,8 +119,8 @@ export default new Vuex.Store({
         snackbar(state){
             return state.snackbar
         },
-        flashMessageText(state){
-            return state.flashMessageText
+        flashMessage(state){
+            return state.flashMessage
         },
     }
 })

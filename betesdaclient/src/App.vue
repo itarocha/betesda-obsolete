@@ -51,16 +51,13 @@
         :left="false"
         :multi-line="true"
         :right="false"
-        :timeout="3000"
+        :timeout="5000"
         :top="true"
         :vertical="true"
+        :color="flashMessageType"
       >
         {{ flashMessageText }}
-        <v-btn
-          color="blue"
-          flat
-          @click="closeSnackbar"
-        >
+        <v-btn flat @click="closeSnackbar">
           Fechar
         </v-btn>
       </v-snackbar>
@@ -108,8 +105,13 @@ export default {
     titulo(){
       return this.$store.getters.titulo
     },
+    flashMessageType(){
+      var fm = this.$store.getters.flashMessage
+      return fm.type
+    },
     flashMessageText(){
-      return this.$store.getters.flashMessageText
+      var fm =  this.$store.getters.flashMessage
+      return fm.text
     },
     snackbar: {
       // getter
@@ -144,7 +146,6 @@ export default {
       clipped: true,
       drawer: true,
       fixed: false,
-      flashMessage: "Hello World",
       //https://fontawesome.com/icons?d=gallery&m=free
       items: [
         {

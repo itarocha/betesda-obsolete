@@ -81,9 +81,13 @@ export default {
   methods: {
       getData(evt) {
         let uri = petra.base_uri+"/app/entidades"; 
+        console.log("ENTIDADES AXIOS.HEADER = ",axios.defaults.headers.common)
         axios.get(uri).then(response => {
           this.dados = response.data;
-        });      
+        }).catch(error => {
+          console.log("ERRO:",error)
+          //reject(error)
+        })      
       },
 
       incluir() {
