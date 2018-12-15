@@ -75,6 +75,39 @@ export default {
   },
 
   methods: {
+    /*
+    axios.get('https://appdividend.com', {
+    headers: {
+      Authorization: 'Bearer ' + token //the token is a variable which holds the token
+    }
+    });
+
+    let config = {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      responseType: 'blob'
+    };
+
+    axios.post('https://appdividend.com', data, config)
+        .then((response) => {
+            console.log(response.data);
+    });
+
+    #Axios Response Object
+    When the HTTP request is successful sent, than then() callback will receive a response object with the following properties:
+
+    -data: the payload returned from the server. By default, Axios expects JSON and will parse this back into a JavaScript object for you.
+    -status: the HTTP code returned from the server.
+    -statusText: the HTTP status message returned by the server.
+    -headers: all the headers sent back by the server.
+    -config: the original request configuration.
+    -request: the actual XMLHttpRequest object (when running in a browser).
+
+    axios.defaults.baseURL = 'https://api.example.com';
+    axios.defaults.headers.common['Authorization'] = AUTH_TOKEN;
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+
+*/
+
       getData(evt) {
         let uri = petra.base_uri+"/app/destinacao_hospedagem"; 
         axios.get(uri).then(response => {

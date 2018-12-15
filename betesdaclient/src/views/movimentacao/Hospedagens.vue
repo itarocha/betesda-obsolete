@@ -1,10 +1,12 @@
 <template>
   <div>
     <hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada"></hospedagem-info>
+    
 
     <!--<v-container class="p0">-->
         <v-layout row>
           <v-flex xs12 sm12>
+            <!--<p>{{txt}} - {{styleGrid}}</p>-->
             <v-btn small color="cyan darken-4" class="white--text" @click="getDadosSemanaAnterior(dados.dataIni)"><v-icon dark left>chevron_left</v-icon>Semana Anterior</v-btn> <!-- fa-chevron-left -->
             <v-btn small color="cyan darken-4" class="white--text" @click="getDadosHoje()">Hoje</v-btn> <!-- fa-chevron-left -->
             <v-btn small color="cyan darken-4" class="white--text" @click="getDadosProximaSemana(dados.dataFim)">Semana Seguinte<v-icon dark right>chevron_right</v-icon></v-btn>
@@ -52,7 +54,7 @@
                     <div class="w15"></div>
                 </v-layout>
                 
-                <div :style="alturaGrid" class="scroll-y p0">
+                <div :style="styleGrid" class="scroll-y p0">
 
                   <v-layout row v-for="(celula, index) in dados.celulas" :key="index">
                     <v-flex sm12>
@@ -223,6 +225,9 @@ export default {
     HospedagemInfo
   },
   data: () =>({
+    windowHeight: 0,
+    styleGrid : 'max-height: 337px',
+    txt : '???',
     dataAtual: null,
     dados: [],
     pessoas:[],
@@ -259,6 +264,35 @@ export default {
   mounted () {
     //console.logconsole.log(this.$vuetify.breakpoint)
     this.$store.dispatch('setAcao','Hospedagens')
+
+    this.windowHeight = window.innerHeight
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.windowHeight = window.innerHeight
+      })
+    })
+    
+  },
+
+  watch: {
+    dataAtual(){
+      this.getDadosSemanaAtual()
+      this.showEstatisticas()
+    },
+
+    estatisticaLeitos(){
+      this.showEstatisticas()
+    },
+
+    windowHeight(newHeight, oldHeight) {
+      this.txt = `mudou de ${oldHeight} para ${newHeight}`
+      this.styleGrid = `max-height: ${newHeight - 272}px`
+    }    
+  },
+
+  created(){
+    this.dataAtual = petraDateTime.hoje()
   },
 
   computed: {
@@ -288,21 +322,6 @@ export default {
       }
     }    
 
-  },
-
-  watch: {
-    dataAtual(){
-      this.getDadosSemanaAtual()
-      this.showEstatisticas()
-    },
-
-    estatisticaLeitos(){
-      this.showEstatisticas()
-    }
-  },
-
-  created(){
-    this.dataAtual = petraDateTime.hoje()
   },
 
   methods: {
