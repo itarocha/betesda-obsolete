@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state:{
+        token: localStorage.getItem('accessToken') || null,
         snackbar : false,
         flashMessageText : 'Hello World',
         tela: {
@@ -40,8 +41,44 @@ export default new Vuex.Store({
         setFlashMessageText(state, valor){
             state.flashMessageText = valor
         },
+        retrieveToken(state, token){
+            state.token = token
+            axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`
+            console.log("AXIOS.HEADER = ",axios.defaults.headers.common)
+        },
+        destroyToken(state){
+            state.token = null
+            //axios.defaults.headers.common['Authorization'] = null
+            delete axios.defaults.headers.common['authorization'];
+        }
     },
     actions:{ // asyncronous
+
+        retrieveToken(context, credentials){
+
+            return new Promise((resolve, reject) => {
+                axios.post(petra.base_uri+"/auth/login", {
+                    usernameOrEmail: credentials.username,
+                    password: credentials.password
+                })
+                .then(response => {
+                    //console.log(response)
+                    const token = response.data.accessToken
+                    localStorage.setItem('accessToken', token)
+                    context.commit('retrieveToken', token)
+                    resolve(response)
+                }).catch(error => {
+                    //console.log(error)
+                    reject(error)
+                })
+            })
+        },
+        destroyToken(context){
+            if (context.getters.loggedIn){
+                localStorage.removeItem('accessToken')
+                context.commit('destroyToken')
+            }
+        },
         increment(state){
             state.commit('increment')
         },
@@ -63,6 +100,9 @@ export default new Vuex.Store({
         },
     },
     getters:{
+        loggedIn(state){
+            return state.token != null
+        },
         titulo(state){
             var descricao = ((state.tela.descricao == "") ? "" : " - " +state.tela.descricao);
             var acao = ((state.tela.acao == "") ? "" : " - " +state.tela.acao);

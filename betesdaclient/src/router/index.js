@@ -23,7 +23,9 @@ import HistoricoHospedagens from '@/views/movimentacao/HistoricoHospedagens.vue'
 
 Vue.use(Router)
 
-export default new Router({
+//export default new Router({
+
+const router = new Router({
   routes: [
     {
       path: '/',
@@ -38,62 +40,98 @@ export default new Router({
     {
       path: '/login',
       name: 'login',
-      component: Login
+      component: Login,
+      meta: {
+        requiresVisitor: true
+      }
     },
     {
       path: '/destinacao_hospedagem',
       name: 'destinacao_hospedagem',
-      component: DestinacaoHospedagem
+      component: DestinacaoHospedagem,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/situacao_leito',
       name: 'situacao_leito',
-      component: SituacaoLeito
+      component: SituacaoLeito,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/tipo_hospede',
       name: 'tipo_hospede',
-      component: TipoHospede
+      component: TipoHospede,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/tipo_leito',
       name: 'tipo_leito',
-      component: TipoLeito
+      component: TipoLeito,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/tipo_servico',
       name: 'tipo_servico',
-      component: TipoServico
+      component: TipoServico,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/quarto',
       name: 'quarto',
-      component: Quarto
+      component: Quarto,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/entidade',
       name: 'entidade',
-      component: Entidade
+      component: Entidade,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/checkin',
       name: 'checkin',
-      component: Checkin
+      component: Checkin,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/hospedagens',
       name: 'hospedagens',
-      component: Hospedagens
+      component: Hospedagens,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/servicos',
       name: 'servicos',
-      component: Servicos
+      component: Servicos,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/historico_hospedagens',
       name: 'historico_hospedagens',
-      component: HistoricoHospedagens
+      component: HistoricoHospedagens,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/helloworld',
@@ -102,3 +140,22 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if(to.matched.some(record => record.meta.requiresAuth)){
+    var loggedIn = store.getters.loggedIn
+    //console.log("Path: ",to.path," loggedIn = ",loggedIn," meta = ", to.meta)
+    if (!loggedIn){
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
+})
+
+export default router

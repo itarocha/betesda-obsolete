@@ -8,6 +8,7 @@ import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 
 import store from './vuex/store'
+global.store = store
 
 import axios from 'axios'
 global.axios = axios
@@ -16,6 +17,7 @@ import petra from './petra'
 global.petra = petra
 
 import petraDateTime from './petra-date-time'
+import VueRouter from 'vue-router';
 global.petraDateTime = petraDateTime
 
 // moment pode ser usado globalmente
@@ -32,8 +34,8 @@ Vue.config.productionTip = false
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  router,
   store,
+  router,
   components: { App },
   template: '<App/>'
 })

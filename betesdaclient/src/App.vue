@@ -17,7 +17,7 @@
             <v-icon color="cyan darken-4">{{item.icon}}</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title v-text="item.title"></v-list-tile-title>
+            <v-list-tile-title class="teal--text" v-text="item.title"></v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
@@ -42,9 +42,8 @@
       <v-toolbar-title v-text="titulo"></v-toolbar-title>
       <v-spacer></v-spacer>
             
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
-        <v-icon>menu</v-icon>
-      </v-btn>
+      <v-btn v-if="!loggedIn" flat @click.stop="login">Login</v-btn>
+      <v-btn v-if="loggedIn" flat @click.stop="logout">Logout</v-btn>
 
       <v-snackbar
         v-model="snackbar"
@@ -100,6 +99,9 @@ export default {
   name: 'App',
 
   computed: {
+    loggedIn(){
+      return this.$store.getters.loggedIn
+    },
     count () {
 	    return this.$store.state.count
     },
@@ -126,7 +128,16 @@ export default {
     },
     closeSnackbar(){
       this.$store.dispatch('setSnackbar',false)
-    }
+    },
+    login(){
+      this.$router.push({name: 'login'})
+    },
+    logout(){
+      this.$store.dispatch('destroyToken')
+      // promisse
+      // .then(response => {this.$router.push({name:'home'})})
+      this.$router.push({name:'home'})
+    },
   },
   data () {
     return {
@@ -140,11 +151,6 @@ export default {
           icon: 'fa-home',
           title: 'Home',
           link: '/'
-        },
-        {
-          icon: 'fa-lock',
-          title: 'Login',
-          link: '/login'
         },
         {
           icon: 'fa-check-circle',

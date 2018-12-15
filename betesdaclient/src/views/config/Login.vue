@@ -10,13 +10,13 @@
               </v-toolbar>
               <v-card-text>
                 <v-form>
-                  <v-text-field prepend-icon="person" name="login" label="Login" type="text" v-model="form.username"></v-text-field>
-                  <v-text-field id="password" prepend-icon="lock" name="password" label="Password" type="password" v-model="form.password"></v-text-field>
+                  <v-text-field prepend-icon="person" ref="edtUserName" name="login" label="Usuário" type="text" v-model="form.username"></v-text-field>
+                  <v-text-field id="password" prepend-icon="lock" name="password" label="Senha" type="password" v-model="form.password"></v-text-field>
                 </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn dark color="cyan darken-4">Login</v-btn>
+                <v-btn dark color="cyan darken-4" @click="login">Login</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -43,6 +43,9 @@ export default {
 
   mounted(){
     this.$store.dispatch('setAcao','Login')
+    setTimeout(() => {
+        this.$refs.edtUserName.focus()
+      }, 500)
   },
 
   data: () =>({
@@ -64,12 +67,23 @@ export default {
   },
 
   methods: {
-      getData(evt) {
-        let uri = petra.base_uri+"/app/tipo_servico"; 
-        axios.get(uri).then(response => {
-          this.dados = response.data;
-        });      
-      },
+
+    login(){
+      this.$store.dispatch('retrieveToken',
+      {
+        username: this.form.username,
+        password : this.form.password
+      }).then(response => {
+        this.$router.push({name: 'hospedagens'})
+      })
+    },
+
+    getData(evt) {
+      let uri = petra.base_uri+"/app/tipo_servico"; 
+      axios.get(uri).then(response => {
+        this.dados = response.data;
+      });      
+    },
 
   }
 }
