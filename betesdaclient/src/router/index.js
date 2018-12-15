@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 
 import Home from '@/views/config/Home.vue'
 import About from '@/views/modelo/About.vue'
+import Login from '@/views/config/Login.vue'
 
 import DestinacaoHospedagem from '@/views/config/DestinacaoHospedagem.vue'
 import SituacaoLeito from '@/views/config/SituacaoLeito.vue'
@@ -33,6 +34,11 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: About
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login
     },
     {
       path: '/destinacao_hospedagem',

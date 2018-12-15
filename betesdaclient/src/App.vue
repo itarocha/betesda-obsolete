@@ -42,11 +42,9 @@
       <v-toolbar-title v-text="titulo"></v-toolbar-title>
       <v-spacer></v-spacer>
             
-      <!--
       <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>menu</v-icon>
       </v-btn>
-      -->
 
       <v-snackbar
         v-model="snackbar"
@@ -142,6 +140,11 @@ export default {
           icon: 'fa-home',
           title: 'Home',
           link: '/'
+        },
+        {
+          icon: 'fa-lock',
+          title: 'Login',
+          link: '/login'
         },
         {
           icon: 'fa-check-circle',
