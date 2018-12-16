@@ -20,9 +20,11 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 @Entity
 @Table(name="quarto")
-public class Quarto implements Serializable{
+public class Quarto  extends UserDateAudit implements Serializable{
 
 	private static final long serialVersionUID = -6172158858365759661L;
 	

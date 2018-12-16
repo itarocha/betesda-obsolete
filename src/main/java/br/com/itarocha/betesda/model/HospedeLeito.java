@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 //import java.util.Date;
@@ -18,11 +19,15 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 @Entity
 @Table(name="hospede_leito")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "quarto", "leito", "hospede"})
-public class HospedeLeito {
+public class HospedeLeito extends UserDateAudit implements Serializable{
 	
+	private static final long serialVersionUID = 5590030840087022870L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

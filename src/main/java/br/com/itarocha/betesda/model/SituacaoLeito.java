@@ -15,10 +15,12 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 @Entity
 @Table(name="estado_leito")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) 
-public class SituacaoLeito implements Serializable{
+public class SituacaoLeito extends UserDateAudit implements Serializable{
 
 /*
  	LIVRE("Livre"),

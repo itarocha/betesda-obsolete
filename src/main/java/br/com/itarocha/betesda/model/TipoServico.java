@@ -13,9 +13,11 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 @Entity
 @Table(name="tipo_servico")
-public class TipoServico implements Serializable{
+public class TipoServico extends UserDateAudit implements Serializable {
 
 	private static final long serialVersionUID = -7511416572575687871L;
 

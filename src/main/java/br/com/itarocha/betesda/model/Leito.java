@@ -15,12 +15,14 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 //import org.codehaus.jackson.annotate.JsonIgnore;
 
 @Entity
 @Table(name="leito")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "quarto"}) // "leitos", 
-public class Leito implements Serializable{
+public class Leito extends UserDateAudit implements Serializable {
 	
 	private static final long serialVersionUID = 5765750404479537331L;
 

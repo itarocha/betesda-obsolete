@@ -12,10 +12,12 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 @Entity
 @Table(name="tipo_hospede")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class TipoHospede implements Serializable{
+public class TipoHospede extends UserDateAudit implements Serializable{
 
 	private static final long serialVersionUID = 3527441284759034033L;
 

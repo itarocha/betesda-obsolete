@@ -1,5 +1,7 @@
 package br.com.itarocha.betesda.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,11 +16,15 @@ import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import br.com.itarocha.betesda.model.audit.UserDateAudit;
+
 @Entity
 @Table(name="encaminhador")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Encaminhador {
+public class Encaminhador extends UserDateAudit implements Serializable{
 	
+	private static final long serialVersionUID = 4127725617611839075L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
