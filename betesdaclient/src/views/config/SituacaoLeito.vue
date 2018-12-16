@@ -77,41 +77,42 @@ export default {
   },
 
   methods: {
-      getData(evt) {
-        let uri = petra.base_uri+"/app/situacao_leito"; 
-        axios.get(uri).then(response => {
-          this.dados = response.data;
-        });      
-      },
 
-      incluir() {
-        this.$refs.dlgEdit.openDialog()
-      },
+    getData(evt) {
+      petra.axiosGet("/app/situacao_leito").then(
+        response => this.dados = response.data
+      )
+    },
 
-      editar(item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgEdit.openDialog(this.form)
-      },
+    incluir() {
+      this.$refs.dlgEdit.openDialog()
+    },
 
-      onSave(data){
-        this.getData()
-      },
+    editar(item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgEdit.openDialog(this.form)
+    },
 
-      deleteItemConfirm (item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgExclusao.openDialog()
-      },
+    onSave(data){
+      petra.showMessageSuccess('Situação de Leito gravada com sucesso')
+      this.getData()
+    },
 
-      onDelete(evt) {
-        let uri = petra.base_uri+"/app/situacao_leito/"+this.form.id;
-        axios.delete(uri)
-            .then(response => { 
-              this.$store.dispatch('setAcao','')
-              this.getData()
-            }).catch(error => {
-               petra.tratarErros(error); 
-            });
-      },
+    deleteItemConfirm (item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgExclusao.openDialog()
+    },
+
+    onDelete(evt) {
+      petra.axiosDelete("/app/situacao_leito/"+this.form.id)
+        .then(response => {
+          petra.showMessageSuccess('Situação de Leito excluída com sucesso')
+          this.getData()
+        })
+        .catch(error => {
+          petra.tratarErros(error)
+        })
+    },
   }
 }
 </script>

@@ -74,17 +74,17 @@ export default {
     },
 
     save(evt) {
-      this.errors.descricao = [];
+      this.errors = [];
 
-      let uri = petra.base_uri+"/app/tipo_leito";
-      axios.post(uri, this.form)
-          .then(response => { 
-            this.dialogVisible = false
-            this.$emit('close',true)
-            this.$emit('save',response.data)
-          }).catch(error => {
-            this.errors = petra.tratarErros(error);
-          });
+      petra.axiosPost("/app/tipo_leito/", this.form)
+        .then(response => {
+          this.dialogVisible = false
+          this.$emit('close',true)
+          this.$emit('save',response.data)
+        })
+        .catch(error => {
+          this.errors = petra.tratarErros(error)
+        })
     },
 
     reset(evt){

@@ -53,7 +53,7 @@ export default {
           .then(response => {
             resolve(response)
           }).catch(error => {
-            if (error.response.status == 401){
+            if ((error.response.status >= 401) && (error.response.status < 500)){
               this.showMessageError("Erro: "+error.response.data.message)
             }
             reject(error)
@@ -68,7 +68,7 @@ export default {
           .then(response => {
             resolve(response)
           }).catch(error => {
-            if (error.response.status == 401){
+            if ((error.response.status >= 401) && (error.response.status < 500)){
               this.showMessageError("Erro: "+error.response.data.message)
             }
             reject(error)
@@ -83,7 +83,7 @@ export default {
           .then(response => {
             resolve(response)
           }).catch(error => {
-            if (error.response.status == 401){
+            if ((error.response.status >= 401) && (error.response.status < 500)){
               this.showMessageError("Erro: "+error.response.data.message)
             }
             reject(error)

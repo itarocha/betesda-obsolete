@@ -75,49 +75,45 @@ export default {
       var nome = this.form.nome ? this.form.nome : 'Não selecionado';
       return 'Deseja realmente excluir "'+nome+'"?'
     }
-    
   },
 
   methods: {
-      getData(evt) {
-        let uri = petra.base_uri+"/app/entidades"; 
-        console.log("ENTIDADES AXIOS.HEADER = ",axios.defaults.headers.common)
-        axios.get(uri).then(response => {
-          this.dados = response.data;
-        }).catch(error => {
-          console.log("ERRO:",error)
-          //reject(error)
-        })      
-      },
 
-      incluir() {
-        this.$refs.dlgEdit.openDialog()
-      },
+    getData(evt) {
+      petra.axiosGet("/app/entidades").then(
+        response => this.dados = response.data
+      )
+    },
 
-      editar(item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgEdit.openDialog(this.form)
-      },
+    incluir() {
+      this.$refs.dlgEdit.openDialog()
+    },
 
-      onSave(data){
-        this.getData()
-      },
+    editar(item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgEdit.openDialog(this.form)
+    },
 
-      deleteItemConfirm (item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgExclusao.openDialog()
-      },
+    onSave(data){
+      petra.showMessageSuccess('Entidade gravada com sucesso')
+      this.getData()
+    },
 
-      onDelete(evt) {
-        let uri = petra.base_uri+"/app/entidades/"+this.form.id;
-        axios.delete(uri)
-            .then(response => { 
-              this.$store.dispatch('setAcao','')
-              this.getData()
-            }).catch(error => {
-               petra.tratarErros(error); 
-            });
-      },
+    deleteItemConfirm (item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgExclusao.openDialog()
+    },
+
+    onDelete(evt) {
+      petra.axiosDelete("/app/entidades/"+this.form.id)
+        .then(response => {
+          petra.showMessageSuccess('Entidade excluída com sucesso')
+          this.getData()
+        })
+        .catch(error => {
+          petra.tratarErros(error)
+        })
+    },
   }
 }
 </script>

@@ -77,40 +77,40 @@ export default {
   methods: {
 
     getData(evt) {
-        petra.axiosGet("/app/destinacao_hospedagem").then(
-          response => this.dados = response.data
-        )
-      },
+      petra.axiosGet("/app/destinacao_hospedagem").then(
+        response => this.dados = response.data
+      )
+    },
 
-      incluir() {
-        this.$refs.dlgEdit.openDialog()
-      },
+    incluir() {
+      this.$refs.dlgEdit.openDialog()
+    },
 
-      editar(item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgEdit.openDialog(this.form)
-      },
+    editar(item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgEdit.openDialog(this.form)
+    },
 
-      onSave(data){
-        petra.showMessageSuccess('Destinação de Hospedagem gravada com sucesso')
-        this.getData()
-      },
+    onSave(data){
+      petra.showMessageSuccess('Destinação de Hospedagem gravada com sucesso')
+      this.getData()
+    },
 
-      deleteItemConfirm (item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgExclusao.openDialog()
-      },
+    deleteItemConfirm (item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgExclusao.openDialog()
+    },
 
-      onDelete(evt) {
-        petra.axiosDelete("/app/destinacao_hospedagem/"+this.form.id)
-          .then(response => {
-            petra.showMessageSuccess('Destinação de Hospedagem excluída com sucesso')
-            this.getData()
-          })
-          .catch(error => {
-            petra.tratarErros(error)
-          })
-      },
+    onDelete(evt) {
+      petra.axiosDelete("/app/destinacao_hospedagem/"+this.form.id)
+        .then(response => {
+          petra.showMessageSuccess('Destinação de Hospedagem excluída com sucesso')
+          this.getData()
+        })
+        .catch(error => {
+          petra.tratarErros(error)
+        })
+    },
   }
 }
 </script>

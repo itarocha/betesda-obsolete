@@ -59,7 +59,6 @@ export default new Vuex.Store({
     actions:{ // asyncronous
 
         retrieveToken(context, credentials){
-
             return new Promise((resolve, reject) => {
                 axios.post(petra.base_uri+"/auth/login", {
                     usernameOrEmail: credentials.username,

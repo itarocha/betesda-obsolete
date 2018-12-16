@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,12 +26,14 @@ public class SituacaoLeitoController {
 	private SituacaoLeitoService service;
 	
 	@RequestMapping
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listar() {
 		List<SituacaoLeito> lista = service.findAll();
 	    return new ResponseEntity<List<SituacaoLeito>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody SituacaoLeito model) {
 		ItaValidator<SituacaoLeito> v = new ItaValidator<SituacaoLeito>(model);
 		v.validate();
@@ -48,6 +51,7 @@ public class SituacaoLeitoController {
 	}
 	
 	@RequestMapping(value="{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
 		try {
 			service.remove(id);

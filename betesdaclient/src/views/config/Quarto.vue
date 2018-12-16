@@ -127,10 +127,8 @@ export default {
   methods: {
 
     getData(evt) {
-      let uri = petra.base_uri + "/app/quarto";
-      axios
-        .get(uri)
-        .then(response => {
+      petra.axiosGet("/app/quarto").then(
+        response => {
           this.dados = response.data;
           if ((!this.active) &&  (this.dados.length > 0)){
             this.active = 0;
@@ -138,10 +136,8 @@ export default {
           } else if ((this.active) && (this.active >= 0) && (this.dados.length > 0)) {
             this.inputTabEvent(this.active);
           }
-        })
-        .catch(error => {
-          console.log(error);
-        });
+        }
+      )
     },
 
     onSaveQuarto(data){

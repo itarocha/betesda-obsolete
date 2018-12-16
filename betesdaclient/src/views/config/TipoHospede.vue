@@ -74,41 +74,42 @@ export default {
   },
 
   methods: {
-      getData(evt) {
-        let uri = petra.base_uri+"/app/tipo_hospede"; 
-        axios.get(uri).then(response => {
-          this.dados = response.data;
-        });      
-      },
+    
+    getData(evt) {
+      petra.axiosGet("/app/tipo_hospede").then(
+        response => this.dados = response.data
+      )
+    },
 
-      incluir() {
-        this.$refs.dlgEdit.openDialog()
-      },
+    incluir() {
+      this.$refs.dlgEdit.openDialog()
+    },
 
-      editar(item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgEdit.openDialog(this.form)
-      },
+    editar(item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgEdit.openDialog(this.form)
+    },
 
-      onSave(data){
-        this.getData()
-      },
+    onSave(data){
+      petra.showMessageSuccess('Tipo de Hóspede gravado com sucesso')
+      this.getData()
+    },
 
-      deleteItemConfirm (item) {
-        this.form = Object.assign({}, item)
-        this.$refs.dlgExclusao.openDialog()
-      },
+    deleteItemConfirm (item) {
+      this.form = Object.assign({}, item)
+      this.$refs.dlgExclusao.openDialog()
+    },
 
-      onDelete(evt) {
-        let uri = petra.base_uri+"/app/tipo_hospede/"+this.form.id;
-        axios.delete(uri)
-            .then(response => { 
-              this.$store.dispatch('setAcao','')
-              this.getData()
-            }).catch(error => {
-               petra.tratarErros(error); 
-            });
-      },
+    onDelete(evt) {
+      petra.axiosDelete("/app/tipo_hospede/"+this.form.id)
+        .then(response => {
+          petra.showMessageSuccess('Tipo de Hóspede excluído com sucesso')
+          this.getData()
+        })
+        .catch(error => {
+          petra.tratarErros(error)
+        })
+    },
   }
 }
 </script>

@@ -80,12 +80,12 @@ export default {
       this.dialogVisible = true
     },
 
+    //TODO refatorar
     loadListas(evt) {
       this.itensDestinacaoHospedagem = [];
       let uri = petra.base_uri + "/app/quarto/listas";
       axios.get(uri).then(response => {
-        this.itensDestinacaoHospedagem =
-          response.data.listaDestinacaoHospedagem;
+        this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem;
         this.itensTipoLeito = response.data.listaTipoLeito;
         this.itensSituacaoLeito = response.data.listaSituacaoLeito;
       });
@@ -99,15 +99,15 @@ export default {
     save(evt) {
       this.errors = [];
 
-      let uri = petra.base_uri+"/app/quarto/leito";
-      axios.post(uri, this.form)
-          .then(response => { 
-            this.dialogVisible = false
-            this.$emit('close',true)
-            this.$emit('save',response.data)
-          }).catch(error => {
-            this.errors = petra.tratarErros(error);
-          });
+      petra.axiosPost("/app/quarto/leito", this.form)
+        .then(response => {
+          this.dialogVisible = false
+          this.$emit('close',true)
+          this.$emit('save',response.data)
+        })
+        .catch(error => {
+          this.errors = petra.tratarErros(error)
+        })
     },
 
     reset(evt){

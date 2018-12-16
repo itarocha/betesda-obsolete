@@ -97,6 +97,9 @@ const router = new Router({
       path: '/entidade',
       name: 'entidade',
       component: Entidade,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/checkin',
