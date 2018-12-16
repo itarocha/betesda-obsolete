@@ -1,6 +1,8 @@
 package br.com.itarocha.betesda.security;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +36,17 @@ public class JwtTokenProvider {
         //FIXME LocalDate? 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-
+        
+        //https://www.programcreek.com/java-api-examples/?api=io.jsonwebtoken.Jwts
+        Map<String, Object> data = new HashMap<>();
+        data.put("sub", userPrincipal.getId());
+        data.put("username", userPrincipal.getUsername());
+        data.put("name", userPrincipal.getName());
+        data.put("authorities", userPrincipal.getAuthorities());
+        
         return Jwts.builder()
-                .setSubject(Long.toString(userPrincipal.getId()))
+                //.setSubject(Long.toString(userPrincipal.getId()))
+                .setClaims(data)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)

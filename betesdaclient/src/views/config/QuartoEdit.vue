@@ -79,7 +79,6 @@ export default {
       this.dialogVisible = true
     },
 
-    //TODO refatorar
     loadListas(evt) {
       this.itensDestinacaoHospedagem = []
 
@@ -89,15 +88,6 @@ export default {
           this.itensTipoLeito = response.data.listaTipoLeito
           this.itensSituacaoLeito = response.data.listaSituacaoLeito
         })
-
-      /*
-      let uri = petra.base_uri + "/app/quarto/listas";
-      axios.get(uri).then(response => {
-        this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
-        this.itensTipoLeito = response.data.listaTipoLeito
-        this.itensSituacaoLeito = response.data.listaSituacaoLeito
-      });
-      */
     },
 
     close(value){

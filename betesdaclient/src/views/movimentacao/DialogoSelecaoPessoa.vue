@@ -89,10 +89,10 @@ export default {
         this.dados = []
         return
       }
-      let uri = petra.base_uri+"/app/pessoas/consultar/"+this.searchText; 
-      axios.get(uri).then(response => {
-        this.dados = response.data;
-      });        
+      petra.axiosGet("/app/pessoas/consultar/" +this.searchText).then(
+        response => {
+           this.dados = response.data
+        })
     },500)
   },
 
@@ -122,22 +122,20 @@ export default {
 
     loadListas(evt) {
       this.itensDestinacaoHospedagem = [];
-      let uri = petra.base_uri + "/app/quarto/listas";
-      axios.get(uri).then(response => {
+      petra.axiosGet("/app/quarto/listas").then(
+        response => {
         this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem;
         this.itensTipoLeito = response.data.listaTipoLeito;
         this.itensSituacaoLeito = response.data.listaSituacaoLeito;
         this.itensTipoHospede = response.data.listaTipoHospede;
-      });
+      })
     },
 
     onChangeText: _.debounce((e) => {
-        let uri = petra.base_uri+"/app/pessoas/consultar/" +e.target.value
-        
-        axios.get(uri).then(response => {
-          this.dados = response.data;
-        });      
-
+      petra.axiosGet("/app/pessoas/consultar/" +e.target.value).then(
+        response => {
+           this.dados = response.data
+        })
     }, 500),
 
     close(value){

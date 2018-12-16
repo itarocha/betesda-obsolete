@@ -195,18 +195,17 @@ export default {
         hospedagemId : hospedagemId
       }
 
-      let uri = petra.base_uri+"/app/hospedagem/mapa/hospedagem_info";
-      axios.post(uri, dados)
-          .then(response => { 
-            console.log("RETORNOU ", response.data)
+      petra.axiosPost("/app/hospedagem/mapa/hospedagem_info", dados)
+        .then(response => { 
+            //console.log("RETORNOU ", response.data)
             this.hospedagem = response.data
             this.hospedes = this.hospedagem.hospedes
             this.tipoHospede = this.hospedagem.hospedes[0].tipoHospede
             this.destinacaoHospedagem = this.hospedagem.destinacaoHospedagem
           }).catch(error => {
             this.errors = petra.tratarErros(error);
-            console.log("ERROS = ", this.errors)
-          });
+            //console.log("ERROS = ", this.errors)
+          })
     },
 
     showSelecionarDataEncerramento(hospedagemId, dataPrevistaSaida){
@@ -220,22 +219,17 @@ export default {
     },
 
     encerrarHospedagem(hospedagemId, data) {
-      let uri = petra.base_uri + "/app/hospedagem/mapa/encerramento";
-
       var dados = {
         hospedagemId : hospedagemId,
         data : data
       }
-
-      axios
-        .post(uri,dados)
+      petra.axiosPost("/app/hospedagem/mapa/encerramento", dados)
         .then(response => {
           this.$emit('encerrada',hospedagemId)
           this.dialogVisible = false
-        })
-        .catch(error => {
+        }).catch(error => {
           //erro
-        });
+        })
     },
 
 

@@ -41,9 +41,21 @@ export default {
       store.dispatch('showFlashMessage', mensagem)
     },
 
+
+    parseJwt(token) {
+      var base64Url = token.split('.')[1]
+      var base64 = base64Url.replace('-', '+').replace('_', '/')
+      return JSON.parse(window.atob(base64))
+    },
+
+    //var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+
     resolveToken(){
       var token = localStorage.getItem('accessToken') || null
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+
+      var decode = this.parseJwt(token)
+      console.log("==============> ", decode)
     },
 
     axiosGet(endpoint){

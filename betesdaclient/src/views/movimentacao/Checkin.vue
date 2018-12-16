@@ -524,16 +524,15 @@ export default {
         toSave.hospedes.push(hospede)
       }
 
-      let uri = petra.base_uri+"/app/hospedagem";
-      axios.post(uri, toSave)
-          .then(response => { 
-            console.log("RETORNO DA HOSPEDAGEM: ", response.data)
+      petra.axiosPost("/app/hospedagem", toSave)
+        .then(response => {
             this.errors = []
             this.resetHospedagem()
             this.showHospedagemGravada(response.data)
-          }).catch(error => {
-            this.errors = this.tratarErros(error);
-          });
+        })
+        .catch(error => {
+          this.errors = petra.tratarErros(error)
+        })
     },
 
     tratarErros(error){
@@ -555,14 +554,14 @@ export default {
 
     loadListas() {
       this.itensDestinacaoHospedagem = [];
-      let uri = petra.base_uri + "/app/quarto/listas";
-      axios.get(uri).then(response => {
-        this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem;
-        this.itensTipoLeito = response.data.listaTipoLeito;
-        this.itensSituacaoLeito = response.data.listaSituacaoLeito;
-        this.itensTipoServico = response.data.listaTipoServico;
-        this.itensTipoHospede = response.data.listaTipoHospede;
-      });
+      petra.axiosGet("/app/quarto/listas").then(
+        response => {
+          this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
+          this.itensTipoLeito = response.data.listaTipoLeito
+          this.itensSituacaoLeito = response.data.listaSituacaoLeito
+          this.itensTipoServico = response.data.listaTipoServico
+          this.itensTipoHospede = response.data.listaTipoHospede
+        })
     },
 
     clearLeitos(){
@@ -597,7 +596,7 @@ export default {
     },
 
     editarHospede(hospede) {
-      console.log("editarHospede ", hospede.pessoa)
+      //console.log("editarHospede ", hospede.pessoa)
       this.$refs.dlgPessoaEdit.openDialog(hospede.pessoa)
     },
 
@@ -613,7 +612,7 @@ export default {
           tipoHospede : _tipoHospede,
           acomodacao : null // {quarto, leito}
         }
-        console.log("Selecionando pessoa: ", _pessoa)
+        //console.log("Selecionando pessoa: ", _pessoa)
         this.hospedes.push(hospede)
       }
     },

@@ -1,19 +1,16 @@
 package br.com.itarocha.betesda.controller;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
@@ -21,7 +18,7 @@ import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
-@CrossOrigin
+//@CrossOrigin
 @RestController
 @RequestMapping("/api/app/hospedagem")
 public class HospedagemController {
@@ -30,6 +27,7 @@ public class HospedagemController {
 	private HospedagemService service;
 	
 	@RequestMapping(method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody HospedagemVO model) {
 		ItaValidator<HospedagemVO> v = new ItaValidator<HospedagemVO>(model);
 		v.validate();
@@ -78,6 +76,7 @@ public class HospedagemController {
 	}
 	
 	@RequestMapping(value="/mapa", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaHospedagem mapa(@RequestBody MapaHospedagemRequest model)
 	{
 		MapaHospedagem listagem = new MapaHospedagem();
@@ -91,6 +90,7 @@ public class HospedagemController {
 	}
 
 	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> encerramento(@RequestBody OperacoesRequest model)
 	{
 		//System.out.println("Recebido: "+model.hospedagemId + " e "+ model.data);
@@ -102,9 +102,8 @@ public class HospedagemController {
 		}
 	}
 	
-	
-	
 	@RequestMapping(value="/mapa/hospedagem_info", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public HospedagemFullVO getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
 	{
 		//System.out.println("Recebido: "+model.hospedeLeitoId);
@@ -113,7 +112,9 @@ public class HospedagemController {
 		//return new Hospedagem();
 	}
 
+	/*
 	@RequestMapping(value="/mapa/testes", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public String testes(@RequestBody OperacoesRequest model)
 	{
 		System.out.println("Recebido: "+model.hospedagemId + " e "+ model.data);
@@ -126,7 +127,7 @@ public class HospedagemController {
 	public String xis()
 	{
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		/* 2018-08-14 ~ 2018-08-22 leito_id = 62  */
+		// 2018-08-14 ~ 2018-08-22 leito_id = 62  
 		LocalDate dIni = LocalDate.parse("14/08/2018", fmt);
 		LocalDate dFim = LocalDate.parse("22/08/2018", fmt);
 		Long leitoId = 62L; // deve retornar false porque contém 2 utilizações (no teste)
@@ -137,7 +138,8 @@ public class HospedagemController {
 		service.pessoaLivre(pessoaId);
 		return retorno;
 	}
-
+	*/
+	
 	private static class MapaHospedagemRequest{
 		public LocalDate data;
 	}

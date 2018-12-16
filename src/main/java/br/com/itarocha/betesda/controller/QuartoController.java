@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +27,6 @@ import br.com.itarocha.betesda.service.TipoLeitoService;
 import br.com.itarocha.betesda.service.TipoServicoService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/app/quarto")
 public class QuartoController {
@@ -52,30 +51,35 @@ public class QuartoController {
 	
 	
 	@RequestMapping
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listar() {
 		List<Quarto> lista = service.findAll();
 		return new ResponseEntity<List<Quarto>>(lista, HttpStatus.OK);
 	}
 	
 	@RequestMapping("/por_destinacao_hospedagem/{id}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listarByDestinacaoHospedagem(@PathVariable("id") Long id) {
 		List<Quarto> lista = service.findAllByDestinacaoHospedagem(id);
 		return new ResponseEntity<List<Quarto>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping("/{id}/leitos")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listarLeitosByQuarto(@PathVariable("id") Long id) {
 		List<Leito> lista = service.findLeitosByQuarto(id);
 		return new ResponseEntity<List<Leito>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping("/leitos_disponiveis")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listarLeitosDisponiveis() {
 		List<Leito> lista = service.findLeitosDisponiveis();
 		return new ResponseEntity<List<Leito>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody NovoQuartoVO model) throws Exception {
 		ItaValidator<NovoQuartoVO> v = new ItaValidator<NovoQuartoVO>(model);
 		v.validate();
@@ -95,6 +99,7 @@ public class QuartoController {
 	}
 	
 	@RequestMapping(value="/alterar", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravarAlteracao(@RequestBody EditQuartoVO model) {
 		ItaValidator<EditQuartoVO> v = new ItaValidator<EditQuartoVO>(model);
 		v.validate();
@@ -118,6 +123,7 @@ public class QuartoController {
 	}
 
 	@RequestMapping(value="/leito", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravarLeito(@RequestBody EditLeitoVO model) {
 		ItaValidator<EditLeitoVO> v = new ItaValidator<EditLeitoVO>(model);
 		v.validate();
@@ -146,6 +152,7 @@ public class QuartoController {
 	}
 	
 	@RequestMapping(value="/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
 		try {
 			service.remove(id);
@@ -156,6 +163,7 @@ public class QuartoController {
 	 }
 
 	@RequestMapping(value="/leito/{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> excluirLeito(@PathVariable("id") Long id) {
 		try {
 			service.removeLeito(id);
@@ -166,6 +174,7 @@ public class QuartoController {
 	 }
 	
 	@RequestMapping("/listas")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listas() {
 		AutoWired retorno = new AutoWired();
 		retorno.listaTipoLeito = tls.listSelect();

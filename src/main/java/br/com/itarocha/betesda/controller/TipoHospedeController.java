@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +16,6 @@ import br.com.itarocha.betesda.model.TipoHospede;
 import br.com.itarocha.betesda.service.TipoHospedeService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/app/tipo_hospede")
 public class TipoHospedeController {
@@ -25,12 +24,14 @@ public class TipoHospedeController {
 	private TipoHospedeService service;
 	
 	@RequestMapping
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listar() {
 		List<TipoHospede> lista = service.findAll();
 	    return new ResponseEntity<List<TipoHospede>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody TipoHospede model) {
 		ItaValidator<TipoHospede> v = new ItaValidator<TipoHospede>(model);
 		v.validate();
@@ -48,6 +49,7 @@ public class TipoHospedeController {
 	}
 	
 	@RequestMapping(value="{id}", method = RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
 		try {
 			service.remove(id);

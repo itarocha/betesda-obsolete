@@ -372,22 +372,18 @@ export default {
     },
 
     getData(data) {
-      let uri = petra.base_uri + "/app/hospedagem/mapa"
-
       var dados = {
         data : data
       }
-
-      axios
-        .post(uri,dados)
+      petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
-          this.dados = response.data
-          console.log("getData() ",this.dados)
-          this.pessoas = response.data.hospedagens
-
-          this.showEstatisticas()
+            this.dados = response.data
+            //console.log("getData() ",this.dados)
+            this.pessoas = response.data.hospedagens
+            this.showEstatisticas()
         })
         .catch(error => {
+
         })
     },
 

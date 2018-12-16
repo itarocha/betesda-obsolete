@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +17,6 @@ import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.service.PessoaService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
-
-@CrossOrigin
 @RestController
 @RequestMapping("/api/app/pessoas")
 public class PessoasController {
@@ -27,6 +25,7 @@ public class PessoasController {
 	private PessoaService service;
 	
 	@RequestMapping(value="{id}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> getById(@PathVariable("id") Long id) {
 		try {
 			Optional<Pessoa> model = service.find(id);
@@ -41,18 +40,21 @@ public class PessoasController {
 	}
 
 	@RequestMapping
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listar() {
 		List<Pessoa> lista = service.findAll();
 		return new ResponseEntity<List<Pessoa>>(lista, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/consultar/{texto}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> consultar(@PathVariable("texto") String texto) {
 		List<Pessoa> lista = service.consultar(texto);
 		return new ResponseEntity<List<Pessoa>>(lista, HttpStatus.OK);
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody Pessoa model) {
 		ItaValidator<Pessoa> v = new ItaValidator<Pessoa>(model);
 		v.validate();
@@ -70,6 +72,7 @@ public class PessoasController {
 	}
 	
 	@RequestMapping(value = "{id}", method=RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
 		try {
 			service.remove(id);

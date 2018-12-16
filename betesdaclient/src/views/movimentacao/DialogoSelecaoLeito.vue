@@ -135,10 +135,10 @@ export default {
     loadQuartosPorTipoUtilizacao(destinacaoHospedagemId){
       this.quartos = [];
       if (destinacaoHospedagemId != null){
-        let uri = petra.base_uri + "/app/quarto/por_destinacao_hospedagem/"+destinacaoHospedagemId
-        axios.get(uri).then(response => {
-          this.quartos = response.data
-        });
+        petra.axiosGet("/app/quarto/por_destinacao_hospedagem/"+destinacaoHospedagemId)
+          .then(response => {
+            this.quartos = response.data
+          })
       }
     },
 

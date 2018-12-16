@@ -136,8 +136,7 @@ export default {
           } else if ((this.active) && (this.active >= 0) && (this.dados.length > 0)) {
             this.inputTabEvent(this.active);
           }
-        }
-      )
+        })
     },
 
     onSaveQuarto(data){
@@ -194,7 +193,6 @@ export default {
       } else {
         this.quartoSelecionado = {}
       }
-
     },
 
     setQuartoSelecionado(quarto){
@@ -203,23 +201,20 @@ export default {
 
     deleteItem(item) {
       this.formQuarto = Object.assign({}, item);
-
       this.descricaoExclusaoQuarto = 'Deseja realmente excluir o Quarto "'+this.formQuarto.numero+'"?'
-
       this.$refs.dlgExclusaoQuarto.openDialog()
     },
 
     onDeleteQuarto(evt) {
-      //this.errors.nome = [];
-      let uri = petra.base_uri + "/app/quarto/" + this.formQuarto.id;
-      axios
-        .delete(uri)
+      this.errors = [];
+      petra.axiosDelete("/app/quarto/"+this.formQuarto.id)
         .then(response => {
-          this.getData();
+          petra.showMessageSuccess('Quarto excluído com sucesso')
+          this.getData()
         })
         .catch(error => {
-          this.errors = petra.tratarErros(error);
-        });
+          petra.tratarErros(error)
+        })
     },
 
     deleteLeito(leito) {
@@ -229,16 +224,16 @@ export default {
     },
 
     onDeleteLeito(evt) {
-      //this.errors.nome = [];
-      let uri = petra.base_uri + "/app/quarto/leito/" + this.formLeito.id;
-      axios
-        .delete(uri)
+      this.errors = [];
+
+      petra.axiosDelete("/app/quarto/leito/"+this.formLeito.id)
         .then(response => {
-          this.getData();
+          petra.showMessageSuccess('Quarto excluído com sucesso')
+          this.getData()
         })
         .catch(error => {
-          this.errors = petra.tratarErros(error);
-        });
+          petra.tratarErros(error)
+        })
     },
 
     cancelar() {
