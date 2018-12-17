@@ -41,7 +41,6 @@ export default {
       store.dispatch('showFlashMessage', mensagem)
     },
 
-
     parseJwt(token) {
       var base64Url = token.split('.')[1]
       var base64 = base64Url.replace('-', '+').replace('_', '/')
@@ -55,7 +54,7 @@ export default {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
       var decode = this.parseJwt(token)
-      console.log("==============> ", decode)
+      //console.log("==============> ", decode)
     },
 
     axiosGet(endpoint){

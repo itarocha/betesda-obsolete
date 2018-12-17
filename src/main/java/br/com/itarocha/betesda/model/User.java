@@ -27,9 +27,7 @@ import br.com.itarocha.betesda.model.audit.DateAudit;
 		@UniqueConstraint(columnNames = {"email"})
 })
 public class User extends DateAudit {
-    /**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 7343190429961838723L;
 
 	@Id

@@ -1,7 +1,9 @@
 package br.com.itarocha.betesda.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,7 +14,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -39,11 +42,19 @@ public class Quarto  extends UserDateAudit implements Serializable{
 	@Size(max = 255, message="Descrição não pode ter mais que 255 caracteres")
 	private String descricao;
 
+	/*
 	@ManyToOne(fetch=FetchType.EAGER)
 	@JoinColumn(name="destinacao_hospedagem_id")
 	@NotNull(message="Destinação da Hospedagem é obrigatória")
 	private DestinacaoHospedagem destinacaoHospedagem;
-			
+	*/
+	
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "quarto_destinacoes",
+            joinColumns = @JoinColumn(name = "quarto_id"),
+            inverseJoinColumns = @JoinColumn(name = "destinacao_hospedagem_id"))
+    private Set<DestinacaoHospedagem> destinacoes = new HashSet<>();
+	
 	@OneToMany(mappedBy = "quarto",fetch=FetchType.EAGER)
 	@OrderBy("numero ASC")
 	private List<Leito> leitos;
@@ -83,7 +94,8 @@ public class Quarto  extends UserDateAudit implements Serializable{
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-
+	
+	/*
 	public DestinacaoHospedagem getDestinacaoHospedagem() {
 		return this.destinacaoHospedagem;
 	}
@@ -91,7 +103,17 @@ public class Quarto  extends UserDateAudit implements Serializable{
 	public void setDestinacaoHospedagem(DestinacaoHospedagem destinacaoHospedagem) {
 		this.destinacaoHospedagem = destinacaoHospedagem;
 	}
+	*/
+	
+    public Set<DestinacaoHospedagem> getDestinacoes() {
+        return this.destinacoes;
+    }
 
+    public void setDestinacoes(Set<DestinacaoHospedagem> destinacoes) {
+        this.destinacoes = destinacoes;
+    }
+	
+	
 	public List<Leito> getLeitos() {
 		return this.leitos;
 	}

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialogVisible" width="500">
+    <v-dialog v-model="dialogVisible" width="600">
         <v-card>
         <v-card-title dark class="white--text cyan darken-4">
           Incluir Quarto
@@ -15,18 +15,30 @@
                 <v-text-field v-model="form.descricao" label="Descrição" :error-messages="getErrors('descricao')"></v-text-field>
               </v-flex>
 
+              <!--
               <v-flex xs12 sm6 md8>
                 <v-select v-model="form.destinacaoHospedagem" :items="itensDestinacaoHospedagem" label="Destinação Hospedagem" :error-messages="getErrors('destinacaoHospedagem')"></v-select>
               </v-flex>
-              <v-flex xs12 sm6 md4>
-                <v-text-field v-model="form.quantidadeLeitos" label="Qtd.Leitos" type="number" :error-messages="getErrors('quantidadeLeitos')"></v-text-field>
+              -->
+
+              <v-flex xs12 sm12 md12>
+                <v-select
+                  :items="itensDestinacaoHospedagem"
+                  label="Destinações de Hospedagem"
+                  multiple
+                  chips
+                  v-model="form.destinacoes"
+                ></v-select>
               </v-flex>
 
-              <v-flex xs12 sm6 md6>
+              <v-flex xs12 sm2 md2>
+                <v-text-field v-model="form.quantidadeLeitos" label="Qtd.Leitos" type="number" :error-messages="getErrors('quantidadeLeitos')"></v-text-field>
+              </v-flex>
+              <v-flex xs12 sm5 md5>
                 <v-select v-model="form.tipoLeito" :items="itensTipoLeito" label="Tipo de Leito" :error-messages="getErrors('tipoLeito')"></v-select>
               </v-flex>
-              <v-flex xs12 sm6 md6>
-                <v-select v-model="form.situacao" :items="itensSituacaoLeito" label="Situação de Leito" :error-messages="getErrors('situacao')"></v-select>
+              <v-flex xs12 sm5 md5>
+                <v-select v-model="form.situacao" :items="itensSituacaoLeito" label="Situação Inicial dos Leitos" :error-messages="getErrors('situacao')"></v-select>
               </v-flex>
             </v-layout>
           </v-container>
@@ -61,7 +73,7 @@ export default {
     form:{
       numero: 0,
       descricao: null,
-      destinacaoHospedagem: null,
+      destinacoes: null,
       quantidadeLeitos: 0,
       tipoLeito: null,
       situacao: null

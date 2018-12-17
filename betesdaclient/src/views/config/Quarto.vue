@@ -21,9 +21,10 @@
           </v-tab>
 
           <v-tab-item v-for="(quarto, index) in dados" :key="index" ripple>
-            <v-layout row wrap class="headline pa-2">
-              <v-flex xs12>
-                <div class="title pl-2">Destinação de Hospedagem: <b>{{quarto.destinacaoHospedagem.descricao}}</b></div>
+            <v-layout row wrap class="subheading pa-2">
+              <v-flex xs12 class="subheading ml-2">
+                  Destinações de Hospedagem:
+                  <v-chip color="amber lighten-2" v-for="(destinacaoHospedagem, idx) in quarto.destinacoes" :key="idx">{{destinacaoHospedagem.descricao}}</v-chip>
               </v-flex>
 
               <v-flex xs12>
@@ -103,7 +104,7 @@ export default {
     formQuarto: {
       numero: 0,
       descricao: null,
-      destinacaoHospedagem: null,
+      destinacoes: null,
       quantidadeLeitos: 0,
       tipoLeito: null,
       situacao: null
@@ -125,6 +126,16 @@ export default {
   },
 
   methods: {
+
+    loadListas() {
+      this.itensDestinacaoHospedagem = []
+      petra.axiosGet("/app/quarto/listas").then(
+        response => {
+          this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
+          this.itensTipoLeito = response.data.listaTipoLeito
+          this.itensSituacaoLeito = response.data.listaSituacaoLeito
+        })
+    },
 
     getData(evt) {
       petra.axiosGet("/app/quarto").then(
@@ -160,11 +171,15 @@ export default {
     },
 
     editItem(item) {
+      var destinacoes = []
+      for(var i = 0; i < item.destinacoes.length; i++){
+        destinacoes.push(item.destinacoes[i].id)
+      }
       var form = {
         id: item.id,
         numero: item.numero,
         descricao: item.descricao,
-        destinacaoHospedagem: item.destinacaoHospedagem.id
+        destinacoes : destinacoes
       }
 
       this.$refs.dlgQuartoEdit.openDialog(form)
@@ -244,7 +259,7 @@ export default {
       (this.formQuarto = {
         numero: 0,
         descricao: null,
-        destinacaoHospedagem: null,
+        destinacoes: null,
         quantidadeLeitos: 0,
         tipoLeito: null,
         situacao: null

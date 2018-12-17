@@ -17,8 +17,12 @@ public class EditQuartoVO {
 	@Size(max = 255, message="Descrição não pode ter mais que 255 caracteres")
 	private String descricao;
 
+	/*
 	@NotNull(message="Destinação da Hospedagem é obrigatória")
 	private Long destinacaoHospedagem;
+	*/
+	
+	private Long[] destinacoes;
 	
 	public EditQuartoVO() {
 	}
@@ -47,6 +51,7 @@ public class EditQuartoVO {
 		this.descricao = descricao;
 	}
 
+	/*
 	public Long getDestinacaoHospedagem() {
 		return destinacaoHospedagem;
 	}
@@ -54,5 +59,13 @@ public class EditQuartoVO {
 	public void setDestinacaoHospedagem(Long destinacaoHospedagem) {
 		this.destinacaoHospedagem = destinacaoHospedagem;
 	}
+	*/
 	
+	public Long[] getDestinacoes() {
+		return destinacoes;
+	}
+
+	public void setDestinacoes(Long[] destinacoes) {
+		this.destinacoes = destinacoes;
+	}
 }

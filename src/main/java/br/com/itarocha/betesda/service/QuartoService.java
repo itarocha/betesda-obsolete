@@ -58,13 +58,21 @@ public class QuartoService {
 	public Quarto create(NovoQuartoVO model) throws Exception{
 		Quarto q = new Quarto();
 		try {
-			DestinacaoHospedagem dest = destinacaoHospedagemRepo.getOne(model.getDestinacaoHospedagem());
 			TipoLeito tipoLeito = tipoLeitoRepo.getOne(model.getTipoLeito());
 			SituacaoLeito situacao = situacaoLeitoRepo.getOne(model.getSituacao());
 			
 			q.setNumero(model.getNumero());
 			q.setDescricao(model.getDescricao());
-			q.setDestinacaoHospedagem(dest);
+
+			for (Long id : model.getDestinacoes()) {
+				DestinacaoHospedagem dh = destinacaoHospedagemRepo.getOne(id);
+				if (dh != null) {
+					q.getDestinacoes().add(dh);
+				}
+			}
+
+			//DestinacaoHospedagem dest = destinacaoHospedagemRepo.getOne(model.getDestinacaoHospedagem());
+			//q.setDestinacaoHospedagem(dest);
 			q.setAtivo(Logico.S);
 			
 			quartoRepo.save(q);
@@ -136,9 +144,18 @@ public class QuartoService {
 		if (oq.isPresent()) {
 			obj = oq.get();
 			obj.setDescricao(model.getDescricao());
-			DestinacaoHospedagem dest = destinacaoHospedagemRepo.getOne(model.getDestinacaoHospedagem());
 			
-			obj.setDestinacaoHospedagem(dest);
+			obj.getDestinacoes().clear();
+			for (Long id : model.getDestinacoes()) {
+				DestinacaoHospedagem dh = destinacaoHospedagemRepo.getOne(id);
+				if (dh != null) {
+					obj.getDestinacoes().add(dh);
+				}
+			}
+
+			// FIXME: propriedade removida
+			//DestinacaoHospedagem dest = destinacaoHospedagemRepo.getOne(model.getDestinacaoHospedagem());
+			//obj.setDestinacaoHospedagem(dest);
 			obj.setNumero(model.getNumero());
 			quartoRepo.save(obj);
 		}

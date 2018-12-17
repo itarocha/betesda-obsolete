@@ -14,9 +14,14 @@
               <v-flex xs12 sm6 md10>
                 <v-text-field v-model="form.descricao" label="Descrição" :error-messages="getErrors('descricao')"></v-text-field>
               </v-flex>
-
               <v-flex xs12 sm12 md12>
-                <v-select v-model="form.destinacaoHospedagem" :items="itensDestinacaoHospedagem" label="Destinação Hospedagem" :error-messages="getErrors('destinacaoHospedagem')"></v-select>
+                <v-select
+                  :items="itensDestinacaoHospedagem"
+                  label="Destinações de Hospedagem"
+                  multiple
+                  chips
+                  v-model="form.destinacoes"
+                ></v-select>
               </v-flex>
             </v-layout>
           </v-container>
@@ -52,7 +57,8 @@ export default {
       id: null,
       numero: 0,
       descricao: null,
-      destinacaoHospedagem: null
+      destinacaoHospedagem: null,
+      destinacoes : null
     },
     dados: [],
     errors:[],

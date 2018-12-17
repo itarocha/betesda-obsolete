@@ -28,6 +28,6 @@ public interface QuartoRepository extends JpaRepository<Quarto, Long> {
 	 @Query("SELECT o FROM Quarto o WHERE (o.numero = :numero)") 
 	 List<Quarto> existeOutroQuartoComEsseNumero(@Param("numero") Integer numero);
 
-	 @Query("SELECT q FROM Quarto q FETCH ALL PROPERTIES WHERE q.destinacaoHospedagem.id = :id ORDER BY q.numero")
+	 @Query("SELECT q FROM Quarto q JOIN q.destinacoes d FETCH ALL PROPERTIES WHERE d.id = :id ORDER BY q.numero") // JOIN FETCH
 	 List<Quarto> findByDestinacaoHospedagemId(@Param("id") Long id);
 }

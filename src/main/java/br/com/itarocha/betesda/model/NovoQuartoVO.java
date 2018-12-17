@@ -14,9 +14,10 @@ public class NovoQuartoVO {
 	@Size(max = 255, message="Descrição não pode ter mais que 255 caracteres")
 	private String descricao;
 
-	@NotNull(message="Destinação da Hospedagem é obrigatória")
-	private Long destinacaoHospedagem;
-			
+	//@NotNull(message="Destinação da Hospedagem é obrigatória")
+	//private Long destinacaoHospedagem;
+	private Long[] destinacoes;
+	
 	@NotNull(message="Quantidade de Leitos precisa ser informada")
 	@Min(value=1, message="Quantidade de Leitos deve ser maior que zero")
 	private Integer quantidadeLeitos;
@@ -45,7 +46,8 @@ public class NovoQuartoVO {
 	public void setDescricao(String descricao) {
 		this.descricao = descricao;
 	}
-
+	
+	/*
 	public Long getDestinacaoHospedagem() {
 		return this.destinacaoHospedagem;
 	}
@@ -53,7 +55,8 @@ public class NovoQuartoVO {
 	public void setDestinacaoHospedagem(Long destinacaoHospedagem) {
 		this.destinacaoHospedagem = destinacaoHospedagem;
 	}
-
+	*/
+	
 	public Integer getQuantidadeLeitos() {
 		return quantidadeLeitos;
 	}
@@ -78,4 +81,11 @@ public class NovoQuartoVO {
 		this.situacao = situacao;
 	}
 
+	public Long[] getDestinacoes() {
+		return destinacoes;
+	}
+
+	public void setDestinacoes(Long[] destinacoes) {
+		this.destinacoes = destinacoes;
+	}
 }
