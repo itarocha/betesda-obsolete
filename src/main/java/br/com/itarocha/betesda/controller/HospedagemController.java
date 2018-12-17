@@ -45,8 +45,8 @@ public class HospedagemController {
 				}
 
 				if ("T".equals(model.getTipoUtilizacao()) && (h.getAcomodacao() != null) && 
-						(h.getAcomodacao().getLeitoId() != null) && 
-						(model.getDataEntrada() != null) && (model.getDataPrevistaSaida() != null) )
+					(h.getAcomodacao().getLeitoId() != null) && 
+					(model.getDataEntrada() != null) && (model.getDataPrevistaSaida() != null) )
 				{
 					Long leitoId = h.getAcomodacao().getLeitoId();
 					LocalDate dataIni = model.getDataEntrada();
@@ -57,8 +57,6 @@ public class HospedagemController {
 					if (!service.leitoLivreNoPeriodo(leitoId, dataIni, dataFim)) {
 						v.addError("id", String.format("Quarto %s Leito %s está ocupado no perído", quartoNumero, leitoNumero ));
 					}
-					
-					
 				}
 			}
 		}

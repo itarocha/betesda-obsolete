@@ -20,6 +20,7 @@ import br.com.itarocha.betesda.model.NovoQuartoVO;
 import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.SelectValueVO;
 import br.com.itarocha.betesda.service.DestinacaoHospedagemService;
+import br.com.itarocha.betesda.service.EntidadeService;
 import br.com.itarocha.betesda.service.QuartoService;
 import br.com.itarocha.betesda.service.SituacaoLeitoService;
 import br.com.itarocha.betesda.service.TipoHospedeService;
@@ -49,6 +50,8 @@ public class QuartoController {
 	@Autowired
 	private TipoServicoService tss;
 	
+	@Autowired
+	private EntidadeService etds;
 	
 	@RequestMapping
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
@@ -186,6 +189,8 @@ public class QuartoController {
 		retorno.listaTipoHospede = ths.listSelect();
 		
 		retorno.listaTipoServico = tss.listSelect();
+
+		retorno.listaEntidade = etds.listSelect();
 		
 		return new ResponseEntity<AutoWired>(retorno, HttpStatus.OK);
 	}
@@ -196,6 +201,7 @@ public class QuartoController {
 		public List<SelectValueVO> listaSituacaoLeito = new ArrayList<SelectValueVO>();
 		public List<SelectValueVO> listaTipoHospede = new ArrayList<SelectValueVO>();
 		public List<SelectValueVO> listaTipoServico = new ArrayList<SelectValueVO>();
+		public List<SelectValueVO> listaEntidade = new ArrayList<SelectValueVO>();
 	} 
 	
 }

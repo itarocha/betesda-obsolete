@@ -6,6 +6,9 @@
         <v-btn dark small color="cyan darken-4" @click="incluirHospedagem" v-if="estado == 'vendo'">
             Incluir
         </v-btn>
+        <v-btn dark small color="cyan darken-4" @click="adicionarPessoa"  v-if="estado != 'vendo'">
+          Incluir Hóspede
+        </v-btn>
         <v-btn dark small color="cyan darken-4" @click="resetHospedagem" v-if="estado != 'vendo'">
             Cancelar
         </v-btn>
@@ -41,6 +44,9 @@
                 <!-- EXPLODE -->
                 <v-card-text >
                     <v-layout wrap>
+                      <v-flex xs12 sm12 md12>
+                        <v-select label="Entidade" ref="edtEntidadeId" :items="itensEntidade" v-model="formOpcoes.entidadeId"></v-select>
+                      </v-flex>
 
                       <v-flex xs12 sm6 md6>
                         <v-menu
@@ -123,9 +129,6 @@
                 <v-toolbar card height="45px" class="grey lighten-2">
                   Hóspedes
                   <v-spacer></v-spacer>
-                  <v-btn dark small color="cyan darken-4" @click="adicionarPessoa">
-                    Adicionar
-                  </v-btn>
                 </v-toolbar>
 
                 <v-flex xs12 sm12 md12 v-for="(item, i)  in hospedes" :key="i" v-if="show">
@@ -332,6 +335,7 @@ export default {
     dataEntrada : null,
     dataPrevistaSaida : null,
     formOpcoes : {
+      entidadeId: null,
       dataEntrada: null,    
       dataEntradaFmt: null,    
       dataPrevistaSaida: null,
@@ -345,6 +349,7 @@ export default {
 
     itensDestinacaoHospedagem : [],
     itensTipoHospede : [],
+    itensEntidades : [],
     itensUtilizacao: [{ text: "Total", value: "T" }, { text: "Parcial", value: "P" }],
     nomePessoaSelecionada : "",
 
@@ -420,6 +425,7 @@ export default {
   methods: {
     reset(){
       this.formOpcoes = {
+        entidadeId: null,
         dataEntrada: null,    
         dataEntradaFmt: null,    
         dataPrevistaSaida: null,
@@ -436,9 +442,22 @@ export default {
     focus(){
       if (this.dialogIncluirHospedagem) {
         setTimeout(() => {
-          this.$refs.edtDataEntrada.focus()
+          this.$refs.edtEntidadeId.focus()
         }, 500)
       }
+    },
+
+    loadListas() {
+      this.itensDestinacaoHospedagem = [];
+      petra.axiosGet("/app/quarto/listas").then(
+        response => {
+          this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
+          this.itensTipoLeito = response.data.listaTipoLeito
+          this.itensSituacaoLeito = response.data.listaSituacaoLeito
+          this.itensTipoServico = response.data.listaTipoServico
+          this.itensTipoHospede = response.data.listaTipoHospede
+          this.itensEntidade = response.data.listaEntidade
+        })
     },
 
     dataEntradaBlur(){
@@ -495,6 +514,7 @@ export default {
       this.errors = []
 
       var toSave = {
+        entidadeId : this.formOpcoes.entidadeId,
         dataEntrada : this.dataEntrada,
         dataPrevistaSaida : this.dataPrevistaSaida,
         destinacaoHospedagemId : this.formOpcoes.destinacaoHospedagem,
@@ -549,18 +569,6 @@ export default {
         this.show = false
         this.$nextTick(() => {
           this.show = true;
-        })
-    },
-
-    loadListas() {
-      this.itensDestinacaoHospedagem = [];
-      petra.axiosGet("/app/quarto/listas").then(
-        response => {
-          this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
-          this.itensTipoLeito = response.data.listaTipoLeito
-          this.itensSituacaoLeito = response.data.listaSituacaoLeito
-          this.itensTipoServico = response.data.listaTipoServico
-          this.itensTipoHospede = response.data.listaTipoHospede
         })
     },
 

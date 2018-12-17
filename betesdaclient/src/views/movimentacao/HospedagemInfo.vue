@@ -48,7 +48,7 @@
                     Destinação de Hospedagem:
                   </v-flex>
                   <v-flex xs12 sm2 md6 class="title">
-                    {{hospedagem.destinacaoHospedagem.descricao}}
+                    {{destinacaoHospedagem.descricao}}
                   </v-flex>
 
                   <v-flex xs12 sm2 md4 offset-md2>
@@ -64,6 +64,14 @@
                   <v-flex xs12 sm2 md6 class="text-uppercase title">
                     {{hospedagem.status}}
                   </v-flex>
+
+                  <v-flex xs12 sm2 md4 offset-md2 v-if="servicos.length > 0">
+                    Serviços:
+                  </v-flex>
+                  <v-flex xs12 sm2 md12 v-if="servicos.length > 0" class="subheading ml-2">
+                      <v-chip color="amber lighten-2" v-for="(servico, idx) in servicos" :key="idx">{{servico.descricao}}</v-chip>
+                  </v-flex>
+
                 </v-layout>
               </v-tab-item>
 
@@ -86,7 +94,7 @@
                           Endereço:
                         </v-flex>
                         <v-flex xs12 sm2 md10>
-                          {{hpd.pessoa.endereco.descricao}}
+                          {{hpd.pessoa.endereco != null ? hpd.pessoa.endereco.descricao : ''}}
                         </v-flex>
 
                         <v-flex xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
@@ -107,6 +115,43 @@
 
               <!-- encaminhador -->
               <v-tab-item>
+                <v-layout row wrap v-if="entidade != null">
+                  <v-flex xs12 sm8 md8>
+                    <v-text-field label="Nome" readonly ref="edtNome" v-model="entidade.nome"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
+                    <v-text-field label="CNPJ" readonly v-model="entidade.cnpj" :mask="'##.###.###/####-##'" :masked="true" ></v-text-field>
+                  </v-flex>
+
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field label="Telefone" readonly v-model="entidade.telefone" ></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field label="Email" readonly v-model="entidade.email"></v-text-field>
+                  </v-flex>
+
+                  <v-flex xs12 sm6 md6 v-if="entidade.endereco">
+                    <v-text-field label="Endereço" readonly v-model="entidade.endereco.logradouro"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm2 md2 v-if="entidade.endereco">
+                    <v-text-field label="Número" readonly v-model="entidade.endereco.numero"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4 v-if="entidade.endereco">
+                    <v-text-field label="Complemento" readonly v-model="entidade.endereco.complemento"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4 v-if="entidade.endereco">
+                    <v-text-field label="Bairro" readonly v-model="entidade.endereco.bairro"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm2 md2 v-if="entidade.endereco">
+                    <v-text-field label="CEP" readonly v-model="entidade.endereco.cep" :mask="'#####-###'"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4 v-if="entidade.endereco">
+                    <v-text-field label="Cidade" readonly v-model="entidade.endereco.cidade"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm2 md2 v-if="entidade.endereco">
+                    <v-text-field label="UF" readonly v-model="entidade.endereco.uf"></v-text-field>
+                  </v-flex>
+                </v-layout>    
               </v-tab-item>
             </v-tabs>
           </v-flex>    
@@ -158,7 +203,9 @@ export default {
     destinacaoHospedagem:{},
     hospede: {},
     hospedes: [],
+    servicos: [],
     hospedagem:{},
+    entidade:{},
     dados: [],
     errors:[],
     dialogVisible : false
@@ -197,9 +244,11 @@ export default {
 
       petra.axiosPost("/app/hospedagem/mapa/hospedagem_info", dados)
         .then(response => { 
-            //console.log("RETORNOU ", response.data)
+            console.log("RETORNOU ", response.data)
             this.hospedagem = response.data
+            this.entidade = (this.hospedagem && this.hospedagem.entidade) ? this.hospedagem.entidade : null
             this.hospedes = this.hospedagem.hospedes
+            this.servicos = (this.hospedagem && this.hospedagem.servicos) ? this.hospedagem.servicos : []
             this.tipoHospede = this.hospedagem.hospedes[0].tipoHospede
             this.destinacaoHospedagem = this.hospedagem.destinacaoHospedagem
           }).catch(error => {
@@ -243,18 +292,6 @@ export default {
     },
 
     save(evt) {
-      //this.errors.descricao = [];
-      /*
-      let uri = petra.base_uri+"/app/destinacao_hospedagem";
-      axios.post(uri, this.form)
-          .then(response => { 
-            this.dialogVisible = false
-            this.$emit('close',true)
-            this.$emit('save',response.data)
-          }).catch(error => {
-            this.errors = petra.tratarErros(error);
-          });
-      */
       this.$emit('close',true)          
     },
 

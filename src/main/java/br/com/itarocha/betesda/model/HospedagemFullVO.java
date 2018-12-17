@@ -4,8 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import br.com.itarocha.betesda.model.hospedagem.CellStatusHospedagem;
 
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class HospedagemFullVO {
 
 	private Long id;
@@ -20,6 +23,7 @@ public class HospedagemFullVO {
 	private CellStatusHospedagem status;
 	
 	private List<Hospede> hospedes = new ArrayList<Hospede>();
+	private List<TipoServico> servicos = new ArrayList<TipoServico>();
 	
 	public HospedagemFullVO() {
 		this.tipoUtilizacao = TipoUtilizacaoHospedagem.T;
@@ -103,6 +107,14 @@ public class HospedagemFullVO {
 
 	public void setHospedes(List<Hospede> hospedes) {
 		this.hospedes = hospedes;
+	}
+
+	public List<TipoServico> getServicos() {
+		return servicos;
+	}
+
+	public void setServicos(List<TipoServico> servicos) {
+		this.servicos = servicos;
 	}
 
 	public CellStatusHospedagem getStatus() {

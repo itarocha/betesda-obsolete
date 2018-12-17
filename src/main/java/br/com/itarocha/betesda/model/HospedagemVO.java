@@ -10,6 +10,11 @@ public class HospedagemVO {
 	
 	private Long id;
 
+	@NotNull(message="Entidade precisa ser informada")
+	private Long entidadeId;
+	
+	private Entidade entidade;
+
 	@NotNull(message="Data de Entrada precisa ser informada")
 	private LocalDate dataEntrada;
 	
@@ -34,6 +39,22 @@ public class HospedagemVO {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getEntidadeId() {
+		return entidadeId;
+	}
+
+	public void setEntidadeId(Long entidadeId) {
+		this.entidadeId = entidadeId;
+	}
+
+	public Entidade getEntidade() {
+		return entidade;
+	}
+
+	public void setEntidade(Entidade entidade) {
+		this.entidade = entidade;
 	}
 
 	public LocalDate getDataEntrada() {

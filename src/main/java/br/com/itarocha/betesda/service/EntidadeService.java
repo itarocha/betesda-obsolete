@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.itarocha.betesda.model.Entidade;
+import br.com.itarocha.betesda.model.SelectValueVO;
+import br.com.itarocha.betesda.model.TipoServico;
 import br.com.itarocha.betesda.repository.EnderecoRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
 
@@ -65,4 +68,13 @@ public class EntidadeService {
 				.setParameter("texto", "%"+texto.toLowerCase()+"%")
 				.getResultList();
 	}
+
+	public List<SelectValueVO> listSelect() {
+		List<SelectValueVO> retorno = new ArrayList<SelectValueVO>();
+		em.createQuery("SELECT e FROM Entidade e ORDER BY e.nome",Entidade.class)
+			.getResultList()
+			.forEach(x -> retorno.add(new SelectValueVO(x.getId(), x.getNome())));
+		return retorno;
+	}
+	
 }

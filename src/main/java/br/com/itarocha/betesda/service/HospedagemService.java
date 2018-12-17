@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
+import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemTipoServico;
@@ -42,6 +43,7 @@ import br.com.itarocha.betesda.model.hospedagem.HospedagemHeader;
 import br.com.itarocha.betesda.model.hospedagem.LeitoOut;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
+import br.com.itarocha.betesda.repository.EntidadeRepository;
 import br.com.itarocha.betesda.repository.HospedagemRepository;
 import br.com.itarocha.betesda.repository.HospedagemTipoServicoRepository;
 import br.com.itarocha.betesda.repository.HospedeLeitoRepository;
@@ -91,12 +93,19 @@ public class HospedagemService {
 	private TipoServicoRepository tipoServicoRepo;
 	
 	@Autowired
+	private EntidadeRepository entidadeRepo;
+	
+	@Autowired
 	private HospedagemTipoServicoRepository hospedagemTipoServicoRepo;
 
 	public Hospedagem create(HospedagemVO model) throws Exception {
 		Hospedagem hospedagem = null;
 		try {
 			hospedagem = new Hospedagem();
+			
+			Optional<Entidade> entidade = entidadeRepo.findById(model.getEntidadeId());// em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
+			hospedagem.setEntidade(entidade.get());
+			model.setEntidade(entidade.get());
 			
 			hospedagem.setDataEntrada(model.getDataEntrada());
 			hospedagem.setDataPrevistaSaida(model.getDataPrevistaSaida());
@@ -109,7 +118,6 @@ public class HospedagemService {
 			hospedagem.setTipoUtilizacao(tu);
 			hospedagem = hospedagemRepo.save(hospedagem);
 			
-			//em.persist(hospedagem);
 			model.setId(hospedagem.getId()); 
 			
 			for (HospedeVO hvo: model.getHospedes()) {
@@ -154,22 +162,19 @@ public class HospedagemService {
 			    		h.getLeitos().add(hl);
 			    	}
 			    }
-			    
-			    if ((model.getServicos().length > 0) && (TipoUtilizacaoHospedagem.P.equals(hospedagem.getTipoUtilizacao())) ) {
-			    	
-			    	for (Long tipoServicoId : model.getServicos()) {
-			    		Optional<TipoServico> ts = tipoServicoRepo.findById(tipoServicoId);
-			    		if (ts.isPresent()) {
-				    		HospedagemTipoServico servico = new HospedagemTipoServico();
-				    		servico.setTipoServico(ts.get());
-				    		servico.setHospedagem(hospedagem);
-				    		hospedagemTipoServicoRepo.save(servico);
-				    		hospedagem.getServicos().add(servico);
-			    		}
-			    	}
-			    }	 
-			    
 			}
+			if ((model.getServicos().length > 0) && (TipoUtilizacaoHospedagem.P.equals(hospedagem.getTipoUtilizacao())) ) {
+				for (Long tipoServicoId : model.getServicos()) {
+					Optional<TipoServico> ts = tipoServicoRepo.findById(tipoServicoId);
+					if (ts.isPresent()) {
+						HospedagemTipoServico servico = new HospedagemTipoServico();
+						servico.setTipoServico(ts.get());
+						servico.setHospedagem(hospedagem);
+						hospedagemTipoServicoRepo.save(servico);
+						hospedagem.getServicos().add(servico);
+					}
+				}
+			}	 
 		} catch (Exception e) {
 			throw e;
 		}
@@ -383,6 +388,12 @@ public class HospedagemService {
 	public HospedagemFullVO getHospedagemPorHospedeLeitoId(Long hospedagemId) {
 		Hospedagem h = hospedagemRepo.findHospedagemByHospedagemId(hospedagemId);
 		HospedagemFullVO retorno = new HospedagemFullVO();
+		
+		for (HospedagemTipoServico hts: h.getServicos()) {
+			System.out.println(String.format("SERVIÇO [%s]-[%s]", hts.getId(), hts.getTipoServico().getDescricao()));
+			TipoServico servico = hts.getTipoServico();
+			retorno.getServicos().add(servico);
+		}
 		
 		retorno.setId(h.getId());
 		retorno.setEntidade(h.getEntidade());
