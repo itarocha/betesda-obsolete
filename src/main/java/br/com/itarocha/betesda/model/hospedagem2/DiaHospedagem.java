@@ -78,4 +78,7 @@ public class DiaHospedagem {
 		this.continuacao = continuacao;
 	}
 	
+	public String getClasse() {
+		return this.possuiContinuidade ? "INDO" : (this.continuacao ? "VINDO" : this.andamento.toString());
+	}
 }

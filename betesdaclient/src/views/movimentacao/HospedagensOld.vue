@@ -56,42 +56,27 @@
                 
                 <div :style="styleGrid" class="scroll-y p0">
 
-                  <v-layout row v-for="(celula, index) in dados.leitos" :key="index">
+                  <v-layout row v-for="(celula, index) in dados.celulas" :key="index">
                     <v-flex sm12>
                       <div class="box p4 laranja hleito">
-                        <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
-                        <center v-if="celula.quartoNumero == '9999'">Parcial</center>
+                        <center v-if="celula.leito.quartoNumero != '9999'">{{celula.leito.quartoNumero}}-{{celula.leito.leitoNumero}}</center>
+                        <center v-if="celula.leito.quartoNumero == '9999'">Parcial</center>
                       </div>
                     </v-flex>
 
-                    <v-flex sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
-                      <div class="box hleito" v-if="celula.hospedagens.length == 0"></div>
-                      <div class="box hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx" v-if="celula.hospedagens.length > 0">
-                        <div :class="hospedagemClass(hospedagem.dias[indice].classe)" 
-                              v-if="hospedagem.dias[indice].identificador != '0'"
-                              :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
-                        @click="showHospedagemInfo(hospedagem.dias[indice].identificador)">
-                          <v-chip color="grey lighten-1" 
-                            :small="true" text-color="black" 
-                            v-if="hospedagem.dias[indice].firstIndex" 
-                            class="chip">{{getNome(hospedagem.dias[indice].identificador)}}</v-chip>
-                        </div>                              
-
-
-                      </div>
-                    </v-flex>
-
-
-                    <!--
                     <v-flex sm12 v-for="(cell,indice) in celula.cells" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
                       <div class="box hleito">
                         <div :class="hospedagemClass(cell.andamento)" v-if="cell.hospedagemId != 0" :style="{backgroundColor: colorStatus(cell.status)}" 
                         @click="showHospedagemInfo(cell.hospedagemId)">
+                          <!--
+                          <v-avatar color="grey darken-2" :size="42" v-if="false">
+                            <span class="white--text" style="font-size:10pt; padding:10px;">WWW</span>
+                          </v-avatar>
+                          -->
                           <v-chip color="grey lighten-1" :small="true" text-color="black" v-if="cell.firstIndex" class="chip">{{getNome(cell.id)}}</v-chip>
                         </div>                              
                       </div>
                     </v-flex>
-                    -->
 
                   </v-layout>
                 </div>
@@ -100,7 +85,6 @@
 
               <!-- início grid -->
               <v-tab-item>
-                <!--
                 <v-flex xs12 sm12 md12>
                   <v-card flat>
                     <v-data-table :headers="headers" :items="pessoas" :dark="false" :persistent="true"
@@ -122,13 +106,11 @@
                     </v-data-table>    
                   </v-card>
                 </v-flex>
-                -->
               </v-tab-item>
               <!-- fim grid -->
 
               <!-- início dashboard -->
               <v-tab-item>
-                <!--
                 <v-container grid-list-md text-xs-center>
                   <v-layout row wrap>
 
@@ -222,7 +204,6 @@
                     </v-flex>                 
                   </v-layout>
                 </v-container>
-                -->
               </v-tab-item>    
               <!-- fim dashboard -->
             </v-tabs>        
@@ -238,7 +219,7 @@ import Titulo from "../../components/Titulo.vue"
 import HospedagemInfo from "./HospedagemInfo.vue"  
 
 export default {
-  name: 'Hospedagens',
+  name: 'HospedagensOld',
   components:{
     Titulo,
     HospedagemInfo
@@ -394,7 +375,7 @@ export default {
       var dados = {
         data : data
       }
-      petra.axiosPost("/app/hospedagem/mapanew", dados)
+      petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
             //console.log("getData() ",this.dados)
@@ -407,7 +388,6 @@ export default {
     },
 
     showEstatisticas(){
-      /* REMOVIDO TEMPORARIAMENTE
       var index = petraDateTime.getIndiceData(this.dataAtual) || 0
 
       if (this.dados && this.dados.qtdLeitosTotais){
@@ -439,7 +419,6 @@ export default {
         this.qtdParciaisPendentes = 0
         this.qtdParciaisEncerrados = 0
       }
-      */
     },
 
     recarregar(){
@@ -458,36 +437,26 @@ export default {
       return petraDateTime.diaSemana(dia)
     },
 
-    hospedagemClass(classe){
-      if (classe == "INICIO") {
+    hospedagemClass(andamento){
+      if (andamento == "INICIO") {
         return 'grafico grafico_inicio'
       } else 
-      if (classe == "DURANTE") {
+      if (andamento == "DURANTE") {
         return 'grafico grafico_durante'
       } else 
-      if (classe == "FIM") {
+      if (andamento == "FIM") {
         return 'grafico grafico_fim'
-      } else
-      if (classe == "INDO") {
-        return 'grafico grafico_indo'
-      } else      
-      if (classe == "VINDO") {
-        return 'grafico grafico_vindo'
       }
-
       return ''
     },  
 
-    colorStatus(id){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        if (hospedagem.statusHospedagem == 'ABERTA'){
-          return '#0D47A1' // blue darken-4
-        } else if (hospedagem.statusHospedagem == 'ENCERRADA'){
-          return '#2E7D32' // green darken-4
-        } else if (hospedagem.statusHospedagem == 'VENCIDA'){
-          return '#D50000' // red accent-4
-        }
+    colorStatus(status){
+      if (status == 'ABERTA'){
+        return '#0D47A1' // blue darken-4
+      } else if (status == 'ENCERRADA'){
+        return '#2E7D32' // green darken-4
+      } else if (status == 'VENCIDA'){
+        return '#D50000' // red accent-4
       }
       return 'blue'
     },
@@ -508,11 +477,8 @@ export default {
       return '???';
     },
 
-    showHospedagemInfo(id){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        this.$refs.hospedagemInfo.openDialog(hospedagem.hospedagemId);
-      }
+    showHospedagemInfo(hospedagemId){
+        this.$refs.hospedagemInfo.openDialog(hospedagemId);
     },
 
     exemplosMoment(){
@@ -589,7 +555,6 @@ export default {
   padding:1px;
   font-size:8pt;
   text-transform:uppercase;
-  margin-left:15px;
 }
 
 .p0{
@@ -629,20 +594,6 @@ export default {
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
   width: calc(100% - 3px);
-}
-
-/*  https://css-tricks.com/the-shapes-of-css/ */
-.grafico_indo {
-  border-top-right-radius: 30px;
-  border-bottom-right-radius: 0px;
-  /*width: calc(100% - 3px);*/
-}
-
-.grafico_vindo {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 30px;
-  /*width: calc(100% - 2px);*/
-  /*margin-left: 3px;*/
 }
 
 </style>

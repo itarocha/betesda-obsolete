@@ -17,6 +17,7 @@ import Entidade from '@/views/config/Entidade.vue'
 
 import Checkin from '@/views/movimentacao/Checkin.vue'
 import Servicos from '@/views/movimentacao/Servicos.vue'
+import HospedagensOld from '@/views/movimentacao/HospedagensOld.vue'
 import Hospedagens from '@/views/movimentacao/Hospedagens.vue'
 import HistoricoHospedagens from '@/views/movimentacao/HistoricoHospedagens.vue'
 
@@ -113,6 +114,14 @@ const router = new Router({
       path: '/hospedagens',
       name: 'hospedagens',
       component: Hospedagens,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/hospedagensold',
+      name: 'hospedagensold',
+      component: HospedagensOld,
       meta: {
         requiresAuth: true
       }
