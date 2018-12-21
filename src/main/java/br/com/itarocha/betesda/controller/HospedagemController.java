@@ -15,10 +15,10 @@ import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
+import br.com.itarocha.betesda.model.hospedagem2.MapaRetorno;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
-//@CrossOrigin
 @RestController
 @RequestMapping("/api/app/hospedagem")
 public class HospedagemController {
@@ -85,6 +85,25 @@ public class HospedagemController {
 		} 
 		
 		return listagem;
+	}
+
+	@RequestMapping(value="/mapanew", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public MapaRetorno mapaNew(@RequestBody MapaHospedagemRequest model)
+	{
+		MapaRetorno retorno = service.buildMapaRetorno(model.data);
+		return retorno;
+		
+		/*
+		MapaHospedagem listagem = new MapaHospedagem();
+		try {
+			listagem  = service.getHospedagens(model.data);
+		} catch(Exception e) {
+			throw e;
+		} 
+		
+		return listagem;
+		*/
 	}
 
 	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)

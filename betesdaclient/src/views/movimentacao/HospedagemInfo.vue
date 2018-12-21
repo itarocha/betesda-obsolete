@@ -101,7 +101,7 @@
                           <v-list>
                             <v-list-tile v-for="leito in hpd.leitos" :key="leito.id">
                               <v-list-tile-content>
-                                {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                                #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
                               </v-list-tile-content>
                             </v-list-tile>
                           </v-list>

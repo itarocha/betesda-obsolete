@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.SelectValueVO;
-import br.com.itarocha.betesda.model.TipoServico;
 import br.com.itarocha.betesda.repository.EnderecoRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
 
