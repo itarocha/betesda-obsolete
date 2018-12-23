@@ -24,7 +24,8 @@ public class ItaValidator<T> {
 		Validator validator = factory.getValidator();
 		Set<ConstraintViolation<T>> violations = validator.validate(this.ref);
 		for (ConstraintViolation<T> violation : violations ) {
-			this.re.getErrors().add(new FieldValidationError(violation.getPropertyPath().toString(), violation.getMessage()));
+			this.re.addError(violation.getPropertyPath().toString(), violation.getMessage());
+			//this.re.getErrors().add(new FieldValidationError(violation.getPropertyPath().toString(), violation.getMessage()));
 		}
 	}
 
@@ -37,7 +38,6 @@ public class ItaValidator<T> {
 	}
 
 	public void addError(String fieldName, String message) {
-		this.re.getErrors().add(new FieldValidationError(fieldName, message));
+		this.re.addError(fieldName, message);
 	}
-
 }

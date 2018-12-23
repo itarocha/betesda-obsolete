@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
 import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.Hospedagem;
@@ -29,6 +30,7 @@ import br.com.itarocha.betesda.model.HospedeLeitoVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.Leito;
 import br.com.itarocha.betesda.model.LeitoVO;
+import br.com.itarocha.betesda.model.Logico;
 import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.model.Quarto;
 import br.com.itarocha.betesda.model.TipoHospede;
@@ -58,6 +60,7 @@ import br.com.itarocha.betesda.repository.PessoaRepository;
 import br.com.itarocha.betesda.repository.QuartoRepository;
 import br.com.itarocha.betesda.repository.TipoHospedeRepository;
 import br.com.itarocha.betesda.repository.TipoServicoRepository;
+import br.com.itarocha.betesda.util.validation.ResultError;
 import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
 
@@ -278,6 +281,8 @@ public class HospedagemService {
 				
 				hhi.setId(id);
 				hhi.setIdentificador(identificador);
+				hhi.setBaixado(Logico.S.equals(hl.getHospede().getBaixado()));
+				
 				hhi.setDestinacaoHospedagemId(hospedagem.getDestinacaoHospedagem().getId());
 				hhi.setDestinacaoHospedagemDescricao(hospedagem.getDestinacaoHospedagem().getDescricao());
 				
@@ -681,7 +686,7 @@ public class HospedagemService {
 	}
 	
 	//TODO Implementar encerrarHospedagem
-	public void encerrarHospedagem(Long hospedagemId, LocalDate dataEncerramento) {
+	public void encerrarHospedagem(Long hospedagemId, LocalDate dataEncerramento) throws ValidationException {
 		/*
 		* hospedagem = getHospedagem(hospedagemId)
 		* Condição: se hospedagem.status == aberta
@@ -695,13 +700,11 @@ public class HospedagemService {
 			
 			Hospedagem h = opt.get();
 			if ((h.getDataEfetivaSaida() != null)) {
-				System.out.println("Erro. Hospedagem deve ter status = emAberto"); 
-				return;
+				throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
 			}
 			
 			if (dataEncerramento.isBefore(h.getDataEntrada())) {
-				System.out.println("Erro. Data de encerramento deve ser superior a data de entrada"); 
-				return;
+				throw new ValidationException(new ResultError().addError("*", "Data de encerramento deve ser superior a data de entrada........."));
 			}
 
 			List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedagemId(hospedagemId);
@@ -714,6 +717,48 @@ public class HospedagemService {
 			h.setDataEfetivaSaida(dataEncerramento);
 			hospedagemRepo.save(h);
 		}
+	} 
+	
+	//TODO Implementar encerrarHospedagem
+	public void baixarHospede(Long hospedeId, LocalDate dataBaixa) throws ValidationException{
+		Optional<Hospede> hospedeOpt = hospedeRepo.findById(hospedeId);
+		if (hospedeOpt.isPresent()) {
+			Long hospedagemId = hospedeOpt.get().getHospedagem().getId();
+			Hospede hospede = hospedeOpt.get();
+
+			if ((Logico.S.equals(hospede.getBaixado())  )) {
+				throw new ValidationException(new ResultError().addError("*", "Hóspede já está baixado"));
+			}
+			
+			Optional<Hospedagem> opt = hospedagemRepo.findById(hospedagemId);
+			if (opt.isPresent()) {
+				
+				Hospedagem h = opt.get();
+				if ((h.getDataEfetivaSaida() != null)) {
+					throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
+				}
+				
+				if (dataBaixa.isBefore(h.getDataEntrada())) {
+					throw new ValidationException(new ResultError().addError("*", "Data de encerramento deve ser superior a data de entrada"));
+				}
+				
+				// SE HOUVER hospedeLeito com dataSaida inferior ao último, não permitir 
+				
+				List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedeId(hospedeId);
+				for (HospedeLeito hl : listaHospedeLeito) {
+					// System.out.println("hospede.Id = " + hl.getHospede().getId() + " Id = " + hl.getId() + " dataEntrada = "+hl.getDataEntrada());
+					if (hl.getDataEntrada().isAfter(dataBaixa)) {
+						throw new ValidationException(new ResultError().addError("*", "Existe movimentação com data ANTERIOR a data da baixa"));
+					}
+					
+					hl.setDataSaida(dataBaixa);
+					hospedeLeitoRepo.save(hl);
+				}
+				
+				hospede.setBaixado(Logico.S);
+			}
+		}
+		
 	} 
 	
 	//TODO Implementar renovarHospedagem

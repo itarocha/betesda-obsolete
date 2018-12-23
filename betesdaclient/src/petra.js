@@ -81,6 +81,12 @@ export default {
           }).catch(error => {
             if ((error.response.status >= 401) && (error.response.status < 500)){
               this.showMessageError("Erro: "+error.response.data.message)
+            } else if ((error.response.status == 500)){
+              if (error.response.data.errors){
+                this.showMessageError("Erro: "+error.response.data.errors[0].errorMessage)
+              } else {
+                this.showMessageError("Erro: "+error.response.data)
+              }
             }
             reject(error)
           })

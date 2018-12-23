@@ -210,14 +210,14 @@ public class HospedagemHeaderInfo {
 	}
 
 	public Boolean getPossuiContinuidade() {
-		return (!this.baixado) && 
+		return //(!this.baixado) && 
 				(this.leitoDataSaida != null) &&
 				(this.getDataSaida() != null) &&
 				(this.getDataSaida().isAfter(this.leitoDataSaida));    
 	}
 
 	public Boolean getContinuacao() {
-		return (!this.baixado) && 
+		return //(!this.baixado) && 
 				(this.dataEntrada != null) &&
 				(this.getDataSaida() != null) && 
 				(this.leitoDataEntrada.isAfter(this.dataEntrada));    

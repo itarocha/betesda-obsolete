@@ -244,7 +244,7 @@ export default {
 
       petra.axiosPost("/app/hospedagem/mapa/hospedagem_info", dados)
         .then(response => { 
-            console.log("RETORNOU ", response.data)
+            //console.log("RETORNOU ", response.data)
             this.hospedagem = response.data
             this.entidade = (this.hospedagem && this.hospedagem.entidade) ? this.hospedagem.entidade : null
             this.hospedes = this.hospedagem.hospedes
@@ -277,7 +277,8 @@ export default {
           this.$emit('encerrada',hospedagemId)
           this.dialogVisible = false
         }).catch(error => {
-          //erro
+          //this.errors = petra.tratarErros(error);
+          this.dialogVisible = false
         })
     },
 

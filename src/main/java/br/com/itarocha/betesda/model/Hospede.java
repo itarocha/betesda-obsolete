@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -45,8 +48,16 @@ public class Hospede extends UserDateAudit implements Serializable{
 	@NotNull(message="Tipo de Hóspede precisa ser informado")
 	private TipoHospede tipoHospede;
 	
+	@Enumerated(EnumType.STRING)
+	@Column(length=1)
+	private Logico baixado;
+	
 	@OneToMany(mappedBy = "hospede",fetch=FetchType.LAZY)
 	private List<HospedeLeito> leitos = new ArrayList<HospedeLeito>();
+	
+	public Hospede() {
+		this.baixado = Logico.N;
+	}
 	
 	public Long getId() {
 		return id;
@@ -78,6 +89,14 @@ public class Hospede extends UserDateAudit implements Serializable{
 
 	public void setTipoHospede(TipoHospede tipoHospede) {
 		this.tipoHospede = tipoHospede;
+	}
+
+	public Logico getBaixado() {
+		return baixado;
+	}
+
+	public void setBaixado(Logico baixado) {
+		this.baixado = baixado;
 	}
 
 	public List<HospedeLeito> getLeitos() {

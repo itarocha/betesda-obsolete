@@ -36,5 +36,13 @@ public interface HospedeLeitoRepository extends JpaRepository<HospedeLeito, Long
 			"AND      hl.data_entrada = (SELECT MAX(outro.data_entrada) FROM hospede_leito outro WHERE outro.hospede_id = hl.hospede_id) " + 
 			"ORDER BY hl.data_entrada DESC", nativeQuery = true) 
 	List<HospedeLeito> findUltimoByHospedagemId(@Param("hospedagemId") Long hospedagemId);
-
+	
+	// Retorna só um
+	@Query(value = "SELECT   hl.* " + 
+	"FROM     hospede_leito hl " + 
+	"WHERE    hl.hospede_id = :hospedeId " +
+	"AND      hl.data_entrada = (SELECT MAX(outro.data_entrada) FROM hospede_leito outro WHERE outro.hospede_id = hl.hospede_id) " + 
+	"ORDER BY hl.data_entrada ", nativeQuery = true)
+	List<HospedeLeito> findUltimoByHospedeId(@Param("hospedeId") Long hospedeId);
+	
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
@@ -18,6 +19,7 @@ import br.com.itarocha.betesda.model.hospedagem.MapaHospedagem;
 import br.com.itarocha.betesda.model.hospedagem2.MapaRetorno;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
+import br.com.itarocha.betesda.util.validation.ResultError;
 
 @RestController
 @RequestMapping("/api/app/hospedagem")
@@ -110,12 +112,23 @@ public class HospedagemController {
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> encerramento(@RequestBody OperacoesRequest model)
 	{
-		//System.out.println("Recebido: "+model.hospedagemId + " e "+ model.data);
 		try {
 			service.encerrarHospedagem(model.hospedagemId, model.data);
 			return new ResponseEntity<String>("ok", HttpStatus.OK);
-		} catch(Exception e) {
-			return new ResponseEntity<String>("erro", HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch(ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value="/mapa/baixar", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> baixar(@RequestBody BaixaRequest model)
+	{
+		try {
+			service.baixarHospede(model.hospedeId, model.data);
+			return new ResponseEntity<String>("ok", HttpStatus.OK); 
+		} catch(ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
@@ -161,6 +174,11 @@ public class HospedagemController {
 		public LocalDate data;
 	}
 
+	private static class BaixaRequest{
+		public LocalDate data;
+		public Long hospedeId;
+	}
+	
 	private static class OperacoesRequest{
 		public LocalDate data;
 		public Long hospedagemId;

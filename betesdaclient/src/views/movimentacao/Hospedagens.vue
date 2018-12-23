@@ -14,7 +14,7 @@
         </v-layout>
 
         <v-layout row wrap>
-          <v-flex xs1 sm12 md3>
+          <v-flex xs1 sm12 md2>
             <v-layout row wrap>
               <v-flex xs12 sm12>
                 <v-date-picker v-model="dataAtual" 
@@ -27,7 +27,7 @@
           </v-flex>
 
 
-          <v-flex xs10 sm12 md9>
+          <v-flex xs10 sm12 md10>
 
             <v-tabs v-model="tabActive" slider-color="cyan darken-2">
               <v-tab>Mapa de Hospedagem</v-tab>
@@ -67,17 +67,15 @@
                     <v-flex sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
                       <div class="box hleito" v-if="celula.hospedagens.length == 0"></div>
                       <div class="box hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx" v-if="celula.hospedagens.length > 0">
-                        <div :class="hospedagemClass(hospedagem.dias[indice].classe)" 
+                        <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe)" 
                               v-if="hospedagem.dias[indice].identificador != '0'"
                               :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
-                        @click="showHospedagemInfo(hospedagem.dias[indice].identificador)">
+                        @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
                           <v-chip color="grey lighten-1" 
                             :small="true" text-color="black" 
                             v-if="hospedagem.dias[indice].firstIndex" 
                             class="chip">{{getNome(hospedagem.dias[indice].identificador)}}</v-chip>
                         </div>                              
-
-
                       </div>
                     </v-flex>
 
@@ -100,21 +98,21 @@
 
               <!-- início grid -->
               <v-tab-item>
-                <!--
                 <v-flex xs12 sm12 md12>
                   <v-card flat>
                     <v-data-table :headers="headers" :items="pessoas" :dark="false" :persistent="true"
                     :rows-per-page-items="rowsperpage" :rows-per-page-text="'Linhas por página'"
                     class="elevation-1 mt-2 mr-2 ml-2">
                       <template slot="items" slot-scope="props">
-                        <td class="text-xs-right">{{ props.item.pessoaId }}</td>
-                        <td class="text-xs-left font-weight-medium" :class="{'green--text': props.item.status=='ENCERRADA', 'indigo--text':props.item.status=='ABERTA', 'red--text':props.item.status=='VENCIDA'}">
+                        <td class="text-xs-right">{{ props.item.hospedagemId }}</td>
+                        <td class="text-xs-left font-weight-medium" :class="{'green--text': props.item.statusHospedagem=='ENCERRADA', 'indigo--text':props.item.statusHospedagem=='ABERTA', 'red--text':props.item.statusHospedagem=='VENCIDA'}">
                           {{ props.item.pessoaNome }}</td>
                         <td class="text-xs-left">{{ formatDate(props.item.dataEntrada,'DD/MMM') }}</td>
                         <td class="text-xs-left">{{ formatDate(props.item.dataPrevistaSaida,'DD/MMM') }}</td>
                         <td class="text-xs-left">{{ formatDate(props.item.dataEfetivaSaida,'DD/MMM') }}</td>
-                        <td class="text-xs-left">{{ props.item.tipoUtilizacao }}</td>
-                        <td class="text-xs-left">{{ props.item.destinacaoHospedagem.descricao }}</td>
+                        <td class="text-xs-left">{{ props.item.utilizacao }}</td>
+                        <td class="text-xs-left">{{ props.item.leitoId != 0 ? props.item.quartoNumero + "-" + props.item.leitoNumero : ""}}</td>
+                        <td class="text-xs-left">{{props.item.destinacaoHospedagemDescricao}}</td>
                         <td class="text-xs-left">
                           <v-icon class="mr-2 teal--text" @click="showHospedagemInfo(props.item.hospedagemId)">info</v-icon>
                         </td>
@@ -122,13 +120,11 @@
                     </v-data-table>    
                   </v-card>
                 </v-flex>
-                -->
               </v-tab-item>
               <!-- fim grid -->
 
               <!-- início dashboard -->
               <v-tab-item>
-                <!--
                 <v-container grid-list-md text-xs-center>
                   <v-layout row wrap>
 
@@ -222,7 +218,6 @@
                     </v-flex>                 
                   </v-layout>
                 </v-container>
-                -->
               </v-tab-item>    
               <!-- fim dashboard -->
             </v-tabs>        
@@ -267,14 +262,15 @@ export default {
 
     colorCache: {},
     headers: [
-      { text: 'Código', align: 'left', value:'id', width: '5%',  sortable: false,},
+      { text: 'Hospedagem', align: 'left', value:'id', width: '5%',  sortable: false,},
       { text: 'Nome',  align:'left', value:'nome', width: '30%' },
       { text: 'Dt.Entrada',  align:'left', value:'dataEntrada', width: '5%' },
       { text: 'Dt.Prevista',  align:'left', value:'dataPrevistaSaida', width: '5%' },
       { text: 'Dt.Saída',  align:'left', value:'dataEfetivaSaida', width: '5%' },
       { text: 'Utilização',  align:'left', value:'tipoUtilizacao', width: '5%' },
-      { text: 'Destinação',  align:'left', value:'destinacaoHospedagem', width: '5%' },
-      { text: 'Ações',  align:'left', value:'nome', width: '5%',  sortable: false, }
+      { text: 'Leito',  align:'left', value:'leitoId', width: '5%' },
+      { text: 'Destinação',  align:'left', value:'destinacaoHospedagem', width: '2%' },
+      { text: 'Ações',  align:'left', value:'nome', width: '2%',  sortable: false, }
     ],
     rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
     tabActive : null,
@@ -399,6 +395,7 @@ export default {
             this.dados = response.data
             //console.log("getData() ",this.dados)
             this.pessoas = response.data.hospedagens
+            //console.log(this.pessoas)
             this.showEstatisticas()
         })
         .catch(error => {
@@ -407,7 +404,6 @@ export default {
     },
 
     showEstatisticas(){
-      /* REMOVIDO TEMPORARIAMENTE
       var index = petraDateTime.getIndiceData(this.dataAtual) || 0
 
       if (this.dados && this.dados.qtdLeitosTotais){
@@ -439,7 +435,6 @@ export default {
         this.qtdParciaisPendentes = 0
         this.qtdParciaisEncerrados = 0
       }
-      */
     },
 
     recarregar(){
@@ -458,30 +453,34 @@ export default {
       return petraDateTime.diaSemana(dia)
     },
 
-    hospedagemClass(classe){
-      if (classe == "INICIO") {
-        return 'grafico grafico_inicio'
-      } else 
-      if (classe == "DURANTE") {
-        return 'grafico grafico_durante'
-      } else 
-      if (classe == "FIM") {
-        return 'grafico grafico_fim'
-      } else
-      if (classe == "INDO") {
-        return 'grafico grafico_indo'
-      } else      
-      if (classe == "VINDO") {
-        return 'grafico grafico_vindo'
+    hospedagemClass(id, classe){
+      var hospedagem = this.getHospedagemById(id);
+      if (hospedagem){
+          if (classe == "INICIO") {
+            return 'grafico grafico_inicio'
+          } else 
+          if (classe == "DURANTE") {
+            return 'grafico grafico_durante'
+          } else 
+          if (classe == "FIM") {
+            return 'grafico grafico_fim'
+          } else
+          if (classe == "INDO") {
+            return 'grafico grafico_indo'
+          } else      
+          if (classe == "VINDO") {
+            return 'grafico grafico_vindo'
+          }
       }
-
       return ''
     },  
 
     colorStatus(id){
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
-        if (hospedagem.statusHospedagem == 'ABERTA'){
+        if (hospedagem.baixado) {
+          return 'orange'
+        } else if (hospedagem.statusHospedagem == 'ABERTA'){
           return '#0D47A1' // blue darken-4
         } else if (hospedagem.statusHospedagem == 'ENCERRADA'){
           return '#2E7D32' // green darken-4
@@ -508,11 +507,15 @@ export default {
       return '???';
     },
 
-    showHospedagemInfo(id){
+    showHospedagemInfoByIdentificador(id){
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
-        this.$refs.hospedagemInfo.openDialog(hospedagem.hospedagemId);
+        this.showHospedagemInfo(hospedagem.hospedagemId)
       }
+    },
+
+    showHospedagemInfo(id){
+      this.$refs.hospedagemInfo.openDialog(id);
     },
 
     exemplosMoment(){
