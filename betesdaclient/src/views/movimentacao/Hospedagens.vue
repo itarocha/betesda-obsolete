@@ -390,7 +390,7 @@ export default {
       var dados = {
         data : data
       }
-      petra.axiosPost("/app/hospedagem/mapanew", dados)
+      petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
             //console.log("getData() ",this.dados)

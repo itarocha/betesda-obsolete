@@ -4,17 +4,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapaHospedagem {
-
+public class MapaRetorno {
+	
 	private LocalDate dataIni;
-
+	
 	private LocalDate dataFim;
 	
-	private List<HospedagemHeader> hospedagens = new ArrayList<HospedagemHeader>();
+	private List<LeitoHeader> leitos = new ArrayList<>();
 	
-	private List<Celula> celulas = new ArrayList<Celula>();
+	private List<LocalDate> dias = new ArrayList<LocalDate>();	
 	
-	private List<LocalDate> dias = new ArrayList<LocalDate>();
+	private List<HospedagemHeaderInfo> hospedagens = new ArrayList<HospedagemHeaderInfo>();
 	
 	private Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
 	private Integer[] qtdVencidos 			= {0,0,0,0,0,0,0};
@@ -30,15 +30,6 @@ public class MapaHospedagem {
 	private Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
 	private Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
 
-	public MapaHospedagem() {
-		
-	}
-	
-	public MapaHospedagem(LocalDate dataIni, LocalDate dataFim) {
-		this.dataIni = dataIni;
-		this.dataFim = dataFim;
-	}
-	
 	public LocalDate getDataIni() {
 		return dataIni;
 	}
@@ -55,26 +46,26 @@ public class MapaHospedagem {
 		this.dataFim = dataFim;
 	}
 
-	public List<HospedagemHeader> getHospedagens() {
+	public List<LeitoHeader> getLeitos() {
+		return leitos;
+	}
+
+	public void setLeitos(List<LeitoHeader> leitos) {
+		this.leitos = leitos;
+	}
+	
+	public List<HospedagemHeaderInfo> getHospedagens() {
 		return hospedagens;
 	}
 
-	public void setHospedagens(List<HospedagemHeader> hospedagens) {
+	public void setHospedagens(List<HospedagemHeaderInfo> hospedagens) {
 		this.hospedagens = hospedagens;
-	}
-
-	public List<Celula> getCelulas() {
-		return celulas;
-	}
-
-	public void setCelulas(List<Celula> celulas) {
-		this.celulas = celulas;
 	}
 
 	public List<LocalDate> getDias() {
 		return dias;
 	}
-
+	
 	public void setDias(List<LocalDate> dias) {
 		this.dias = dias;
 	}
@@ -166,5 +157,5 @@ public class MapaHospedagem {
 	public void setQtdLeitosLivres(Integer[] qtdLeitosLivres) {
 		this.qtdLeitosLivres = qtdLeitosLivres;
 	}
-
+	
 }

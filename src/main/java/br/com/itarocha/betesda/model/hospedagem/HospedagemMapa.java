@@ -1,4 +1,4 @@
-package br.com.itarocha.betesda.model.hospedagem2;
+package br.com.itarocha.betesda.model.hospedagem;
 
 public class HospedagemMapa {
 	

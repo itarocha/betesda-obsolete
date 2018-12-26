@@ -1,6 +1,7 @@
 <template>
   <div>
     <dialogo-selecao-data-encerramento ref="dlgSelecaoDataEncerramento" @close="onSelecionarDataEncerramento"></dialogo-selecao-data-encerramento>
+    <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
     
     <v-dialog v-model="dialogVisible" width="800">
         <v-card>
@@ -78,8 +79,13 @@
               <!-- hóspedes -->
               <v-tab-item>
                 <v-expansion-panel>
-                  <v-expansion-panel-content v-for="(hpd, i) in hospedagem.hospedes" :key="i" expand>
-                    <div slot="header"><span class="text-uppercase title">{{hpd.pessoa.nome}}</span> - {{hpd.tipoHospede.descricao}}</div>  
+                  <v-expansion-panel-content v-for="(hpd, i) in hospedagem.hospedes" :key="i" expand :class="{'amber lighten-4' : isBaixado(hpd)}">
+                    <div slot="header"><span class="text-uppercase title">{{hpd.pessoa.nome}}</span> - {{hpd.tipoHospede.descricao}} 
+                      <span v-if="hpd.baixado == 'S'" class="text-uppercase subheading"> - BAIXADO</span>
+                      <v-btn small dark color="cyan darken-4" @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'">
+                        Baixar
+                      </v-btn>
+                    </div>  
                     <v-card>
                       <v-card-text class="grey lighten-3">
                       <v-layout row wrap>
@@ -99,9 +105,12 @@
 
                         <v-flex xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
                           <v-list>
-                            <v-list-tile v-for="leito in hpd.leitos" :key="leito.id">
+                            <v-list-tile v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex">
                               <v-list-tile-content>
+                                <div>
                                 #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                                <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="subheading"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
+                                </div>
                               </v-list-tile-content>
                             </v-list-tile>
                           </v-list>
@@ -182,12 +191,14 @@
 <script>
 
 import DialogoSelecaoDataEncerramento from "./DialogoSelecaoDataEncerramento.vue"
+import DialogoSelecaoDataBaixa from "./DialogoSelecaoDataBaixa.vue"
 
 export default {
   name: 'HospedagemInfo',
   
   components: {
-    DialogoSelecaoDataEncerramento
+    DialogoSelecaoDataEncerramento,
+    DialogoSelecaoDataBaixa,
   },
 
   props: {
@@ -237,6 +248,10 @@ export default {
       return tipo == "T" ? "Total" : "Parcial"
     },
 
+    isBaixado(hospede){
+      return hospede.baixado == 'S'
+    },
+
     getInfo(hospedagemId) {
       var dados = {
         hospedagemId : hospedagemId
@@ -272,6 +287,7 @@ export default {
         hospedagemId : hospedagemId,
         data : data
       }
+
       petra.axiosPost("/app/hospedagem/mapa/encerramento", dados)
         .then(response => {
           this.$emit('encerrada',hospedagemId)
@@ -282,6 +298,32 @@ export default {
         })
     },
 
+    // Baixa
+    showSelecionarDataBaixa(hospedeId, dataPrevistaSaida){
+      this.$refs.dlgSelecaoDataBaixa.openDialog(hospedeId, dataPrevistaSaida);
+    },
+
+    onSelecionarDataBaixa(hospedeId, dataBaixa){
+      if (dataBaixa != null){
+        this.baixarHospedagem(hospedeId, dataBaixa)
+      }
+    },
+
+    baixarHospedagem(hospedeId, data) {
+      var dados = {
+        hospedeId : hospedeId,
+        data : data
+      }
+      
+      petra.axiosPost("/app/hospedagem/mapa/baixar", dados)
+        .then(response => {
+          //this.$emit('baixada',hospedeId)
+          //this.dialogVisible = false
+        }).catch(error => {
+          //this.errors = petra.tratarErros(error);
+          //this.dialogVisible = false
+        })
+    },
 
     close(value){
       this.dialogVisible = false

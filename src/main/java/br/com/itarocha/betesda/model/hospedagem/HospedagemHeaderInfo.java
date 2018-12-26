@@ -1,9 +1,6 @@
-package br.com.itarocha.betesda.model.hospedagem2;
+package br.com.itarocha.betesda.model.hospedagem;
 
 import java.time.LocalDate;
-
-import br.com.itarocha.betesda.model.hospedagem.CellStatusHospedagem;
-import br.com.itarocha.betesda.model.hospedagem.CellUtilizacao;
 
 public class HospedagemHeaderInfo {
 

@@ -199,11 +199,6 @@ export default {
           link: '/hospedagens'
         },
         {
-          icon: 'fa-suitcase',
-          title: 'Hospedagens ANTIGO',
-          link: '/hospedagensold'
-        },
-        {
           icon: 'fa-utensils',
           title: 'Lançamento de Serviços',
           link: '/servicos'

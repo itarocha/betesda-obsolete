@@ -1,6 +1,4 @@
-package br.com.itarocha.betesda.model.hospedagem2;
-
-import br.com.itarocha.betesda.model.hospedagem.CellAndamento;
+package br.com.itarocha.betesda.model.hospedagem;
 
 public class DiaHospedagem {
 	

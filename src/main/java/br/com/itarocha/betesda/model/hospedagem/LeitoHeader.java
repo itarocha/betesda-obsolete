@@ -1,4 +1,4 @@
-package br.com.itarocha.betesda.model.hospedagem2;
+package br.com.itarocha.betesda.model.hospedagem;
 
 import java.util.ArrayList;
 import java.util.List;

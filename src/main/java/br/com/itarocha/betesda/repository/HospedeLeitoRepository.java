@@ -45,4 +45,7 @@ public interface HospedeLeitoRepository extends JpaRepository<HospedeLeito, Long
 	"ORDER BY hl.data_entrada ", nativeQuery = true)
 	List<HospedeLeito> findUltimoByHospedeId(@Param("hospedeId") Long hospedeId);
 	
+	
+	@Query(value = "SELECT COUNT(*) FROM  hospede h WHERE h.baixado = 'N' AND h.hospedagem_id = :hospedagemId", nativeQuery = true)	
+	Long countHospedesNaoBaixadosByHospedagemId(@Param("hospedagemId") Long hospedagemId);
 }
