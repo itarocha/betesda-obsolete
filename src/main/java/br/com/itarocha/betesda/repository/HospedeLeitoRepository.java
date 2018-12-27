@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -48,4 +49,13 @@ public interface HospedeLeitoRepository extends JpaRepository<HospedeLeito, Long
 	
 	@Query(value = "SELECT COUNT(*) FROM  hospede h WHERE h.baixado = 'N' AND h.hospedagem_id = :hospedagemId", nativeQuery = true)	
 	Long countHospedesNaoBaixadosByHospedagemId(@Param("hospedagemId") Long hospedagemId);
+	
+	
+	@Query(value = "SELECT     MAX(hl.data_entrada) data_entrada "+ 
+	"FROM       hospede h "+
+	"INNER JOIN hospede_leito hl "+
+	"ON         hl.hospede_id = h.id "+
+	"WHERE      h.hospedagem_id = :hospedagemId ",nativeQuery = true)	
+	LocalDate ultimaDataEntradaByHospedagemId(@Param("hospedagemId") Long hospedagemId);
+	
 }

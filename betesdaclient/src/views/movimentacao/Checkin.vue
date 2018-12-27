@@ -6,9 +6,6 @@
         <v-btn dark small color="cyan darken-4" @click="incluirHospedagem" v-if="estado == 'vendo'">
             Incluir
         </v-btn>
-        <v-btn dark small color="cyan darken-4" @click="adicionarPessoa"  v-if="estado != 'vendo'">
-          Incluir Hóspede
-        </v-btn>
         <v-btn dark small color="cyan darken-4" @click="resetHospedagem" v-if="estado != 'vendo'">
             Cancelar
         </v-btn>
@@ -32,7 +29,7 @@
 
             <v-flex xs6 sm6 md6>
               <dialogo-selecao-pessoa ref="dlgSelecaoPessoa" @selecionar="onSelecionarPessoa" @close="onCloseSelecionarPessoa"></dialogo-selecao-pessoa>
-              <dialogo-selecao-leito ref="dlgSelecaoLeito" :nome="nomePessoaSelecionada" @close="onSelecionarLeito"></dialogo-selecao-leito>
+              <dialogo-selecao-leito ref="dlgSelecaoLeito" @close="onSelecionarLeito"></dialogo-selecao-leito>
               <pessoa-edit ref="dlgPessoaEdit" @save="onUpdatePessoa"></pessoa-edit>
               <dialogo-selecao-tipo-hospede ref="dlgSelTipoHospede" :valores="itensSelecaoTipoHospede" @close="onCloseSelecaoTipoHospede"></dialogo-selecao-tipo-hospede>
 
@@ -129,6 +126,9 @@
                 <v-toolbar card height="45px" class="grey lighten-2">
                   Hóspedes
                   <v-spacer></v-spacer>
+                  <v-btn dark small color="cyan darken-4" @click="adicionarPessoa"  v-if="estado != 'vendo'">
+                    Incluir Hóspede
+                  </v-btn>
                 </v-toolbar>
 
                 <v-flex xs12 sm12 md12 v-for="(item, i)  in hospedes" :key="i" v-if="show">
@@ -351,7 +351,6 @@ export default {
     itensTipoHospede : [],
     itensEntidades : [],
     itensUtilizacao: [{ text: "Total", value: "T" }, { text: "Parcial", value: "P" }],
-    nomePessoaSelecionada : "",
 
     tabActive : null,
     hospedagemGravada : {},
@@ -585,7 +584,6 @@ export default {
 
     selecionarLeito(hospede) {
       this.selecionarAcomodacao(hospede)
-      this.nomePessoaSelecionada = hospede.nome
       this.$refs.dlgSelecaoLeito.openDialog(hospede, this.formOpcoes.destinacaoHospedagem)
     },
 
@@ -640,12 +638,14 @@ export default {
       this.focus()
     },
 
-    onSelecionarLeito(hospede, acomodacao){
+    onSelecionarLeito(selecao){
       this.focus()
-      if (hospede != null && acomodacao != null){
+//hospede, acomodacao
+
+      if (selecao != null){
         for (var i = 0; i < this.hospedes.length; ++i) {
-          if (hospede.pessoa.id == this.hospedes[i].pessoa.id){
-            this.hospedes[i].acomodacao = acomodacao
+          if (selecao.hospede.pessoa.id == this.hospedes[i].pessoa.id){
+            this.hospedes[i].acomodacao = {quarto: selecao.quarto, leito: selecao.leito}
             return
           }
         }      

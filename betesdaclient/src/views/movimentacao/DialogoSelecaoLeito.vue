@@ -1,35 +1,12 @@
 <template>
   <div>
-    <v-dialog v-model="dialogVisible" width="650" :scrollable="true">
-        <v-card>
+    <v-dialog v-model="dialogVisible" width="800" :scrollable="true">
+      <v-card>
         <v-card-title dark class="white--text cyan darken-4">
-          {{titulo}}
+          Selecionar Leito
         </v-card-title>
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-layout wrap>
-              <v-flex xs12 sm12 md12>
-                  <h3>{{nome}}</h3>
-              </v-flex>
-              <v-flex xs12 sm12 md12>
-                  <v-select v-model="quarto" :items="itensQuarto" item-text="displayText" item-value="id" label="Quarto" required></v-select>
-              </v-flex>
-              <v-flex xs12 sm12 md12 v-if="quarto != null">
-                  <p style="color:'red'">Clique sobre a representação do leito para selecionar...</p>
-              </v-flex>
-
-              <v-flex xs3 v-for="(leito, i) in leitos" :key="i">
-                <v-card v-bind:class="{'amber lighten-4':leitoSelecionado(leito), 'grey lighten-4':!leitoSelecionado(leito)}" @click.native="selecionarLeito(leito)">
-                  <v-card-text class="text-sm">
-                    <h3>{{leito.numero}}</h3>
-                    <div class="caption">{{leito.tipoLeito.descricao}}</div>
-                    <div class="caption">{{leito.tipoLeito.quantidadeCamas}} cama(s)</div>
-                  </v-card-text>
-                </v-card>
-              </v-flex>
-
-            </v-layout>
-          </v-container>
+        <v-card-text style="height:500px;">
+          <frame-selecao-leito ref="frameSelecaoLeito" @selecionarQuarto="onSelecionarQuarto" @selecionarLeito="onSelecionarLeito"></frame-selecao-leito>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -50,20 +27,21 @@
 
 <script>
 
+import FrameSelecaoLeito from "./FrameSelecaoLeito.vue"
+
 export default {
   name: 'DialogoSelecaoLeito',
   
-  props: {
-    nome : String
+  components:{
+    FrameSelecaoLeito,
   },
-
+  
   data: () =>({
-    titulo : "Selecionar Leito",
     hospede : null,
     quarto : null,
     leito: null,
-    leitos : [],
-    quartos : [],
+
+    // local
     dialogVisible : false,
   }),
 
@@ -71,84 +49,37 @@ export default {
     this.reset()
   },
 
-  watch: {
-    quarto(value) {
-      var leitos = []
-      this.leito = null
-      for(var i=0; i < this.quartos.length; i++){
-        if (this.quartos[i].id == value){
-          leitos = this.quartos[i].leitos
-          break
-        }
-      }
-      this.leitos = leitos
-    }
-  },
-
-  computed : {
-    itensQuarto() {
-      if (this.quartos){
-        return this.quartos
-      } else {
-        return []
-      }
-    }
-  },
-
   methods: {
     openDialog(hospede, destinacaoHospedagemId){
+      this.$refs.frameSelecaoLeito.openDialog(hospede, destinacaoHospedagemId)
       this.reset()
-      this.loadQuartosPorTipoUtilizacao(destinacaoHospedagemId)
-      this.hospede = hospede
       this.dialogVisible = true
     },
 
-    leitoSelecionado(leito){
-      return this.leito && leito.id == this.leito.id
+    onSelecionarLeito(leito){
+      this.leito = leito
     },
 
-    selecionarLeito(leito){
-      this.leito = leito
+    onSelecionarQuarto(quarto){
+      this.quarto = quarto
     },
 
     close(selected){
       if (selected){
-        var item = null
-        
-        for (var i = 0; i < this.quartos.length; i++) {
-          if (this.quarto == this.quartos[i].id){
-            item = {
-              quarto : this.quartos[i], 
-              leito : this.leito
-            }
-            break;
-          }
-        }
-        
-        this.$emit('close',this.hospede, item)
+        var selecao = this.$refs.frameSelecaoLeito.getSelecao()
+        // selecao : {hospede, quarto, leito}
+        this.$emit('close',selecao)
       } else {
-        this.$emit('close',this.hospede, null)
+        this.$emit('close',null)
       }
+      // local
       this.dialogVisible = false
     },
 
-    loadQuartosPorTipoUtilizacao(destinacaoHospedagemId){
-      this.quartos = [];
-      if (destinacaoHospedagemId != null){
-        petra.axiosGet("/app/quarto/por_destinacao_hospedagem/"+destinacaoHospedagemId)
-          .then(response => {
-            this.quartos = response.data
-          })
-      }
-    },
-
     reset(){
-      this.tipoHospede = null
       this.quarto = null
       this.leito = null
-      this.leitos = []
     },
-
   }
 }
 </script>

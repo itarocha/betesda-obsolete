@@ -1,13 +1,10 @@
 package br.com.itarocha.betesda.service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -501,16 +498,32 @@ public class HospedagemService {
 		*/
 		Optional<Hospedagem> opt  = hospedagemRepo.findById(hospedagemId);
 		if (opt.isPresent()) {
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			
 			Hospedagem h = opt.get();
 			if ((h.getDataEfetivaSaida() != null)) {
 				throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
 			}
-			
-			if (dataEncerramento.isBefore(h.getDataEntrada())) {
-				throw new ValidationException(new ResultError().addError("*", "Data de encerramento deve ser superior a data de entrada"));
+	
+			if (TipoUtilizacaoHospedagem.P.equals(h.getTipoUtilizacao())) {
+				if (h.getDataEntrada().isBefore(dataEncerramento)) {
+					throw new ValidationException(new ResultError().addError("*", 
+							String.format("Data de Encerramento deve ser igual ou superior a Data de Entrada (%s)", fmt.format(h.getDataEntrada())) ));
+				} 
+			} else {
+				LocalDate dataMinima = hospedeLeitoRepo.ultimaDataEntradaByHospedagemId(hospedagemId);
+				if (dataEncerramento.isBefore(dataMinima)) {
+					throw new ValidationException(new ResultError().addError("*", 
+							String.format("Data de Encerramento deve ser igual ou superior a Data de Entrada da última movimentação (%s)",fmt.format(dataMinima))));
+				}
 			}
-
+			
+			if (dataEncerramento.isAfter(h.getDataPrevistaSaida())) {
+				throw new ValidationException(new ResultError().addError("*", 
+						String.format("Data de Encerramento deve ser inferior a data Prevista de Saída (%s)",fmt.format(h.getDataPrevistaSaida()))));
+			}
+			
+			/*	
 			List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedagemId(hospedagemId);
 			for (HospedeLeito hl : listaHospedeLeito) {
 				// System.out.println("hospede.Id = " + hl.getHospede().getId() + " Id = " + hl.getId() + " dataEntrada = "+hl.getDataEntrada());
@@ -520,6 +533,7 @@ public class HospedagemService {
 			
 			h.setDataEfetivaSaida(dataEncerramento);
 			hospedagemRepo.save(h);
+			*/
 		}
 	} 
 	

@@ -8,7 +8,7 @@
         <v-card-title dark class="white--text cyan darken-4">
           Informações de Hospedagem
         </v-card-title>
-        <v-card-text style="height:450px;">
+        <v-card-text style="height:400px;">
           <v-flex xs10 sm12 md12>
             <div>
               <div><span class="headline text-uppercase">Hospedagem #{{hospedagemId}}</span></div>
@@ -294,7 +294,7 @@ export default {
           this.dialogVisible = false
         }).catch(error => {
           //this.errors = petra.tratarErros(error);
-          this.dialogVisible = false
+          //this.dialogVisible = false
         })
     },
 

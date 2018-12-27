@@ -14,7 +14,7 @@
         </v-layout>
 
         <v-layout row wrap>
-          <v-flex xs1 sm12 md2>
+          <v-flex xs1 sm12 md3>
             <v-layout row wrap>
               <v-flex xs12 sm12>
                 <v-date-picker v-model="dataAtual" 
@@ -27,7 +27,7 @@
           </v-flex>
 
 
-          <v-flex xs10 sm12 md10>
+          <v-flex xs10 sm12 md9>
 
             <v-tabs v-model="tabActive" slider-color="cyan darken-2">
               <v-tab>Mapa de Hospedagem</v-tab>
