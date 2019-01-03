@@ -48,3 +48,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
+betesdabuilder/upload\.sh
+*.xlsm
+*.xlsx
+planilha/\.~lock\.betesda122018\.xlsm#

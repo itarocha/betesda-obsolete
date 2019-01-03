@@ -16,8 +16,8 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -53,8 +53,24 @@ public class Pessoa extends UserDateAudit implements Serializable {
 	@Size(min = 11, max = 11, message="CPF deve ter 11 caracteres")
 	private String cpf;
 	
+	@Size(min = 15, max = 15, message="Cartão do SUS deve ter 15 caracteres")
+	private String cartaoSus;
+
 	@Size(max = 32, message="RG deve ter até 32 caracteres")
 	private String rg;
+	
+	@Column(length=64)
+	private String naturalidadeCidade;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(length = 2)
+	private UnidadeFederacao naturalidadeUf;
+	
+	@Column(length=64)
+	private String nacionalidade;
+	
+	@Column(length=64)
+	private String profissao;
 
 	@Valid
 	@ManyToOne()
@@ -64,10 +80,10 @@ public class Pessoa extends UserDateAudit implements Serializable {
 	@Size(max = 16, message="Telefone não pode ter mais que 16 caracteres")
 	private String telefone;
 	
-	@Pattern(regexp="^$|[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
-	        +"[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
-	        +"(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-	             message="Email inválido")
+	@Size(max = 16, message="Telefone 2 não pode ter mais que 16 caracteres")
+	private String telefone2;
+
+	@Email(message="Email inválido")
 	@Size(max = 64, message="Email deve ter no máximo 64 caracteres")
 	private String email;
 	
@@ -79,7 +95,7 @@ public class Pessoa extends UserDateAudit implements Serializable {
 		this.endereco = new Endereco();
 		this.sexo = Sexo.F;
 	}
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -128,12 +144,52 @@ public class Pessoa extends UserDateAudit implements Serializable {
 		this.cpf = cpf;
 	}
 
+	public String getCartaoSus() {
+		return cartaoSus;
+	}
+
+	public void setCartaoSus(String cartaoSus) {
+		this.cartaoSus = cartaoSus;
+	}
+
 	public String getRg() {
 		return rg;
 	}
 
 	public void setRg(String rg) {
 		this.rg = rg;
+	}
+
+	public String getNaturalidadeCidade() {
+		return naturalidadeCidade;
+	}
+
+	public void setNaturalidadeCidade(String naturalidadeCidade) {
+		this.naturalidadeCidade = naturalidadeCidade;
+	}
+
+	public UnidadeFederacao getNaturalidadeUf() {
+		return naturalidadeUf;
+	}
+
+	public void setNaturalidadeUf(UnidadeFederacao naturalidadeUf) {
+		this.naturalidadeUf = naturalidadeUf;
+	}
+
+	public String getNacionalidade() {
+		return nacionalidade;
+	}
+
+	public void setNacionalidade(String nacionalidade) {
+		this.nacionalidade = nacionalidade;
+	}
+
+	public String getProfissao() {
+		return profissao;
+	}
+
+	public void setProfissao(String profissao) {
+		this.profissao = profissao;
 	}
 
 	public Endereco getEndereco() {
@@ -150,6 +206,14 @@ public class Pessoa extends UserDateAudit implements Serializable {
 
 	public void setTelefone(String telefone) {
 		this.telefone = telefone;
+	}
+
+	public String getTelefone2() {
+		return telefone2;
+	}
+
+	public void setTelefone2(String telefone2) {
+		this.telefone2 = telefone2;
 	}
 
 	public String getEmail() {

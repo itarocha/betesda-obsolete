@@ -1,64 +1,112 @@
 <template>
   <div>
-    <v-dialog v-model="dialogVisible" width="800">
+    <v-dialog v-model="dialogVisible" width="900">
       <v-card>
         <v-card-title dark class="white--text cyan darken-4">
           Incluir Pessoa
         </v-card-title>
 
-        <v-card-text>
+        <v-card-text style="height:400px;">
           <v-layout row wrap>
             <v-flex xs12 sm8 md8>
               <v-text-field label="Nome" ref="edtNome" v-model="form.nome" :error-messages="getErrors('nome')"></v-text-field>
             </v-flex>
-
             <v-flex xs12 sm4 md4>
               <v-text-field label="Nascimento" v-model="form.dataNascimento" :mask="'##/##/####'" :error-messages="getErrors('dataNascimento')"></v-text-field>
             </v-flex>
 
-            <v-flex xs12 sm6 md6>
-              <v-select label="Sexo" v-model="form.sexo" :items="itensSexo" :error-messages="getErrors('sexo')"></v-select>
-            </v-flex>
-            <v-flex xs12 sm6 md6>
-              <v-select label="Estado Civil" v-model="form.estadoCivil" :items="itensEstadoCivil" :error-messages="getErrors('estadoCivil')"></v-select>
+            <v-flex xs12 sm12 md12>
+              <v-tabs fixed-tabs v-model="tabActive" dark color="cyan darken-3" slider-color="yellow">
+                <v-tab>Dados Pessoais</v-tab>
+                <v-tab>Endereço e Telefone</v-tab>
+                <v-tab>Observações</v-tab>
+                <v-tab-item>
+                  <v-layout row wrap>
+
+                    <v-flex xs12 sm3 md3>
+                      <v-select label="Sexo" v-model="form.sexo" :items="itensSexo" :error-messages="getErrors('sexo')"></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm3 md3>
+                      <v-select label="Estado Civil" v-model="form.estadoCivil" :items="itensEstadoCivil" :error-messages="getErrors('estadoCivil')"></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Profissão" v-model="form.profissao" :error-messages="getErrors('profissao')"></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Naturalidade" v-model="form.naturalidadeCidade" :error-messages="getErrors('naturalidadeCidade')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2>
+                      <v-select label="Nat.UF" v-model="form.naturalidadeUf" :items="itensUF" item-text="value" item-value="value" :error-messages="getErrors('naturalidadeUf')"></v-select>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="Nacionalidade" v-model="form.nacionalidade" :error-messages="getErrors('nacionalidade')"></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="CPF" v-model="form.cpf" :mask="'###.###.###-##'" :masked="true" :error-messages="getErrors('cpf')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="RG" v-model="form.rg" :error-messages="getErrors('rg')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="Cartão do SUS" v-model="form.cartaoSus" :mask="'###.####.####.####'" :masked="true" :error-messages="getErrors('cartaoSus')"></v-text-field>
+                    </v-flex>
+
+                  </v-layout>
+                </v-tab-item>
+
+                <v-tab-item>
+                  <v-layout row wrap>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Endereço" v-model="form.endereco.logradouro" :error-messages="getErrors('endereco.logradouro')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2>
+                      <v-text-field label="Número" v-model="form.endereco.numero" :error-messages="getErrors('endereco.numero')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="Complemento" v-model="form.endereco.complemento" :error-messages="getErrors('endereco.complemento')"></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="Bairro" v-model="form.endereco.bairro" :error-messages="getErrors('endereco.bairro')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2>
+                      <v-text-field label="CEP" v-model="form.endereco.cep" :mask="'#####-###'" :error-messages="getErrors('endereco.cep')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="Cidade" v-model="form.endereco.cidade" :error-messages="getErrors('endereco.cidade')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2>
+                      <v-select label="UF" v-model="form.endereco.uf" :items="itensUF" item-text="value" item-value="value" :error-messages="getErrors('endereco.uf')"></v-select>
+                    </v-flex>
+
+                    <v-flex xs12 sm3 md3>
+                      <v-text-field label="Telefone" v-model="form.telefone" :error-messages="getErrors('telefone')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm3 md3>
+                      <v-text-field label="Telefone 2" v-model="form.telefone2" :error-messages="getErrors('telefone2')"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Email" v-model="form.email" :error-messages="getErrors('email')"></v-text-field>
+                    </v-flex>
+                  </v-layout>
+                </v-tab-item>
+
+                <v-tab-item>
+                  <v-layout row wrap>
+                    <v-flex xs12 sm12 md12>
+                      <v-textarea label="Observações" box :height="250" v-model="form.observacoes" :error-messages="getErrors('observacoes')"></v-textarea>
+                    </v-flex>
+                  </v-layout>
+                </v-tab-item>
+
+              </v-tabs>  
             </v-flex>
 
-            <v-flex xs12 sm6 md6>
-              <v-text-field label="Telefone" v-model="form.telefone" :error-messages="getErrors('telefone')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md6>
-              <v-text-field label="Email" v-model="form.email" :error-messages="getErrors('email')"></v-text-field>
-            </v-flex>
 
-            <v-flex xs12 sm6 md6>
-              <v-text-field label="CPF" v-model="form.cpf" :mask="'###.###.###-##'" :masked="true" :error-messages="getErrors('cpf')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md6>
-              <v-text-field label="RG" v-model="form.rg" :error-messages="getErrors('rg')"></v-text-field>
-            </v-flex>
 
-            <v-flex xs12 sm6 md6>
-              <v-text-field label="Endereço" v-model="form.endereco.logradouro" :error-messages="getErrors('endereco.logradouro')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm2 md2>
-              <v-text-field label="Número" v-model="form.endereco.numero" :error-messages="getErrors('endereco.numero')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm4 md4>
-              <v-text-field label="Complemento" v-model="form.endereco.complemento" :error-messages="getErrors('endereco.complemento')"></v-text-field>
-            </v-flex>
 
-            <v-flex xs12 sm4 md4>
-              <v-text-field label="Bairro" v-model="form.endereco.bairro" :error-messages="getErrors('endereco.bairro')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm2 md2>
-              <v-text-field label="CEP" v-model="form.endereco.cep" :mask="'#####-###'" :error-messages="getErrors('endereco.cep')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm4 md4>
-              <v-text-field label="Cidade" v-model="form.endereco.cidade" :error-messages="getErrors('endereco.cidade')"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm2 md2>
-              <v-select label="UF" v-model="form.endereco.uf" :items="itensUF" item-text="value" item-value="value" :error-messages="getErrors('endereco.uf')"></v-select>
-            </v-flex>
           </v-layout>
 
         </v-card-text>
@@ -93,6 +141,7 @@ export default {
   props: {},
 
   data: () => ({
+    tabActive : 0,
     dataNascimento: null,
     dataNascimentoFmt: null,
     form: {
@@ -102,8 +151,13 @@ export default {
       sexo : null,
       estadoCivil : null,
       cpf : null,
+      profissao : null,
       rg : null,
+      naturalidadeCidade : null,
+      naturalidadeUf : null,
+      cartaoSus : null,
       telefone : null,
+      telefone2 : null,
       email : null,
       endereco : {
         logradouro : null,
@@ -113,7 +167,8 @@ export default {
         cep : null,
         cidade : null,
         uf : null
-      }
+      },
+      observacoes : null
     },
     menuDataNascimento: false,
     dados: [],

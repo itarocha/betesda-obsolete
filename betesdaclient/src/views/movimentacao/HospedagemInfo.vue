@@ -82,8 +82,13 @@
                   <v-expansion-panel-content v-for="(hpd, i) in hospedagem.hospedes" :key="i" expand :class="{'amber lighten-4' : isBaixado(hpd)}">
                     <div slot="header"><span class="text-uppercase title">{{hpd.pessoa.nome}}</span> - {{hpd.tipoHospede.descricao}} 
                       <span v-if="hpd.baixado == 'S'" class="text-uppercase subheading"> - BAIXADO</span>
-                      <v-btn small dark color="cyan darken-4" @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'">
-                        Baixar
+                      <v-btn small dark color="cyan darken-4" 
+                        v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
+                        @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)">Baixar
+                      </v-btn>
+                      <v-btn small dark color="cyan darken-4" 
+                        v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
+                        @click.native="showTransferir(hpd.id)">Transferir
                       </v-btn>
                     </div>  
                     <v-card>
@@ -175,9 +180,6 @@
           </v-btn>
           <v-btn small dark color="cyan darken-4" @click.native="encerrar" v-if="hospedagem.dataEfetivaSaida == null">
             Renovar
-          </v-btn>
-          <v-btn small dark color="cyan darken-4" @click.native="encerrar" v-if="hospedagem.dataEfetivaSaida == null">
-            Transferir
           </v-btn>
           <v-btn small color="secondary" @click.native="close(false)">
             Fechar
@@ -324,6 +326,12 @@ export default {
           //this.dialogVisible = false
         })
     },
+
+    // Transferencia
+    showTransferir(hospedeId){
+      //this.$refs.dlgSelecaoDataBaixa.openDialog(hospedeId, dataPrevistaSaida);
+    },
+
 
     close(value){
       this.dialogVisible = false
