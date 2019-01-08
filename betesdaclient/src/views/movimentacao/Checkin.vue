@@ -304,7 +304,7 @@ import Titulo from "../../components/Titulo.vue"
 import DialogoSelecaoPessoa from "./DialogoSelecaoPessoa.vue"
 import DialogoSelecaoLeito from "./DialogoSelecaoLeito.vue"
 import DialogoSelecaoTipoHospede from "./DialogoSelecaoTipoHospede.vue"
-import PessoaEdit from "./PessoaEdit.vue"
+import PessoaEdit from "../config/PessoaEdit.vue"
 import {mask} from "vue-the-mask"
 
 var moment = require('moment')

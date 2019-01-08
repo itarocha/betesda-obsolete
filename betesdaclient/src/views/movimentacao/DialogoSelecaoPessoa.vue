@@ -55,7 +55,7 @@
 <script>
 
 import DialogoSelecaoTipoHospede from './DialogoSelecaoTipoHospede.vue'
-import PessoaEdit from './PessoaEdit.vue'
+import PessoaEdit from '../config/PessoaEdit.vue'
 import _ from 'lodash'
 
 export default {

@@ -159,7 +159,7 @@ export default {
           link: '/situacao_leito'
         },
         {
-          icon: 'fa-users',
+          icon: 'fa-tag',
           title: 'Tipos de Hóspedes',
           link: '/tipo_hospede'
         },
@@ -187,6 +187,11 @@ export default {
           icon: 'fa-university',
           title: 'Entidades',
           link: '/entidade'
+        },
+        {
+          icon: 'fa-users',
+          title: 'Pessoas',
+          link: '/pessoas'
         },
         {
           icon: 'fa-sign-in-alt',

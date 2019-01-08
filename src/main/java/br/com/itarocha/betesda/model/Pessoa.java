@@ -50,7 +50,7 @@ public class Pessoa extends UserDateAudit implements Serializable {
 	@Column(length=1)
 	private EstadoCivil estadoCivil;
 	
-	@Size(min = 11, max = 11, message="CPF deve ter 11 caracteres")
+	@Size(min = 0, max = 11, message="CPF deve ter 11 caracteres")
 	private String cpf;
 	
 	@Size(min = 15, max = 15, message="Cartão do SUS deve ter 15 caracteres")

@@ -14,6 +14,7 @@ import TipoLeito from '@/views/config/TipoLeito.vue'
 import TipoServico from '@/views/config/TipoServico.vue'
 import Quarto from '@/views/config/Quarto.vue'
 import Entidade from '@/views/config/Entidade.vue'
+import Pessoas from '@/views/config/Pessoas.vue'
 
 import Checkin from '@/views/movimentacao/Checkin.vue'
 import Servicos from '@/views/movimentacao/Servicos.vue'
@@ -97,6 +98,14 @@ const router = new Router({
       path: '/entidade',
       name: 'entidade',
       component: Entidade,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/pessoas',
+      name: 'pessoas',
+      component: Pessoas,
       meta: {
         requiresAuth: true
       }

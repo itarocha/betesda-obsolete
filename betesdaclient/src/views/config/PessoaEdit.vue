@@ -12,7 +12,7 @@
               <v-text-field label="Nome" ref="edtNome" v-model="form.nome" :error-messages="getErrors('nome')"></v-text-field>
             </v-flex>
             <v-flex xs12 sm4 md4>
-              <v-text-field label="Nascimento" v-model="form.dataNascimento" :mask="'##/##/####'" :error-messages="getErrors('dataNascimento')"></v-text-field>
+              <v-text-field label="Nascimento" v-model="dataNascimento" :mask="'##/##/####'" :error-messages="getErrors('dataNascimento')"></v-text-field>
             </v-flex>
 
             <v-flex xs12 sm12 md12>
@@ -103,12 +103,7 @@
 
               </v-tabs>  
             </v-flex>
-
-
-
-
           </v-layout>
-
         </v-card-text>
 
         <v-divider></v-divider>
@@ -213,12 +208,6 @@ export default {
     this.reset();
   },
 
-  watch : {
-    dataNascimento(val) {
-      this.form.dataNascimentoFmt = this.formatDate(this.form.dataNascimento)
-    },   
-  },
-
   methods: {
     openDialog(form) {
       this.reset();
@@ -226,9 +215,9 @@ export default {
       if (!form) {
         this.reset();
       } else {
-        console.log(form)
+        //console.log(form)
         this.form = form;
-        this.form.dataNascimento = this.formatDate(this.form.dataNascimento)
+        this.dataNascimento = this.formatDate(this.form.dataNascimento)
       }
       this.dialogVisible = true;
       setTimeout(() => {
@@ -237,16 +226,6 @@ export default {
     },
 
     loadListas(evt) {
-      /*
-      this.itensDestinacaoHospedagem = [];
-      let uri = petra.base_uri + "/quarto/listas";
-      axios.get(uri).then(response => {
-        this.itensDestinacaoHospedagem =
-          response.data.listaDestinacaoHospedagem;
-        this.itensTipoLeito = response.data.listaTipoLeito;
-        this.itensSituacaoLeito = response.data.listaSituacaoLeito;
-      });
-      */
     },
 
     /*
@@ -275,13 +254,9 @@ export default {
       //var st = "26042013";
       var pattern = /(\d{2})(\d{2})(\d{4})/;
       //var dt = new Date(st.replace(pattern,'$3-$2-$1'));
-      return st.replace(pattern,'$3-$2-$1');
-    },
-
-    newParseDateOld(date){
-      var st = "26.04.2013";
-      var pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-      var dt = new Date(st.replace(pattern,'$3-$2-$1'));      
+      var retorno = st.replace(pattern,'$3-$2-$1');
+      //console.log(retorno);
+      return retorno;
     },
 
     close(value) {
@@ -289,11 +264,14 @@ export default {
       this.$emit("close", false);
     },
 
-    save(evt) {
+    save() {
       this.errors = [];
-      this.form.dataNascimento = this.newParseDate(this.form.dataNascimento)
 
-      petra.axiosPost("/app/pessoas", this.form)
+      var toSave = this.form;
+      toSave.dataNascimento = this.newParseDate(this.dataNascimento)
+      console.log(toSave)
+
+      petra.axiosPost("/app/pessoas", toSave)
         .then(response => {
             this.dialogVisible = false
             this.$emit('close',true)
@@ -316,6 +294,6 @@ export default {
 </script>
 <style scoped>
   v-input {
-    font-size : 12pt;
+    font-size : 10pt;
   }
 </style>
