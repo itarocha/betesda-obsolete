@@ -8,7 +8,7 @@
         <v-card-title dark class="white--text cyan darken-4">
           Informações de Hospedagem
         </v-card-title>
-        <v-card-text style="height:400px;">
+        <v-card-text style="height:450px;">
           <v-flex xs10 sm12 md12>
             <div>
               <div><span class="headline text-uppercase">Hospedagem #{{hospedagemId}}</span></div>
@@ -82,14 +82,16 @@
                   <v-expansion-panel-content v-for="(hpd, i) in hospedagem.hospedes" :key="i" expand :class="{'amber lighten-4' : isBaixado(hpd)}">
                     <div slot="header"><span class="text-uppercase title">{{hpd.pessoa.nome}}</span> - {{hpd.tipoHospede.descricao}} 
                       <span v-if="hpd.baixado == 'S'" class="text-uppercase subheading"> - BAIXADO</span>
-                      <v-btn small dark color="cyan darken-4" 
-                        v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
-                        @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)">Baixar
-                      </v-btn>
-                      <v-btn small dark color="cyan darken-4" 
-                        v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
-                        @click.native="showTransferir(hpd.id)">Transferir
-                      </v-btn>
+                      <div>
+                        <v-btn small dark color="cyan darken-4" 
+                          v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
+                          @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)">Baixar
+                        </v-btn>
+                        <v-btn small dark color="cyan darken-4" 
+                          v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
+                          @click.native="showTransferir(hpd.id)">Transferir
+                        </v-btn>
+                      </div>
                     </div>  
                     <v-card>
                       <v-card-text class="grey lighten-3">

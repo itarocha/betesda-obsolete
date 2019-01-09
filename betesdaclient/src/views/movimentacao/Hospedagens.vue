@@ -58,7 +58,7 @@
 
                   <v-layout row v-for="(celula, index) in dados.leitos" :key="index">
                     <v-flex sm12>
-                      <div class="box p4 laranja hleito">
+                      <div class="box p4 laranja hleito" :style="{height:calcularAlturaLeito(index)}">
                         <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
                         <center v-if="celula.quartoNumero == '9999'">Parcial</center>
                       </div>
@@ -66,7 +66,7 @@
 
                     <v-flex sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
                       <div class="box hleito" v-if="celula.hospedagens.length == 0"></div>
-                      <div class="box hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx" v-if="celula.hospedagens.length > 0">
+                      <div class="box hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
                         <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe)" 
                               v-if="hospedagem.dias[indice].identificador != '0'"
                               :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
@@ -489,6 +489,20 @@ export default {
         }
       }
       return 'blue'
+    },
+
+    calcularAlturaLeito(index){
+      var qtd = 0
+
+      if (this.dados && this.dados.leitos){
+        qtd = this.dados.leitos[index].hospedagens.length
+      }
+
+      if (qtd <= 1) {
+        return '28px'
+      } else {
+        return  (qtd*28)+'px'
+      }
     },
 
     getHospedagemById(id){
