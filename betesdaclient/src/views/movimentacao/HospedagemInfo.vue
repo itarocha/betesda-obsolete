@@ -2,7 +2,7 @@
   <div>
     <dialogo-selecao-data-encerramento ref="dlgSelecaoDataEncerramento" @close="onSelecionarDataEncerramento"></dialogo-selecao-data-encerramento>
     <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
-    <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onSelecionarLeitoTransferencia"></dialogo-selecao-leito-transferencia>
+    <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onCloseTransferencia"></dialogo-selecao-leito-transferencia>
     
     <v-dialog v-model="dialogVisible" width="800" :scrollable="true">
         <v-card>
@@ -345,17 +345,19 @@ export default {
       this.$refs.dlgSelecaoLeitoTransferencia.openDialog(hospede, destinacaoHospedagemId);
     },
 
-    onSelecionarLeitoTransferencia(){
-      /*
-      if (dataBaixa != null){
-        this.baixarHospedagem(hospedeId, dataBaixa)
+    onCloseTransferencia(sucesso){
+      //console.log("*************************** onCloseTransferencia")
+      if (sucesso){
+        //console.log("*************************** sucesso!!!!!")
+
+        this.getInfo(this.hospedagemId)
+        //this.$emit('close',true)          
       }
-      */
     },  
 
     close(value){
       this.dialogVisible = false
-      this.$emit('close',false)
+      this.$emit('close',value)
     },
 
     encerrar(evt) {

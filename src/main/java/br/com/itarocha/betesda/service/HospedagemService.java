@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.service;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -619,19 +620,15 @@ public class HospedagemService {
 					throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
 				}
 				
-				/*
-				Long qtd = hospedeLeitoRepo.countHospedesNaoBaixadosByHospedagemId(hospedagemId);
-				if (qtd <= 1) {
-					throw new ValidationException(new ResultError().addError("*", "Para baixar hóspede é necessário ter pelo menos 2 hóspedes ativos"));
-				}
-				*/
+				List<BigInteger> hospedagens = hospedagensNoPeriodo(leitoId, dataTransferencia, h.getDataPrevistaSaida());
 				
-				//TODO: Permitir somente se a hospedagem for igual
-				List<HospedeLeito> lst = hospedeLeitoRepo.findByLeitoNoPeriodo(leitoId, dataTransferencia, h.getDataPrevistaSaida());
-				if (!lst.isEmpty()) {
-					throw new ValidationException(new ResultError().addError("*", "Este Leito já está em uso no período"));
+				for (BigInteger _hospedagemId : hospedagens) {
+					Long value = hospedagemId.longValue(); 
+					if (!value.equals(h.getId())) {
+						throw new ValidationException(new ResultError().addError("*", "Este Leito já está em uso no período por outra Hospedagem"));
+					}
 				}
-				
+
 				if (dataTransferencia.isBefore(h.getDataEntrada())) {
 					throw new ValidationException(new ResultError().addError("*", "Data de encerramento deve ser superior a data de entrada"));
 				}
@@ -753,6 +750,25 @@ public class HospedagemService {
 								 .getSingleResult()).longValue();
 		
 		return qtd <= 0; 
+	}
+
+	public List<BigInteger> hospedagensNoPeriodo(Long leitoId, LocalDate dataIni, LocalDate dataFim) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("SELECT h.hospedagem_id ");
+		sb.append("FROM   hospede_leito hl ");
+		sb.append("INNER JOIN hospede h ");
+		sb.append("ON         h.id = hl.hospede_id "); 
+		sb.append("WHERE  hl.leito_id = :leitoId  "); 
+		sb.append("AND    (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim))  "); 
+		sb.append("OR     ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim)))  ");
+		
+		Query query = em.createNativeQuery(sb.toString());
+		List<BigInteger> lista = (List<BigInteger>)query.setParameter("leitoId", leitoId)
+								 .setParameter("dataIni", dataIni)
+								 .setParameter("dataFim", dataFim)
+								 .getResultList();
+		
+		return lista; 
 	}
 
 	public boolean pessoaLivre(Long pessoaId) {

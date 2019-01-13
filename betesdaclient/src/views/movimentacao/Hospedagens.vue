@@ -1,6 +1,6 @@
 <template>
   <div>
-    <hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada"></hospedagem-info>
+    <hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada" @close="onCloseHospedagemInfo"></hospedagem-info>
     
 
     <!--<v-container class="p0">-->
@@ -443,6 +443,10 @@ export default {
 
     onEncerrada(hospedagemId){
       this.refreshMapa()
+    },
+
+    onCloseHospedagemInfo(){
+      this.refreshMapa();
     },
 
     formatDate(data,formato){

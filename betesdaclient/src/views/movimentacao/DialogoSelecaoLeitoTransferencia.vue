@@ -6,8 +6,14 @@
           Selecionar Data e Leito para Transferência
         </v-card-title>
         <v-card-text style="height:500px;">
-
           <v-layout row wrap>
+            <!-- Mensagens de erro -->  
+            <v-flex xs12 sm12 md12>
+              <v-alert :value="true" type="error" v-for="(error,i) in errors" :key="i">
+                {{error.errorMessage}}
+              </v-alert>
+            </v-flex>
+
             <v-flex xs12 sm12 md12>
               <h3>Hóspede: {{nomeHospede}}</h3>
             </v-flex>
@@ -47,6 +53,7 @@ export default {
   },
   
   data: () =>({
+    errors : [],
     nomeHospede : null,
     hospede : null,
     quarto : null,
@@ -104,27 +111,18 @@ export default {
         data : petraDateTime.formatDateBrNoMaskToDb(this.dataTransferencia) 
       }
 
-      // selecao.hospede.id
-      // selecao.leito.id
-      // var dataTransferencia = petraDateTime.formatDateBrNoMaskToDb(this.dataTransferencia) 
-      console.log(dados)
-      /*
-      this.$emit('close',selecao)
-      */
-      
       petra.axiosPost("/app/hospedagem/mapa/transferir", dados)
         .then(response => {
-          //this.$emit('baixada',hospedeId)
-          //this.dialogVisible = false
+          this.$emit('close',true)
+          this.dialogVisible = false
         }).catch(error => {
-          //this.errors = petra.tratarErros(error);
-          //this.dialogVisible = false
+          this.errors = petra.tratarErros(error);
         })
-
 
     },
 
     reset(){
+      this.errors = []
       this.quarto = null
       this.leito = null
     },
