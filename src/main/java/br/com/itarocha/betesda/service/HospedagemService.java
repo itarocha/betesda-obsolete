@@ -140,7 +140,7 @@ public class HospedagemService {
 				hospedagem.getHospedes().add(h);
 				
 			    if ((hvo.getAcomodacao() != null) && (TipoUtilizacaoHospedagem.T.equals(hospedagem.getTipoUtilizacao())) ) {
-			    	
+			    	//TODO: Tem um código igual no transferir. Refatorar criar método
 			    	Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
 			    	Optional<Leito> leito = leitoRepo.findById(hvo.getAcomodacao().getLeitoId());
 
@@ -217,7 +217,7 @@ public class HospedagemService {
 		}
 		
 		LocalDate hoje = LocalDate.now();
-		//List<HospedagemHeader> hospedagensHeaders = new ArrayList<HospedagemHeader>();
+
 		// Popula os leitos ocupados no mapa
 		for(HospedeLeitoVO hl : listaHospedes) {
 			Hospedagem hospedagem = hl.getHospedagem(); 
@@ -228,8 +228,11 @@ public class HospedagemService {
 			
 			CellStatusHospedagem statusHospedagem = resolveStatusHospedagemNew(hoje, hospedagem.getDataPrevistaSaida(), hospedagem.getDataEfetivaSaida());
 			
-			LocalDate dataEntrada = null;
-			LocalDate dataSaida = null;
+			LocalDate dataEntradaHospedagem = hospedagem.getDataEntrada();
+			LocalDate dataSaidaHospedagem = hospedagem.getDataEfetivaSaida() == null ? hospedagem.getDataPrevistaSaida() : hospedagem.getDataEfetivaSaida(); 
+			
+			LocalDate dataEntradaLeito = null;
+			LocalDate dataSaidaLeito = null;
 			String key = null;
 			String identificador = null;
 			Long id = 0L;
@@ -237,8 +240,8 @@ public class HospedagemService {
 			CellUtilizacao utilizacao = CellUtilizacao.VAZIO;
 			if ("T".equals(hl.getTipoUtilizacao())) {
 				utilizacao = CellUtilizacao.TOTAL;
-				dataEntrada = hl.getHospedeLeito().getDataEntrada();
-				dataSaida = hl.getHospedeLeito().getDataSaida();
+				dataEntradaLeito = hl.getHospedeLeito().getDataEntrada();
+				dataSaidaLeito = hl.getHospedeLeito().getDataSaida();
 				Integer quartoNumero = hl.getHospedeLeito().getQuarto().getNumero();
 				Integer leitoNumero = hl.getHospedeLeito().getLeito().getNumero();
 				key = makeLeitoKey(hl.getHospedeLeito().getLeito().getId(), quartoNumero, leitoNumero);
@@ -246,8 +249,8 @@ public class HospedagemService {
 				identificador =  String.format("T%06d", id); // T000000 Total
 			} else {
 				utilizacao = CellUtilizacao.PARCIAL;
-				dataEntrada = hl.getHospedagem().getDataEntrada(); 
-				dataSaida = hl.getHospedagem().getDataEfetivaSaida() == null ? hl.getHospedagem().getDataPrevistaSaida() : hl.getHospedagem().getDataEfetivaSaida(); 
+				dataEntradaLeito = hl.getHospedagem().getDataEntrada(); 
+				dataSaidaLeito = hl.getHospedagem().getDataEfetivaSaida() == null ? hl.getHospedagem().getDataPrevistaSaida() : hl.getHospedagem().getDataEfetivaSaida(); 
 				Integer quartoNumero = 9999;
 				Integer leitoNumero = 9999;
 				key = makeLeitoKey(hl.getHospede().getId(), quartoNumero, leitoNumero);
@@ -282,8 +285,8 @@ public class HospedagemService {
 				hhi.setDataPrevistaSaida(hospedagem.getDataPrevistaSaida());
 				hhi.setDataEfetivaSaida(hospedagem.getDataEfetivaSaida());
 				
-				hhi.setLeitoDataEntrada(dataEntrada);
-				hhi.setLeitoDataSaida(dataSaida);
+				hhi.setLeitoDataEntrada(dataEntradaLeito);
+				hhi.setLeitoDataSaida(dataSaidaLeito);
 				
 				hhi.setPessoaId(p.getId());
 				hhi.setPessoaNome(p.getNome());
@@ -301,13 +304,35 @@ public class HospedagemService {
 				int firstIndex = -1;
 				while (dtmp.compareTo(dFim) != 1) {
 					CellAndamento andamento = CellAndamento.VAZIO;
-					if (dataEntrada.compareTo(dtmp) == 0) {
-						andamento = CellAndamento.INICIO;
-					} else if (dataSaida.compareTo(dtmp) == 0) {
-						andamento = CellAndamento.FIM;
-					} else if (dtmp.isAfter(dataEntrada) && dtmp.isBefore(dataSaida)) {
+
+					Boolean inicioHospedagem = (dataEntradaHospedagem.equals(dtmp)); 
+					Boolean fimHospedagem = (dataSaidaHospedagem.equals(dtmp)); 
+
+					Boolean inicioLeito = (dataEntradaLeito.equals(dtmp)); 
+					Boolean fimLeito = (dataSaidaLeito.equals(dtmp)); 
+					Boolean duranteLeito = (dtmp.isAfter(dataEntradaLeito) && dtmp.isBefore(dataSaidaLeito));
+
+					if (duranteLeito) {
 						andamento = CellAndamento.DURANTE;
-					}
+					} else
+					if (inicioLeito && fimHospedagem) {
+						andamento = CellAndamento.VINDO_FIM;
+					} else	
+					if (inicioLeito && fimLeito) {
+						andamento = CellAndamento.INDO_VINDO;
+					} else	
+					if (inicioHospedagem && inicioLeito) {
+						andamento = CellAndamento.INICIO;
+					} else
+					if (!inicioHospedagem && inicioLeito) {
+						andamento = CellAndamento.VINDO;
+					} else
+					if (fimHospedagem && fimLeito) {
+							andamento = CellAndamento.FIM;
+					} else	
+					if (!fimHospedagem && fimLeito) {
+							andamento = CellAndamento.INDO;
+					}	
 					
 					DiaHospedagem dh = hm.getDias()[celulaIndex];
 					dh.setAndamento(andamento);
@@ -317,9 +342,13 @@ public class HospedagemService {
 						if (firstIndex == -1) {
 							dh.setFirstIndex(true);
 							firstIndex = celulaIndex;
-						}
-						dh.setPossuiContinuidade(CellAndamento.FIM.equals(andamento) && hhi.getPossuiContinuidade());
-						dh.setContinuacao(CellAndamento.INICIO.equals(andamento) && hhi.getContinuacao());
+						} 
+						//dh.setPossuiContinuidade( (CellAndamento.FIM.equals(andamento) || CellAndamento.INICIO_FIM.equals(andamento)) && hhi.getPossuiContinuidade());
+						//dh.setPossuiContinuidade(hhi.getPossuiContinuidade());
+						//dh.setContinuacao((CellAndamento.INICIO.equals(andamento) || CellAndamento.INICIO_FIM.equals(andamento)) && hhi.getContinuacao());
+						// Provavelmente possuiContinuidade e setContinuacao não servem pra nada!
+						dh.setPossuiContinuidade(hhi.getPossuiContinuidade());
+						dh.setContinuacao(hhi.getContinuacao());
 					}
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
@@ -473,20 +502,6 @@ public class HospedagemService {
 		return retorno;
 	}
 	
-	//TODO Implementar transferencia
-	public void transferirHospedagem(Long hospedagemId, Long leitoId, LocalDate dataApartir) {
-		/*
-		* hospedagem = getHospedagem(hospedagemId)
-		* Condição: se hospedagem.status == aberta
-		* Condição: Verificar se não existe hospedagemLeito em (leito, dataApartir, hospedagem.dataPrevistaSaida) !!!
-		* hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
-		* hospedagemLeito.setDataSaída(dataApartir -1)
-		* Cria um novo HospedeLeito com hospedagemId, leito, dataApartir e dataSaida = hospedagem.dataPrevistaSaida
-		*/
-		
-	}
-	
-	//TODO Implementar encerrarHospedagem
 	public void encerrarHospedagem(Long hospedagemId, LocalDate dataEncerramento) throws ValidationException {
 		/*
 		* hospedagem = getHospedagem(hospedagemId)
@@ -537,7 +552,6 @@ public class HospedagemService {
 		}
 	} 
 	
-	//TODO Implementar encerrarHospedagem
 	public void baixarHospede(Long hospedeId, LocalDate dataBaixa) throws ValidationException{
 		Optional<Hospede> hospedeOpt = hospedeRepo.findById(hospedeId);
 		if (hospedeOpt.isPresent()) {
@@ -576,6 +590,92 @@ public class HospedagemService {
 				}
 				
 				hospede.setBaixado(Logico.S);
+			}
+		}
+		
+	} 
+	
+	public void transferirHospede(Long hospedeId, Long leitoId, LocalDate dataTransferencia) throws ValidationException{
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		Optional<Hospede> hospedeOpt = hospedeRepo.findById(hospedeId);
+		if (hospedeOpt.isPresent()) {
+			Long hospedagemId = hospedeOpt.get().getHospedagem().getId();
+			Hospede hospede = hospedeOpt.get();
+
+			if ((Logico.S.equals(hospede.getBaixado())  )) {
+				throw new ValidationException(new ResultError().addError("*", "Hóspede já está baixado"));
+			}
+
+			Optional<Hospedagem> opt = hospedagemRepo.findById(hospedagemId);
+			if (opt.isPresent()) {
+				
+				Hospedagem h = opt.get();
+				
+				if (!TipoUtilizacaoHospedagem.T.equals(h.getTipoUtilizacao())) {
+					throw new ValidationException(new ResultError().addError("*", "Tipo de Utilização da Hospedagem deve ser Total"));
+				} 
+				
+				if ((h.getDataEfetivaSaida() != null)) {
+					throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
+				}
+				
+				/*
+				Long qtd = hospedeLeitoRepo.countHospedesNaoBaixadosByHospedagemId(hospedagemId);
+				if (qtd <= 1) {
+					throw new ValidationException(new ResultError().addError("*", "Para baixar hóspede é necessário ter pelo menos 2 hóspedes ativos"));
+				}
+				*/
+				
+				//TODO: Permitir somente se a hospedagem for igual
+				List<HospedeLeito> lst = hospedeLeitoRepo.findByLeitoNoPeriodo(leitoId, dataTransferencia, h.getDataPrevistaSaida());
+				if (!lst.isEmpty()) {
+					throw new ValidationException(new ResultError().addError("*", "Este Leito já está em uso no período"));
+				}
+				
+				if (dataTransferencia.isBefore(h.getDataEntrada())) {
+					throw new ValidationException(new ResultError().addError("*", "Data de encerramento deve ser superior a data de entrada"));
+				}
+				
+				if (dataTransferencia.isAfter(h.getDataPrevistaSaida())) {
+					throw new ValidationException(new ResultError().addError("*", 
+							String.format("Data de Transferência deve ser inferior a data Prevista de Saída (%s)",fmt.format(h.getDataPrevistaSaida()))));
+				}
+				
+				LocalDate dataMinima = hospedeLeitoRepo.ultimaDataEntradaByHospedagemId(hospedagemId);
+				dataMinima = dataMinima.plusDays(1);
+				if (dataTransferencia.isBefore(dataMinima)) {
+					throw new ValidationException(new ResultError().addError("*", 
+							String.format("Data de Transferência deve ser igual ou superior a Data de Entrada da última movimentação (%s)",fmt.format(dataMinima))));
+				}
+				
+				List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedeId(hospedeId);
+				for (HospedeLeito hl : listaHospedeLeito) {
+					if (hl.getDataEntrada().isAfter(dataTransferencia)) {
+						throw new ValidationException(new ResultError().addError("*", "Existe movimentação com data ANTERIOR a data da transferência"));
+					}
+					
+					hl.setDataSaida(dataTransferencia.minusDays(1));
+					hospedeLeitoRepo.save(hl);
+				}
+				
+				// Inserir novo HospedeLeito com LeitoId, dataTransferencia até dataPrevistaSaida
+		    	//Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
+		    	Optional<Leito> leito = leitoRepo.findById(leitoId);
+
+		    	if (leito.isPresent()) {
+		    		Quarto q = leito.get().getQuarto();
+		    		
+		    		HospedeLeito hl = new HospedeLeito();
+		    		hl.setHospede(hospede);
+		    		hl.setDataEntrada(dataTransferencia);
+		    		hl.setDataSaida(h.getDataPrevistaSaida());
+
+		    		hl.setQuarto(q);
+
+		    		hl.setLeito(leito.get());
+
+		    		hospedeLeitoRepo.save(hl);
+		    	}
 			}
 		}
 		

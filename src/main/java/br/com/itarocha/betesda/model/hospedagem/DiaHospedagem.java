@@ -77,6 +77,19 @@ public class DiaHospedagem {
 	}
 	
 	public String getClasse() {
-		return this.possuiContinuidade ? "INDO" : (this.continuacao ? "VINDO" : this.andamento.toString());
+		/*
+		String retorno = "";
+		if (this.possuiContinuidade && this.continuacao) {
+			retorno = "INDO_VINDO";
+		} else if (this.continuacao && (!this.possuiContinuidade)) {
+			retorno = "VINDO_FIM";
+		} 
+		else {
+			retorno = this.possuiContinuidade ? "INDO" : (this.continuacao ? "VINDO" : this.andamento.toString());
+		}
+		*/
+		//String retorno = this.possuiContinuidade ? "INDO" : (this.continuacao ? "VINDO" : this.andamento.toString());
+		String retorno = this.andamento.toString();
+		return retorno;
 	}
 }

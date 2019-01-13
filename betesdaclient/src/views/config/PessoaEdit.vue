@@ -217,7 +217,7 @@ export default {
       } else {
         //console.log(form)
         this.form = form;
-        this.dataNascimento = this.formatDate(this.form.dataNascimento)
+        this.dataNascimento = petraDateTime.formatDateDbToBr(this.form.dataNascimento)
       }
       this.dialogVisible = true;
       setTimeout(() => {
@@ -226,37 +226,6 @@ export default {
     },
 
     loadListas(evt) {
-    },
-
-    /*
-    dataNascimentoBlur(){
-      this.dataNascimento = this.parseDate(this.dataNascimentoFmt)
-      this.form.dataNascimento = this.parseDate(this.dataNascimentoFmt)
-    },
-    */
-
-    formatDate(date) {
-      if (!date) return null
-
-      const [year, month, day] = date.split('-')
-      return `${day}/${month}/${year}`
-    },
-    
-    parseDate(date) {
-      if (!date) return null
-      const [day, month, year] = date.split('/')
-      var retorno = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`
-      return retorno
-    },    
-
-    // Converte data no formato DDMMYYYY em YYYY-MM-DD
-    newParseDate(st){
-      //var st = "26042013";
-      var pattern = /(\d{2})(\d{2})(\d{4})/;
-      //var dt = new Date(st.replace(pattern,'$3-$2-$1'));
-      var retorno = st.replace(pattern,'$3-$2-$1');
-      //console.log(retorno);
-      return retorno;
     },
 
     close(value) {
@@ -268,8 +237,7 @@ export default {
       this.errors = [];
 
       var toSave = this.form;
-      toSave.dataNascimento = this.newParseDate(this.dataNascimento)
-      console.log(toSave)
+      toSave.dataNascimento = petraDateTime.formatDateBrNoMaskToDb(this.dataNascimento)
 
       petra.axiosPost("/app/pessoas", toSave)
         .then(response => {

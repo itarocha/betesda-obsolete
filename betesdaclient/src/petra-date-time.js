@@ -8,6 +8,22 @@ export default {
       return dia ? moment(dia).format(formato) : ""
     },
 
+
+    // Converte data no formato YYYY-MM-DD para DD/MM/YYYY
+    formatDateDbToBr(date) {
+      if (!date) return null
+
+      const [year, month, day] = date.split('-')
+      return `${day}/${month}/${year}`
+    },
+    
+    // Converte data no formato DDMMYYYY em YYYY-MM-DD
+    formatDateBrNoMaskToDb(st){
+      var pattern = /(\d{2})(\d{2})(\d{4})/;
+      var retorno = st.replace(pattern,'$3-$2-$1');
+      return retorno;
+    },
+
     diaSemana(dia){
       return moment(dia).format("ddd")
     },
@@ -16,8 +32,10 @@ export default {
       return moment(data).format("e")
     },
 
-    hoje(){
-      return moment().format("YYYY-MM-DD")
+    hoje(formato){
+      //return moment().format("YYYY-MM-DD")
+      formato = formato || "YYYY-MM-DD"
+      return moment().format(formato)
     },
 
     semanaAnterior(data){

@@ -117,6 +117,18 @@ public class HospedagemController {
 		}
 	}
 	
+	@RequestMapping(value="/mapa/transferir", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> transferir(@RequestBody TransferenciaRequest model)
+	{
+		try {
+			service.transferirHospede(model.hospedeId, model.leitoId, model.data);
+			return new ResponseEntity<String>("ok", HttpStatus.OK); 
+		} catch(ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(value="/mapa/hospedagem_info", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public HospedagemFullVO getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
@@ -162,6 +174,12 @@ public class HospedagemController {
 	private static class BaixaRequest{
 		public LocalDate data;
 		public Long hospedeId;
+	}
+	
+	private static class TransferenciaRequest{
+		public LocalDate data;
+		public Long hospedeId;
+		public Long leitoId;
 	}
 	
 	private static class OperacoesRequest{

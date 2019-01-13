@@ -3,17 +3,18 @@
     <v-dialog v-model="dialogVisible" width="800" :scrollable="true">
       <v-card>
         <v-card-title dark class="white--text cyan darken-4">
-          Selecionar Leito
+          Selecionar Data e Leito para Transferência
         </v-card-title>
         <v-card-text style="height:500px;">
-
 
           <v-layout row wrap>
             <v-flex xs12 sm12 md12>
               <h3>Hóspede: {{nomeHospede}}</h3>
             </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-text-field label="Data de Transferência" ref="edtDataTransferencia" v-model="dataTransferencia" :mask="'##/##/####'"></v-text-field>
+            </v-flex>
           </v-layout>
-
 
           <frame-selecao-leito ref="frameSelecaoLeito" @selecionarQuarto="onSelecionarQuarto" @selecionarLeito="onSelecionarLeito"></frame-selecao-leito>
         </v-card-text>
@@ -22,8 +23,8 @@
 
         <v-card-actions class="grey lighten-4"> 
           <v-spacer></v-spacer>
-          <v-btn small class="white--text cyan darken-4" @click.native="close(true)" :disabled="quarto == null || leito == null">
-            Ok
+          <v-btn small class="white--text cyan darken-4" @click.native="transferir" :disabled="quarto == null || leito == null || dataTransferencia == ''">
+            Transferir
           </v-btn>
           <v-btn small color="secondary" @click.native="close(false)">
             Cancelar
@@ -39,7 +40,7 @@
 import FrameSelecaoLeito from "./FrameSelecaoLeito.vue"
 
 export default {
-  name: 'DialogoSelecaoLeito',
+  name: 'DialogoSelecaoLeitoTransferencia',
   
   components:{
     FrameSelecaoLeito,
@@ -50,6 +51,7 @@ export default {
     hospede : null,
     quarto : null,
     leito: null,
+    dataTransferencia : null,
 
     // local
     dialogVisible : false,
@@ -64,7 +66,13 @@ export default {
       this.$refs.frameSelecaoLeito.openDialog(hospede, destinacaoHospedagemId)
       this.reset()
       this.nomeHospede = hospede.pessoa.nome
+      this.dataTransferencia = petraDateTime.hoje("DDMMYYYY")
       this.dialogVisible = true
+
+      setTimeout(() => {
+        this.$refs.edtDataTransferencia.focus()
+      }, 500)
+
     },
 
     onSelecionarLeito(leito){
@@ -87,10 +95,39 @@ export default {
       this.dialogVisible = false
     },
 
+    transferir(){
+      var selecao = this.$refs.frameSelecaoLeito.getSelecao()
+
+      var dados = {
+        hospedeId : selecao.hospede.id,
+        leitoId : selecao.leito.id,
+        data : petraDateTime.formatDateBrNoMaskToDb(this.dataTransferencia) 
+      }
+
+      // selecao.hospede.id
+      // selecao.leito.id
+      // var dataTransferencia = petraDateTime.formatDateBrNoMaskToDb(this.dataTransferencia) 
+      console.log(dados)
+      /*
+      this.$emit('close',selecao)
+      */
+      
+      petra.axiosPost("/app/hospedagem/mapa/transferir", dados)
+        .then(response => {
+          //this.$emit('baixada',hospedeId)
+          //this.dialogVisible = false
+        }).catch(error => {
+          //this.errors = petra.tratarErros(error);
+          //this.dialogVisible = false
+        })
+
+
+    },
+
     reset(){
       this.quarto = null
       this.leito = null
     },
   }
 }
-</script> 
+</script>

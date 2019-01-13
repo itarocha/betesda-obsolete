@@ -2,193 +2,201 @@
   <div>
     <dialogo-selecao-data-encerramento ref="dlgSelecaoDataEncerramento" @close="onSelecionarDataEncerramento"></dialogo-selecao-data-encerramento>
     <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
+    <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onSelecionarLeitoTransferencia"></dialogo-selecao-leito-transferencia>
     
-    <v-dialog v-model="dialogVisible" width="800">
+    <v-dialog v-model="dialogVisible" width="800" :scrollable="true">
         <v-card>
-        <v-card-title dark class="white--text cyan darken-4">
-          Informações de Hospedagem
-        </v-card-title>
-        <v-card-text style="height:450px;">
-          <v-flex xs10 sm12 md12>
-            <div>
-              <div><span class="headline text-uppercase">Hospedagem #{{hospedagemId}}</span></div>
-            </div>
-            <v-divider></v-divider>
-            <v-tabs v-model="tabActive" slider-color="cyan darken-2" fixed-tabs>
-              <v-tab>Hospedagem</v-tab>
-              <v-tab>Hóspede(s)</v-tab>
-              <v-tab>Encaminhador</v-tab>
+          <v-card-title dark class="white--text cyan darken-4">
+            Informações de Hospedagem #{{hospedagemId}}
+          </v-card-title>
 
-              <!-- hospedagem -->
-              <v-tab-item>
-                <v-layout justify-space-between row wrap fill-height>
-                  <v-flex  xs12 sm12 md12><div style="height:50px;"></div></v-flex>
+          <v-card-text style="height:450px;">
+            <v-flex xs10 sm12 md12>
+              <v-tabs v-model="tabActive" slider-color="cyan darken-2" fixed-tabs>
+                <v-tab>Hospedagem</v-tab>
+                <v-tab>Hóspede(s)</v-tab>
+                <v-tab>Encaminhador</v-tab>
 
-                  <v-flex  xs12 sm2 md4 offset-md2>
-                    Data de Entrada:
-                  </v-flex>
-                  <v-flex xs12 sm2 md6 class="title">
-                    {{formatDate(hospedagem.dataEntrada)}}
-                  </v-flex>
+                <!-- hospedagem -->
+                <v-tab-item>
+                  <v-layout justify-space-between row wrap fill-height>
+                    <v-flex  xs12 sm12 md12><div style="height:50px;"></div></v-flex>
 
-                  <v-flex xs12 sm2 md4 offset-md2>
-                    Data Prevista de Saída:
-                  </v-flex>
-                  <v-flex md6 class="title">
-                    {{formatDate(hospedagem.dataPrevistaSaida)}}
-                  </v-flex>
+                    <v-flex  xs12 sm2 md4 offset-md2>
+                      Data de Entrada:
+                    </v-flex>
+                    <v-flex xs12 sm2 md6 class="title">
+                      {{formatDate(hospedagem.dataEntrada)}}
+                    </v-flex>
 
-                  <v-flex xs12 sm2 md4 offset-md2>
-                    Data de Saída:
-                  </v-flex>
-                  <v-flex xs12 sm2 md6 class="title">
-                    {{formatDate(hospedagem.dataEfetivaSaida)}}
-                  </v-flex>
+                    <v-flex xs12 sm2 md4 offset-md2>
+                      Data Prevista de Saída:
+                    </v-flex>
+                    <v-flex md6 class="title">
+                      {{formatDate(hospedagem.dataPrevistaSaida)}}
+                    </v-flex>
 
-                  <v-flex xs12 sm2 md4 offset-md2>
-                    Destinação de Hospedagem:
-                  </v-flex>
-                  <v-flex xs12 sm2 md6 class="title">
-                    {{destinacaoHospedagem.descricao}}
-                  </v-flex>
+                    <v-flex xs12 sm2 md4 offset-md2>
+                      Data de Saída:
+                    </v-flex>
+                    <v-flex xs12 sm2 md6 class="title">
+                      {{formatDate(hospedagem.dataEfetivaSaida)}}
+                    </v-flex>
 
-                  <v-flex xs12 sm2 md4 offset-md2>
-                    Tipo de Utilização:
-                  </v-flex>
-                  <v-flex xs12 sm2 md6 class="title">
-                    {{tipoUtilizacao(hospedagem.tipoUtilizacao)}}
-                  </v-flex>
+                    <v-flex xs12 sm2 md4 offset-md2>
+                      Destinação de Hospedagem:
+                    </v-flex>
+                    <v-flex xs12 sm2 md6 class="title">
+                      {{destinacaoHospedagem.descricao}}
+                    </v-flex>
 
-                  <v-flex xs12 sm2 md4 offset-md2>
-                    Situação:
-                  </v-flex>
-                  <v-flex xs12 sm2 md6 class="text-uppercase title">
-                    {{hospedagem.status}}
-                  </v-flex>
+                    <v-flex xs12 sm2 md4 offset-md2>
+                      Tipo de Utilização:
+                    </v-flex>
+                    <v-flex xs12 sm2 md6 class="title">
+                      {{tipoUtilizacao(hospedagem.tipoUtilizacao)}}
+                    </v-flex>
 
-                  <v-flex xs12 sm2 md4 offset-md2 v-if="servicos.length > 0">
-                    Serviços:
-                  </v-flex>
-                  <v-flex xs12 sm2 md12 v-if="servicos.length > 0" class="subheading ml-2">
-                      <v-chip color="amber lighten-2" v-for="(servico, idx) in servicos" :key="idx">{{servico.descricao}}</v-chip>
-                  </v-flex>
+                    <v-flex xs12 sm2 md4 offset-md2>
+                      Situação:
+                    </v-flex>
+                    <v-flex xs12 sm2 md6 class="text-uppercase title">
+                      {{hospedagem.status}}
+                    </v-flex>
 
-                </v-layout>
-              </v-tab-item>
+                    <v-flex xs12 sm2 md4 offset-md2 v-if="servicos.length > 0">
+                      Serviços:
+                    </v-flex>
+                    <v-flex xs12 sm2 md12 v-if="servicos.length > 0" class="subheading ml-2">
+                        <v-chip color="amber lighten-2" v-for="(servico, idx) in servicos" :key="idx">{{servico.descricao}}</v-chip>
+                    </v-flex>
 
-              <!-- hóspedes -->
-              <v-tab-item>
-                <v-expansion-panel>
-                  <v-expansion-panel-content v-for="(hpd, i) in hospedagem.hospedes" :key="i" expand :class="{'amber lighten-4' : isBaixado(hpd)}">
-                    <div slot="header"><span class="text-uppercase title">{{hpd.pessoa.nome}}</span> - {{hpd.tipoHospede.descricao}} 
-                      <span v-if="hpd.baixado == 'S'" class="text-uppercase subheading"> - BAIXADO</span>
-                      <div>
-                        <v-btn small dark color="cyan darken-4" 
-                          v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
-                          @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)">Baixar
-                        </v-btn>
-                        <v-btn small dark color="cyan darken-4" 
-                          v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
-                          @click.native="showTransferir(hpd.id)">Transferir
-                        </v-btn>
-                      </div>
-                    </div>  
-                    <v-card>
-                      <v-card-text class="grey lighten-3">
-                      <v-layout row wrap>
-                        <v-flex xs12 sm2 md2>
-                          <span class="caption">Nascimento:</span>
-                        </v-flex>
-                        <v-flex xs12 sm10 md10>
-                          {{formatDate(hpd.pessoa.dataNascimento)}}
-                        </v-flex>
+                  </v-layout>
+                </v-tab-item>
 
-                        <v-flex xs12 sm2 md2 class="caption">
-                          Endereço:
-                        </v-flex>
-                        <v-flex xs12 sm2 md10>
-                          {{hpd.pessoa.endereco != null ? hpd.pessoa.endereco.descricao : ''}}
-                        </v-flex>
+                <!-- hóspedes -->
+                <v-tab-item>
+                  <v-expansion-panel>
+                    <v-expansion-panel-content v-for="(hpd, i) in hospedagem.hospedes" :key="i" expand 
+                    :class="{'grey lighten-4' : !isBaixado(hpd), 'amber lighten-4' : isBaixado(hpd)}">
+                      <div slot="header">
+                        <span class="text-uppercase title">{{hpd.pessoa.nome}}</span> - {{hpd.tipoHospede.descricao}} 
+                        <span v-if="hpd.baixado == 'S'" class="text-uppercase subheading font-weight-bold"> BAIXADO</span>
+                        <div>
+                          <v-btn small dark color="cyan darken-4" 
+                            v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
+                            @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)">Baixar
+                          </v-btn>
+                          <v-btn small dark color="cyan darken-4" 
+                            v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
+                            @click.native="showTransferencia(hpd, hospedagem.destinacaoHospedagem.id)">Transferir
+                          </v-btn>
+                        </div>
+                      </div>  
+                      <v-card>
+                        <v-card-text :class="{'grey lighten-5' : !isBaixado(hpd), 'amber lighten-5' : isBaixado(hpd)}">
+                        <v-layout row wrap>
+                          <v-flex xs2 sm2 md2>
+                            <span class="caption">Nascimento:</span>
+                          </v-flex>
+                          <v-flex xs10 sm10 md10>
+                            {{formatDate(hpd.pessoa.dataNascimento)}}
+                          </v-flex>
 
-                        <v-flex xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
-                          <v-list>
-                            <v-list-tile v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex">
-                              <v-list-tile-content>
-                                <div>
-                                #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
-                                <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="subheading"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
-                                </div>
-                              </v-list-tile-content>
-                            </v-list-tile>
-                          </v-list>
-                        </v-flex>  
-                      </v-layout>
-                      </v-card-text>
-                    </v-card>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
-              </v-tab-item>
+                          <v-flex xs12 sm2 md2 class="caption">
+                            Endereço:
+                          </v-flex>
+                          <v-flex xs12 sm10 md10>
+                            {{hpd.pessoa.endereco != null ? hpd.pessoa.endereco.descricao : ''}}
+                          </v-flex>
 
-              <!-- encaminhador -->
-              <v-tab-item>
-                <v-layout row wrap v-if="entidade != null">
-                  <v-flex xs12 sm8 md8>
-                    <v-text-field label="Nome" readonly ref="edtNome" v-model="entidade.nome"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm4 md4>
-                    <v-text-field label="CNPJ" readonly v-model="entidade.cnpj" :mask="'##.###.###/####-##'" :masked="true" ></v-text-field>
-                  </v-flex>
+                          <v-flex xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
+                              <div v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex" class="body-1 pa-1 pl-3">
+                                  #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                                  <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="subheading"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
+                              </div>
 
-                  <v-flex xs12 sm6 md6>
-                    <v-text-field label="Telefone" readonly v-model="entidade.telefone" ></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6>
-                    <v-text-field label="Email" readonly v-model="entidade.email"></v-text-field>
-                  </v-flex>
 
-                  <v-flex xs12 sm6 md6 v-if="entidade.endereco">
-                    <v-text-field label="Endereço" readonly v-model="entidade.endereco.logradouro"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm2 md2 v-if="entidade.endereco">
-                    <v-text-field label="Número" readonly v-model="entidade.endereco.numero"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm4 md4 v-if="entidade.endereco">
-                    <v-text-field label="Complemento" readonly v-model="entidade.endereco.complemento"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm4 md4 v-if="entidade.endereco">
-                    <v-text-field label="Bairro" readonly v-model="entidade.endereco.bairro"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm2 md2 v-if="entidade.endereco">
-                    <v-text-field label="CEP" readonly v-model="entidade.endereco.cep" :mask="'#####-###'"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm4 md4 v-if="entidade.endereco">
-                    <v-text-field label="Cidade" readonly v-model="entidade.endereco.cidade"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm2 md2 v-if="entidade.endereco">
-                    <v-text-field label="UF" readonly v-model="entidade.endereco.uf"></v-text-field>
-                  </v-flex>
-                </v-layout>    
-              </v-tab-item>
-            </v-tabs>
-          </v-flex>    
-        </v-card-text>
+                            <!--  
+                            <v-list>
+                              <v-list-tile v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex">
+                                <v-list-tile-content class="body-1 pa-3">
+                                  #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                                  <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="subheading"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
+                                </v-list-tile-content>
+                              </v-list-tile>
+                            </v-list>
+                            -->
+                          </v-flex>  
+                        </v-layout>
+                        </v-card-text>
+                      </v-card>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-tab-item>
 
-        <v-divider></v-divider>
+                <!-- encaminhador -->
+                <v-tab-item>
+                  <v-layout row wrap v-if="entidade != null">
+                    <v-flex xs12 sm8 md8>
+                      <v-text-field label="Nome" readonly ref="edtNome" v-model="entidade.nome"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4>
+                      <v-text-field label="CNPJ" readonly v-model="entidade.cnpj" :mask="'##.###.###/####-##'" :masked="true" ></v-text-field>
+                    </v-flex>
 
-        <v-card-actions class="grey lighten-4"> 
-          <v-spacer></v-spacer>
-          <v-btn small dark color="cyan darken-4" @click.native="showSelecionarDataEncerramento(hospedagem.id, hospedagem.dataPrevistaSaida)" v-if="hospedagem.dataEfetivaSaida == null">
-            Encerrar
-          </v-btn>
-          <v-btn small dark color="cyan darken-4" @click.native="encerrar" v-if="hospedagem.dataEfetivaSaida == null">
-            Renovar
-          </v-btn>
-          <v-btn small color="secondary" @click.native="close(false)">
-            Fechar
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Telefone" readonly v-model="entidade.telefone" ></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Email" readonly v-model="entidade.email"></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12 sm6 md6 v-if="entidade.endereco">
+                      <v-text-field label="Endereço" readonly v-model="entidade.endereco.logradouro"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 v-if="entidade.endereco">
+                      <v-text-field label="Número" readonly v-model="entidade.endereco.numero"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4 v-if="entidade.endereco">
+                      <v-text-field label="Complemento" readonly v-model="entidade.endereco.complemento"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4 v-if="entidade.endereco">
+                      <v-text-field label="Bairro" readonly v-model="entidade.endereco.bairro"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 v-if="entidade.endereco">
+                      <v-text-field label="CEP" readonly v-model="entidade.endereco.cep" :mask="'#####-###'"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm4 md4 v-if="entidade.endereco">
+                      <v-text-field label="Cidade" readonly v-model="entidade.endereco.cidade"></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm2 md2 v-if="entidade.endereco">
+                      <v-text-field label="UF" readonly v-model="entidade.endereco.uf"></v-text-field>
+                    </v-flex>
+                  </v-layout>    
+                </v-tab-item>
+              </v-tabs>
+            </v-flex>    
+          </v-card-text>
+
+          <v-divider></v-divider>
+
+          <v-card-actions class="grey lighten-4"> 
+            <v-spacer></v-spacer>
+            <v-btn small dark color="cyan darken-4" @click.native="showSelecionarDataEncerramento(hospedagem.id, hospedagem.dataPrevistaSaida)" v-if="hospedagem.dataEfetivaSaida == null">
+              Encerrar
+            </v-btn>
+            <!--
+            <v-btn small dark color="cyan darken-4" @click.native="encerrar" v-if="hospedagem.dataEfetivaSaida == null">
+              Renovar
+            </v-btn>
+            -->
+            <v-btn small color="secondary" @click.native="close(false)">
+              Fechar
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
   </div>
 </template>
 
@@ -196,6 +204,7 @@
 
 import DialogoSelecaoDataEncerramento from "./DialogoSelecaoDataEncerramento.vue"
 import DialogoSelecaoDataBaixa from "./DialogoSelecaoDataBaixa.vue"
+import DialogoSelecaoLeitoTransferencia from "./DialogoSelecaoLeitoTransferencia.vue"
 
 export default {
   name: 'HospedagemInfo',
@@ -203,6 +212,7 @@ export default {
   components: {
     DialogoSelecaoDataEncerramento,
     DialogoSelecaoDataBaixa,
+    DialogoSelecaoLeitoTransferencia
   },
 
   props: {
@@ -330,10 +340,18 @@ export default {
     },
 
     // Transferencia
-    showTransferir(hospedeId){
-      //this.$refs.dlgSelecaoDataBaixa.openDialog(hospedeId, dataPrevistaSaida);
+    showTransferencia(hospede, destinacaoHospedagemId){
+      //console.log(destinacaoHospedagemId, hospede.pessoa)
+      this.$refs.dlgSelecaoLeitoTransferencia.openDialog(hospede, destinacaoHospedagemId);
     },
 
+    onSelecionarLeitoTransferencia(){
+      /*
+      if (dataBaixa != null){
+        this.baixarHospedagem(hospedeId, dataBaixa)
+      }
+      */
+    },  
 
     close(value){
       this.dialogVisible = false

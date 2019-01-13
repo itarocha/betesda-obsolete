@@ -47,6 +47,15 @@ public interface HospedeLeitoRepository extends JpaRepository<HospedeLeito, Long
 	List<HospedeLeito> findUltimoByHospedeId(@Param("hospedeId") Long hospedeId);
 	
 	
+	// Retorna se existe alguma hospedagem no leito no período
+	@Query(value = "SELECT hl.* " +
+	"FROM   hospede_leito hl "+
+	"WHERE       (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim)) "+
+	"OR          ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim))) "+
+	"AND         hl.leito_id = :leitoId ", nativeQuery = true)
+	List<HospedeLeito> findByLeitoNoPeriodo(@Param("leitoId") Long leitoId, @Param("dataIni") LocalDate dataIni, @Param("dataFim") LocalDate dataFim);
+
+	
 	@Query(value = "SELECT COUNT(*) FROM  hospede h WHERE h.baixado = 'N' AND h.hospedagem_id = :hospedagemId", nativeQuery = true)	
 	Long countHospedesNaoBaixadosByHospedagemId(@Param("hospedagemId") Long hospedagemId);
 	

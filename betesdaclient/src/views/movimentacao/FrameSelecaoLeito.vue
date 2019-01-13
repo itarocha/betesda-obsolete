@@ -2,16 +2,13 @@
   <div>
     <v-layout row wrap>
       <v-flex xs12 sm12 md12>
-        <h3>Hóspede: {{nomeHospede}}</h3>
-      </v-flex>
-      <v-flex xs12 sm12 md12>
         <v-select v-model="quarto" :items="itensQuarto" item-text="displayText" item-value="id" label="Quarto" required></v-select>
       </v-flex>
       <v-flex xs12 sm12 md12 v-if="quarto != null">
         <p style="color:'red'">Clique sobre a representação do leito para selecionar...</p>
       </v-flex>
 
-      <v-flex xs3 v-for="(leito, i) in leitos" :key="i" v-if="leitos">
+      <v-flex xs3 v-for="(leito, i) in leitos" :key="i">
         <v-card v-bind:class="{'amber lighten-4':leitoSelecionado(leito), 'grey lighten-4':!leitoSelecionado(leito), 'ma-1':true}" @click.native="selecionarLeito(leito)">
           <v-card-text class="text-sm">
             <h3>{{leito.numero}}</h3>

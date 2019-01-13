@@ -59,7 +59,7 @@
                   <v-layout row v-for="(celula, index) in dados.leitos" :key="index">
                     <v-flex sm12>
                       <div class="box p4 laranja hleito" :style="{height:calcularAlturaLeito(index)}">
-                        <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                        <center v-if="celula.quartoNumero != '9999'">#{{index}} {{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
                         <center v-if="celula.quartoNumero == '9999'">Parcial</center>
                       </div>
                     </v-flex>
@@ -70,7 +70,7 @@
                         <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe)" 
                               v-if="hospedagem.dias[indice].identificador != '0'"
                               :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
-                        @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
+                              @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
                           <v-chip color="grey lighten-1" 
                             :small="true" text-color="black" 
                             v-if="hospedagem.dias[indice].firstIndex" 
@@ -393,7 +393,7 @@ export default {
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
-            //console.log("getData() ",this.dados)
+            console.log("getData() ",this.dados)
             this.pessoas = response.data.hospedagens
             //console.log(this.pessoas)
             this.showEstatisticas()
@@ -470,6 +470,12 @@ export default {
           } else      
           if (classe == "VINDO") {
             return 'grafico grafico_vindo'
+          } else
+          if (classe == "INDO_VINDO") {
+            return 'grafico grafico_indo grafico_vindo'
+          } else
+          if (classe == "VINDO_FIM") {
+            return 'grafico grafico_vindo grafico_fim'
           }
       }
       return ''
