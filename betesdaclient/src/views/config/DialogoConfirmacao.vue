@@ -6,7 +6,7 @@
           {{titulo}}
         </v-card-title>
         <v-card-text>
-          {{mensagem}}
+          {{mensagem}}{{message}}
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions class="grey lighten-4"> 
@@ -42,7 +42,10 @@ export default {
 
   methods: {
     // publico
-    openDialog(){
+    openDialog(message){
+      if (message){
+        this.message = message
+      }
       this.dialogVisible = true
     },
 

@@ -1,7 +1,6 @@
 <template>
   <div>
     <hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada" @close="onCloseHospedagemInfo"></hospedagem-info>
-    
 
     <!--<v-container class="p0">-->
         <v-layout row>
@@ -236,7 +235,7 @@ export default {
   name: 'Hospedagens',
   components:{
     Titulo,
-    HospedagemInfo
+    HospedagemInfo,
   },
   data: () =>({
     windowHeight: 0,

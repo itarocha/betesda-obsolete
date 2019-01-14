@@ -3,6 +3,8 @@
     <dialogo-selecao-data-encerramento ref="dlgSelecaoDataEncerramento" @close="onSelecionarDataEncerramento"></dialogo-selecao-data-encerramento>
     <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
     <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onCloseTransferencia"></dialogo-selecao-leito-transferencia>
+    <dialogo-selecao-data-renovacao ref="dlgSelecaoDataRenovacao" @close="onSelecionarDataRenovacao"></dialogo-selecao-data-renovacao>
+    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDeleteConfirmed"></dialogo-confirmacao>
     
     <v-dialog v-model="dialogVisible" width="800" :scrollable="true">
         <v-card>
@@ -11,6 +13,13 @@
           </v-card-title>
 
           <v-card-text style="height:450px;">
+            <!-- Mensagens de erro -->  
+            <v-flex xs12 sm12 md12>
+              <v-alert :value="true" type="error" v-for="(error,i) in errors" :key="i">
+                {{error.errorMessage}}
+              </v-alert>
+            </v-flex>
+
             <v-flex xs10 sm12 md12>
               <v-tabs v-model="tabActive" slider-color="cyan darken-2" fixed-tabs>
                 <v-tab>Hospedagem</v-tab>
@@ -183,14 +192,15 @@
 
           <v-card-actions class="grey lighten-4"> 
             <v-spacer></v-spacer>
+            <v-btn small dark color="cyan darken-4" @click.native="deleteConfirm">
+              Excluir
+            </v-btn>
+            <v-btn small dark color="cyan darken-4" @click.native="showSelecionarDataRenovacao" v-if="hospedagem.dataEfetivaSaida == null">
+              Renovar
+            </v-btn>
             <v-btn small dark color="cyan darken-4" @click.native="showSelecionarDataEncerramento(hospedagem.id, hospedagem.dataPrevistaSaida)" v-if="hospedagem.dataEfetivaSaida == null">
               Encerrar
             </v-btn>
-            <!--
-            <v-btn small dark color="cyan darken-4" @click.native="encerrar" v-if="hospedagem.dataEfetivaSaida == null">
-              Renovar
-            </v-btn>
-            -->
             <v-btn small color="secondary" @click.native="close(false)">
               Fechar
             </v-btn>
@@ -203,8 +213,10 @@
 <script>
 
 import DialogoSelecaoDataEncerramento from "./DialogoSelecaoDataEncerramento.vue"
+import DialogoSelecaoDataRenovacao from "./DialogoSelecaoDataRenovacao.vue"
 import DialogoSelecaoDataBaixa from "./DialogoSelecaoDataBaixa.vue"
 import DialogoSelecaoLeitoTransferencia from "./DialogoSelecaoLeitoTransferencia.vue"
+import DialogoConfirmacao from '../config/DialogoConfirmacao.vue'
 
 export default {
   name: 'HospedagemInfo',
@@ -212,7 +224,9 @@ export default {
   components: {
     DialogoSelecaoDataEncerramento,
     DialogoSelecaoDataBaixa,
-    DialogoSelecaoLeitoTransferencia
+    DialogoSelecaoDataRenovacao,
+    DialogoSelecaoLeitoTransferencia,
+    DialogoConfirmacao
   },
 
   props: {
@@ -221,6 +235,8 @@ export default {
 
   data: () =>({
     titulo : "Incluir/Alterar Destinação de Hospedagem",
+    descricaoItemExclusao : "???",
+
     tabActive : 0,
 
     hospedagemId: 0,
@@ -273,7 +289,6 @@ export default {
 
       petra.axiosPost("/app/hospedagem/mapa/hospedagem_info", dados)
         .then(response => { 
-            //console.log("RETORNOU ", response.data)
             this.hospedagem = response.data
             this.entidade = (this.hospedagem && this.hospedagem.entidade) ? this.hospedagem.entidade : null
             this.hospedes = this.hospedagem.hospedes
@@ -282,7 +297,6 @@ export default {
             this.destinacaoHospedagem = this.hospedagem.destinacaoHospedagem
           }).catch(error => {
             this.errors = petra.tratarErros(error);
-            //console.log("ERROS = ", this.errors)
           })
     },
 
@@ -307,7 +321,7 @@ export default {
           this.$emit('encerrada',hospedagemId)
           this.dialogVisible = false
         }).catch(error => {
-          //this.errors = petra.tratarErros(error);
+          this.errors = petra.tratarErros(error);
           //this.dialogVisible = false
         })
     },
@@ -334,24 +348,46 @@ export default {
           //this.$emit('baixada',hospedeId)
           //this.dialogVisible = false
         }).catch(error => {
-          //this.errors = petra.tratarErros(error);
+          this.errors = petra.tratarErros(error);
           //this.dialogVisible = false
+        })
+    },
+
+
+    // Renovação
+    showSelecionarDataRenovacao(){
+      this.$refs.dlgSelecaoDataRenovacao.openDialog(this.hospedagem.id, this.hospedagem.dataPrevistaSaida);
+    },
+
+    onSelecionarDataRenovacao(hospedagemId, dataRenovacao){
+      if (dataRenovacao != null){
+        this.renovarHospedagem(hospedagemId, dataRenovacao)
+      }
+    },
+
+    renovarHospedagem(hospedagemId, data) {
+      var dados = {
+        hospedagemId : hospedagemId,
+        data : data
+      }
+      
+      petra.axiosPost("/app/hospedagem/mapa/renovacao", dados)
+        .then(response => {
+          this.$emit('close',true)
+          this.dialogVisible = false
+        }).catch(error => {
+          this.errors = petra.tratarErros(error);
         })
     },
 
     // Transferencia
     showTransferencia(hospede, destinacaoHospedagemId){
-      //console.log(destinacaoHospedagemId, hospede.pessoa)
       this.$refs.dlgSelecaoLeitoTransferencia.openDialog(hospede, destinacaoHospedagemId);
     },
 
     onCloseTransferencia(sucesso){
-      //console.log("*************************** onCloseTransferencia")
       if (sucesso){
-        //console.log("*************************** sucesso!!!!!")
-
         this.getInfo(this.hospedagemId)
-        //this.$emit('close',true)          
       }
     },  
 
@@ -361,7 +397,22 @@ export default {
     },
 
     encerrar(evt) {
-      this.$emit('close',true)          
+      this.$emit('close',true)
+    },
+
+    deleteConfirm() {
+      this.$refs.dlgExclusao.openDialog("Deseja realmente excluir esta Hospedagem?")
+    },
+
+    onDeleteConfirmed(evt) {
+      petra.axiosDelete("/app/hospedagem/"+this.hospedagemId)
+        .then(response => {
+          petra.showMessageSuccess('Hospedagem excluída com sucesso')
+          this.$emit('close',true)
+          this.dialogVisible = false
+        })
+        .catch(error => {
+        })
     },
 
     save(evt) {

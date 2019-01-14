@@ -471,7 +471,6 @@ public class HospedagemService {
 		HospedagemFullVO retorno = new HospedagemFullVO();
 		
 		for (HospedagemTipoServico hts: h.getServicos()) {
-			System.out.println(String.format("SERVIÇO [%s]-[%s]", hts.getId(), hts.getTipoServico().getDescricao()));
 			TipoServico servico = hts.getTipoServico();
 			retorno.getServicos().add(servico);
 		}
@@ -509,7 +508,7 @@ public class HospedagemService {
 		* Condição: se hospedagem.status == aberta
 		* Condição: dataEncerramento >= hospedagem.dataEntrada
 		* hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
-		* hospedagemLeito.setDataSaída(dataEncerramento)
+		* Para cada hospedeLeito - hospedagemLeito.setDataSaída(dataEncerramento)
 		* hospedagem.setDataPrevistaSaida(dataEncerramento)
 		*/
 		Optional<Hospedagem> opt  = hospedagemRepo.findById(hospedagemId);
@@ -539,17 +538,29 @@ public class HospedagemService {
 						String.format("Data de Encerramento deve ser inferior a data Prevista de Saída (%s)",fmt.format(h.getDataPrevistaSaida()))));
 			}
 			
-			/*	
-			List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedagemId(hospedagemId);
-			for (HospedeLeito hl : listaHospedeLeito) {
-				// System.out.println("hospede.Id = " + hl.getHospede().getId() + " Id = " + hl.getId() + " dataEntrada = "+hl.getDataEntrada());
+			List<HospedeLeito> hlToSave = new ArrayList<HospedeLeito>();
+			
+			if (TipoUtilizacaoHospedagem.T.equals(h.getTipoUtilizacao())) {
+				List<Hospede> hospedes = h.getHospedes();
+				for (Hospede hpd : hospedes) {
+
+					List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedeId(hpd.getId());
+					
+					for (HospedeLeito hl : listaHospedeLeito) {
+						if (Logico.N.equals(hpd.getBaixado())) {
+							hlToSave.add(hl);
+						}
+					}
+				}
+			}
+
+			for (HospedeLeito hl : hlToSave) {
 				hl.setDataSaida(dataEncerramento);
 				hospedeLeitoRepo.save(hl);
-			}
-			
+			}	
 			h.setDataEfetivaSaida(dataEncerramento);
 			hospedagemRepo.save(h);
-			*/
+			
 		}
 	} 
 	
@@ -679,22 +690,83 @@ public class HospedagemService {
 	} 
 	
 	//TODO Implementar renovarHospedagem
-	public void renovarHospedagem(LocalDate novaDataPrevistaSaida) {
+	public void renovarHospedagem(Long hospedagemId, LocalDate dataRenovacao) {
 		/*
 		* Somente se hospedagem.status == aberta
 		* hospedagem = getHospedagem(hospedagemId)
 		* Condição: novaDataPrevistaSaida > hospedagem.dataPrevistaSaida
 		* hospedagemLeito = getUltimoHospedagemLeito(hospedagemId)
 		* Condição: Verificar se não existe hospedagemLeito em (hospedagemLeito.leito, hospedagem.dataPrevistaSaida + 1, novaDataPrevistaSaida) !!!
-		* hospedagemLeito.setDataSaída(novaDataPrevistaSaida)
+		* Para cada hospedeLeito, o último, hospedagemLeito.setDataSaída(novaDataPrevistaSaida)
 		* hospedagem.setDataPrevistaSaida(novaDataPrevistaSaida)
 		 */
+		Optional<Hospedagem> opt  = hospedagemRepo.findById(hospedagemId);
+		if (opt.isPresent()) {
+			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			
+			Hospedagem h = opt.get();
+			if ((h.getDataEfetivaSaida() != null)) {
+				throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
+			}
+	
+			if (!dataRenovacao.isAfter(h.getDataPrevistaSaida())) {
+				throw new ValidationException(new ResultError().addError("*", 
+						String.format("Data de Renovação deve ser igual ou superior a Data Prevista de Saída (%s)", fmt.format(h.getDataPrevistaSaida())) ));
+			} 
+
+			// Para cada leito (caso seja Total), verificar se ele está sendo utilizado no período (dataPrevistaSaida ~ dataRenovacao)
+			
+			List<HospedeLeito> hlToSave = new ArrayList<HospedeLeito>();
+			
+			if (TipoUtilizacaoHospedagem.T.equals(h.getTipoUtilizacao())) {
+				List<Hospede> hospedes = h.getHospedes();
+				for (Hospede hpd : hospedes) {
+
+					List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedeId(hpd.getId());
+					
+					for (HospedeLeito hl : listaHospedeLeito) {
+						if (Logico.N.equals(hpd.getBaixado())) {
+							Long leitoId = hl.getLeito().getId();
+							//System.out.println(hpd.getPessoa().getNome() + " - " + hl.getDataSaida() + " - " + hl.getQuarto().getNumero() + " - " + hl.getLeito().getNumero() +  " - Baixado? " + hpd.getBaixado());
+							
+							List<BigInteger> hospedagens = hospedagensNoPeriodo(leitoId, h.getDataPrevistaSaida().plusDays(1), dataRenovacao);
+							
+							for (BigInteger _hId : hospedagens) {
+								Long value = _hId.longValue(); 
+								if (!value.equals( hospedagemId )) {
+									Integer quartoNumero = hl.getQuarto().getNumero();
+									Integer leitoNumero = hl.getLeito().getNumero() ;
+
+									throw new ValidationException(new ResultError().addError("*", String.format("O Leito %s do Quarto %s já está em uso no período por outra Hospedagem", leitoNumero, quartoNumero)));
+								}
+							}
+							
+							hlToSave.add(hl);
+						}
+					}
+				}
+			}
+
+			for (HospedeLeito hl : hlToSave) {
+				hl.setDataSaida(dataRenovacao);
+				hospedeLeitoRepo.save(hl);
+			}	
+			h.setDataPrevistaSaida(dataRenovacao);
+			hospedagemRepo.save(h);
+		}
 		
 	}
 	
 	//TODO Implementar createNaoAtendimento
 	public void createNaoAtendimento(Long hospedagemId, LocalDate dataNaoAtendimento) {
 		
+	}
+	
+	public void excluirHospedagem(Long id) {
+		Optional<Hospedagem> opt = hospedagemRepo.findById(id);
+		if (opt.isPresent()) {
+			hospedagemRepo.delete(opt.get());
+		}
 	}
 	
 	//TODO Implementar removeNaoAtendimento
