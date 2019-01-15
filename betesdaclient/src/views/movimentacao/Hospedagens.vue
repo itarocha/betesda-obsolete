@@ -58,7 +58,7 @@
                   <v-layout row v-for="(celula, index) in dados.leitos" :key="index">
                     <v-flex sm12>
                       <div class="box p4 laranja hleito" :style="{height:calcularAlturaLeito(index)}">
-                        <center v-if="celula.quartoNumero != '9999'">#{{index}} {{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                        <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
                         <center v-if="celula.quartoNumero == '9999'">Parcial</center>
                       </div>
                     </v-flex>

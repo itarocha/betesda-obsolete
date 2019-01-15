@@ -6,11 +6,16 @@
     <v-layout row wrap>
       <v-flex xs12 sm12 md12>
         <v-btn dark small color="cyan darken-4" @click="incluir">
-            Incluir
+            {{tituloBotaoIncluir}}
+        </v-btn>
+        <v-btn dark small color="cyan darken-4" @click="gerenciarEntidades" v-if="mode=='encaminhadores'">
+            Voltar para Entidades
         </v-btn>
       </v-flex>
 
-      <v-flex xs12 sm12 md12>
+
+
+      <v-flex xs12 sm12 md12 v-if="mode == 'entidades'">
         <v-card flat class="ml-2 mr-2">
           <v-data-table :headers="headers" :items="dados" :dark="false" :persistent="true"
           :rows-per-page-items="rowsperpage" :rows-per-page-text="'Linhas por página'"
@@ -23,12 +28,19 @@
                 <td class="text-xs-left">{{ props.item.endereco.descricao }}</td>
                 <td class="text-xs-left">
                   <v-icon small class="mr-2" @click="editar(props.item)">edit</v-icon>
+                  <v-icon small class="mr-2" @click="gerenciarEncaminhadores(props.item)">fa-user</v-icon>
                   <v-icon small @click="deleteItemConfirm(props.item)">delete</v-icon>
                 </td>
             </template>
           </v-data-table>    
         </v-card>
       </v-flex>
+
+      <v-flex xs12 sm12 md12 v-if="mode == 'encaminhadores'">
+        <h1>{{form.nome}}</h1>
+      </v-flex>  
+
+
     </v-layout>
   </div>
 </template>
@@ -47,6 +59,7 @@ export default {
 
   data: () =>({
     dados: [],
+    mode: 'entidades',
 
     form : {},
 
@@ -72,8 +85,15 @@ export default {
 
   computed: {
     descricaoItemExclusao(){
-      var nome = this.form.nome ? this.form.nome : 'Não selecionado';
-      return 'Deseja realmente excluir "'+nome+'"?'
+      if (this.form!=null){
+        var nome = this.form.nome ? this.form.nome : 'Não selecionado';
+        return 'Deseja realmente excluir "'+nome+'"?'
+      }
+      return "";
+    },
+
+    tituloBotaoIncluir(){
+      return this.mode == 'entidades' ? 'Incluir Entidade' : 'Incluir Encaminhador'
     }
   },
 
@@ -92,6 +112,17 @@ export default {
     editar(item) {
       this.form = Object.assign({}, item)
       this.$refs.dlgEdit.openDialog(this.form)
+    },
+
+    gerenciarEncaminhadores(item) {
+      this.form = Object.assign({}, item)
+      this.mode='encaminhadores'
+      //this.$refs.dlgEdit.openDialog(this.form)
+    },
+
+    gerenciarEntidades() {
+      this.form = null
+      this.mode='entidades'
     },
 
     onSave(data){
