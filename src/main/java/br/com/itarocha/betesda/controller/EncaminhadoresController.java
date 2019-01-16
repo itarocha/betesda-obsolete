@@ -1,0 +1,86 @@
+package br.com.itarocha.betesda.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.com.itarocha.betesda.model.Encaminhador;
+import br.com.itarocha.betesda.service.EncaminhadorService;
+import br.com.itarocha.betesda.util.validation.ItaValidator;
+
+@RestController
+@RequestMapping("/api/app/encaminhadores")
+public class EncaminhadoresController {
+
+	@Autowired
+	private EncaminhadorService service;
+	
+	@RequestMapping(value="{id}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> getById(@PathVariable("id") Long id) {
+		try {
+			Optional<Encaminhador> model = service.find(id);
+			if (model.isPresent()) {
+				return new ResponseEntity<Encaminhador>(model.get(), HttpStatus.OK);
+			} else {
+				return new ResponseEntity<String>("não encontrado", HttpStatus.NOT_FOUND);
+			}
+		} finally {
+			//em.close();
+		}
+	}
+
+	@RequestMapping(value="/por_encaminhador/{id}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> listar(@PathVariable("id") Long entidadeId) {
+		List<Encaminhador> lista = service.findAll(entidadeId);
+		return new ResponseEntity<List<Encaminhador>>(lista, HttpStatus.OK);
+	}
+	
+	/*
+	@RequestMapping(value = "/consultar/{texto}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> consultar(@PathVariable("texto") String texto) {
+		List<Entidade> lista = service.consultar(texto);
+		return new ResponseEntity<List<Entidade>>(lista, HttpStatus.OK);
+	}
+	*/
+	
+	@RequestMapping(method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	public ResponseEntity<?> gravar(@RequestBody Encaminhador model) {
+		ItaValidator<Encaminhador> v = new ItaValidator<Encaminhador>(model);
+		v.validate();
+		if (!v.hasErrors() ) {
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		try {
+			Encaminhador saved = null;
+			saved = service.create(model);
+		    return new ResponseEntity<Encaminhador>(saved, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value = "{id}", method=RequestMethod.DELETE)
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
+		try {
+			service.remove(id);
+			return new ResponseEntity<String>("sucesso", HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	 }
+}

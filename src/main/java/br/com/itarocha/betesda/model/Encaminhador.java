@@ -2,7 +2,10 @@ package br.com.itarocha.betesda.model;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,8 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -45,13 +48,19 @@ public class Encaminhador extends UserDateAudit implements Serializable{
 	@Size(max = 16, message="Telefone não pode ter mais que 16 caracteres")
 	private String telefone;
 	
-	@Pattern(regexp="^$|[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
-	        +"[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
-	        +"(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-	             message="Email inválido")
+	@Email(message="Email inválido")
 	@Size(max = 64, message="Email deve ter no máximo 64 caracteres")
 	private String email;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(length=1)
+	@NotNull(message="Ativo é obrigatório")
+	private Logico ativo;
 
+	public Encaminhador() {
+		this.ativo = Logico.S;
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -100,5 +109,12 @@ public class Encaminhador extends UserDateAudit implements Serializable{
 		this.email = email;
 	}
 	
+	public Logico getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Logico ativo) {
+		this.ativo = ativo;
+	}
 	
 }

@@ -12,6 +12,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -22,7 +23,7 @@ import br.com.itarocha.betesda.model.audit.UserDateAudit;
 
 @Entity
 @Table(name="entidade")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "encaminhadores"})
 public class Entidade  extends UserDateAudit implements Serializable{
 	
 	private static final long serialVersionUID = 9099025388150371771L;
@@ -47,10 +48,7 @@ public class Entidade  extends UserDateAudit implements Serializable{
 	@Size(max = 16, message="Telefone não pode ter mais que 16 caracteres")
 	private String telefone;
 	
-	@Pattern(regexp="^$|[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
-	        +"[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
-	        +"(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-	             message="Email inválido")
+	@Email(message="Email inválido")
 	@Size(max = 64, message="Email deve ter no máximo 64 caracteres")
 	private String email;
 
