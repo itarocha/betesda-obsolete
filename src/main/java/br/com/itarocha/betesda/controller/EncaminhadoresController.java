@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.itarocha.betesda.controller.QuartoController.AutoWired;
 import br.com.itarocha.betesda.model.Encaminhador;
+import br.com.itarocha.betesda.model.SelectValueVO;
 import br.com.itarocha.betesda.service.EncaminhadorService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
@@ -46,15 +49,6 @@ public class EncaminhadoresController {
 		return new ResponseEntity<List<Encaminhador>>(lista, HttpStatus.OK);
 	}
 	
-	/*
-	@RequestMapping(value = "/consultar/{texto}")
-	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
-	public ResponseEntity<?> consultar(@PathVariable("texto") String texto) {
-		List<Entidade> lista = service.consultar(texto);
-		return new ResponseEntity<List<Entidade>>(lista, HttpStatus.OK);
-	}
-	*/
-	
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody Encaminhador model) {
@@ -83,4 +77,12 @@ public class EncaminhadoresController {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	 }
+	
+	@RequestMapping("/lista/{id}")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> getListaEncaminhadores(@PathVariable("id") Long entidadeId) {
+		List<SelectValueVO> lista = service.listSelect(entidadeId);
+		return new ResponseEntity<List<SelectValueVO>>(lista, HttpStatus.OK);
+	}
+	
 }

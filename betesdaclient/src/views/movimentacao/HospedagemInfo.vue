@@ -147,40 +147,55 @@
                 <!-- encaminhador -->
                 <v-tab-item>
                   <v-layout row wrap v-if="entidade != null">
+
+                    <v-flex xs8 sm8 md8>
+                      <v-text-field label="Encaminhador" readonly ref="edtNome" v-model="encaminhador.nome" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs4 sm4 md4>
+                      <v-text-field label="Cargo" readonly v-model="encaminhador.cargo" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Telefone" readonly v-model="encaminhador.telefone" hide-details></v-text-field>
+                    </v-flex>
+                    <v-flex xs12 sm6 md6>
+                      <v-text-field label="Email" readonly v-model="encaminhador.email" hide-details></v-text-field>
+                    </v-flex>
+
+
                     <v-flex xs12 sm8 md8>
-                      <v-text-field label="Nome" readonly ref="edtNome" v-model="entidade.nome"></v-text-field>
+                      <v-text-field label="Entidade" readonly v-model="entidade.nome" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field label="CNPJ" readonly v-model="entidade.cnpj" :mask="'##.###.###/####-##'" :masked="true" ></v-text-field>
+                      <v-text-field label="CNPJ" readonly v-model="entidade.cnpj" :mask="'##.###.###/####-##'" :masked="true" hide-details></v-text-field>
                     </v-flex>
 
                     <v-flex xs12 sm6 md6>
-                      <v-text-field label="Telefone" readonly v-model="entidade.telefone" ></v-text-field>
+                      <v-text-field label="Telefone" readonly v-model="entidade.telefone" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
-                      <v-text-field label="Email" readonly v-model="entidade.email"></v-text-field>
+                      <v-text-field label="Email" readonly v-model="entidade.email" hide-details></v-text-field>
                     </v-flex>
 
                     <v-flex xs12 sm6 md6 v-if="entidade.endereco">
-                      <v-text-field label="Endereço" readonly v-model="entidade.endereco.logradouro"></v-text-field>
+                      <v-text-field label="Endereço" readonly v-model="entidade.endereco.logradouro" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2 v-if="entidade.endereco">
-                      <v-text-field label="Número" readonly v-model="entidade.endereco.numero"></v-text-field>
+                      <v-text-field label="Número" readonly v-model="entidade.endereco.numero" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4 v-if="entidade.endereco">
-                      <v-text-field label="Complemento" readonly v-model="entidade.endereco.complemento"></v-text-field>
+                      <v-text-field label="Complemento" readonly v-model="entidade.endereco.complemento" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4 v-if="entidade.endereco">
-                      <v-text-field label="Bairro" readonly v-model="entidade.endereco.bairro"></v-text-field>
+                      <v-text-field label="Bairro" readonly v-model="entidade.endereco.bairro" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2 v-if="entidade.endereco">
-                      <v-text-field label="CEP" readonly v-model="entidade.endereco.cep" :mask="'#####-###'"></v-text-field>
+                      <v-text-field label="CEP" readonly v-model="entidade.endereco.cep" :mask="'#####-###'" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4 v-if="entidade.endereco">
-                      <v-text-field label="Cidade" readonly v-model="entidade.endereco.cidade"></v-text-field>
+                      <v-text-field label="Cidade" readonly v-model="entidade.endereco.cidade" hide-details></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm2 md2 v-if="entidade.endereco">
-                      <v-text-field label="UF" readonly v-model="entidade.endereco.uf"></v-text-field>
+                      <v-text-field label="UF" readonly v-model="entidade.endereco.uf" hide-details></v-text-field>
                     </v-flex>
                   </v-layout>    
                 </v-tab-item>
@@ -247,6 +262,7 @@ export default {
     servicos: [],
     hospedagem:{},
     entidade:{},
+    encaminhador:{},
     dados: [],
     errors:[],
     dialogVisible : false
@@ -291,6 +307,7 @@ export default {
         .then(response => { 
             this.hospedagem = response.data
             this.entidade = (this.hospedagem && this.hospedagem.entidade) ? this.hospedagem.entidade : null
+            this.encaminhador = (this.hospedagem && this.hospedagem.encaminhador) ? this.hospedagem.encaminhador : null
             this.hospedes = this.hospedagem.hospedes
             this.servicos = (this.hospedagem && this.hospedagem.servicos) ? this.hospedagem.servicos : []
             this.tipoHospede = this.hospedagem.hospedes[0].tipoHospede

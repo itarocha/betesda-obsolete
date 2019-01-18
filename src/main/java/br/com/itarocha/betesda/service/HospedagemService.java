@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.DestinacaoHospedagem;
+import br.com.itarocha.betesda.model.Encaminhador;
 import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.Hospedagem;
 import br.com.itarocha.betesda.model.HospedagemFullVO;
@@ -43,6 +44,7 @@ import br.com.itarocha.betesda.model.hospedagem.HospedagemMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
+import br.com.itarocha.betesda.repository.EncaminhadorRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
 import br.com.itarocha.betesda.repository.HospedagemRepository;
 import br.com.itarocha.betesda.repository.HospedagemTipoServicoRepository;
@@ -97,6 +99,9 @@ public class HospedagemService {
 	private EntidadeRepository entidadeRepo;
 	
 	@Autowired
+	private EncaminhadorRepository encaminhadorRepo;
+	
+	@Autowired
 	private HospedagemTipoServicoRepository hospedagemTipoServicoRepo;
 
 	public Hospedagem create(HospedagemVO model) throws Exception {
@@ -104,9 +109,13 @@ public class HospedagemService {
 		try {
 			hospedagem = new Hospedagem();
 			
-			Optional<Entidade> entidade = entidadeRepo.findById(model.getEntidadeId());// em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
+			Optional<Entidade> entidade = entidadeRepo.findById(model.getEntidadeId());
 			hospedagem.setEntidade(entidade.get());
 			model.setEntidade(entidade.get());
+			
+			Optional<Encaminhador> encaminhador = encaminhadorRepo.findById(model.getEncaminhadorId());
+			hospedagem.setEncaminhador(encaminhador.get());
+			model.setEncaminhador(encaminhador.get());
 			
 			hospedagem.setDataEntrada(model.getDataEntrada());
 			hospedagem.setDataPrevistaSaida(model.getDataPrevistaSaida());

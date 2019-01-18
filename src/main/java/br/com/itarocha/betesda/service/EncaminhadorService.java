@@ -64,9 +64,10 @@ public class EncaminhadorService {
 	}
 
 	//TODO Por código da entidade
-	public List<SelectValueVO> listSelect() {
+	public List<SelectValueVO> listSelect(Long entidadeId) {
 		List<SelectValueVO> retorno = new ArrayList<SelectValueVO>();
-		em.createQuery("SELECT e FROM Encaminhador e ORDER BY e.nome",Encaminhador.class)
+		em.createQuery("SELECT model FROM Encaminhador model WHERE model.entidade.id = :entidadeId AND model.ativo = 'S' ORDER BY model.nome",Encaminhador.class)
+			.setParameter("entidadeId", entidadeId)
 			.getResultList()
 			.forEach(x -> retorno.add(new SelectValueVO(x.getId(), x.getNome())));
 		return retorno;

@@ -27,8 +27,8 @@
                 <td class="text-xs-left">{{ props.item.endereco.descricao }}</td>
                 <td class="text-xs-left">
                   <v-icon small class="mr-2" @click="editarEntidade(props.item)">edit</v-icon>
-                  <v-icon small class="mr-2" @click="gerenciarEncaminhadores(props.item)">fa-user</v-icon>
-                  <v-icon small @click="deleteItemConfirm(props.item)">delete</v-icon>
+                  <v-icon small class="mr-2" @click="deleteItemConfirm(props.item)">delete</v-icon>
+                  <v-icon small color="red darken-4" @click="gerenciarEncaminhadores(props.item)">fa-user</v-icon>
                 </td>
             </template>
           </v-data-table>    

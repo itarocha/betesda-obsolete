@@ -15,6 +15,11 @@ public class HospedagemVO {
 	
 	private Entidade entidade;
 
+	@NotNull(message="Encaminhador precisa ser informado")
+	private Long encaminhadorId;
+	
+	private Encaminhador encaminhador;
+	
 	@NotNull(message="Data de Entrada precisa ser informada")
 	private LocalDate dataEntrada;
 	
@@ -55,6 +60,22 @@ public class HospedagemVO {
 
 	public void setEntidade(Entidade entidade) {
 		this.entidade = entidade;
+	}
+
+	public Long getEncaminhadorId() {
+		return encaminhadorId;
+	}
+
+	public void setEncaminhadorId(Long encaminhadorId) {
+		this.encaminhadorId = encaminhadorId;
+	}
+
+	public Encaminhador getEncaminhador() {
+		return encaminhador;
+	}
+
+	public void setEncaminhador(Encaminhador encaminhador) {
+		this.encaminhador = encaminhador;
 	}
 
 	public LocalDate getDataEntrada() {
