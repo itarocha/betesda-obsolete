@@ -20,7 +20,7 @@
         <v-card-actions class="grey lighten-4"> 
           <v-spacer></v-spacer>
           <v-btn small dark color="cyan darken-4" @click.native="save">
-            Ok
+            Gravar
           </v-btn>
           <v-btn small color="secondary" @click.native="close(false)">
             Cancelar

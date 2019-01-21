@@ -1,6 +1,6 @@
 <template>
   <div>
-    <dialogo-confirmacao ref="dlgExclusao" :mensagem="descricaoItemExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
     <tipo-leito-edit ref="dlgEdit" @save="onSave"></tipo-leito-edit>
 
     <v-layout row wrap>
@@ -60,14 +60,6 @@ export default {
     rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
   }),
 
-  computed: {
-    descricaoItemExclusao(){
-      var descricao = this.form.descricao ? this.form.descricao : 'Não selecionado';
-      return 'Deseja realmente excluir "'+descricao+'"?'
-    }
-    
-  },
-
   created(){
     this.getData()
   },
@@ -99,12 +91,11 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.form = Object.assign({}, item)
-      this.$refs.dlgExclusao.openDialog()
+      this.$refs.dlgExclusao.openDialog(this.$refs.dlgExclusao.openDialog(  `Deseja realmente excluir o tipo de leito "${item.descricao}"?` ))
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/tipo_leito/"+this.form.id)
+      petra.axiosDelete("/app/tipo_leito/"+this.form.id, false)
         .then(response => {
           petra.showMessageSuccess('Tipo de Leito excluído com sucesso')
           this.getData()

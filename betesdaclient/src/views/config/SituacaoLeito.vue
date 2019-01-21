@@ -68,14 +68,6 @@ export default {
     this.$store.dispatch('setAcao','Situações de Leitos')
   },
 
-  computed: {
-    descricaoItemExclusao(){
-      var descricao = this.form.descricao ? this.form.descricao : 'Não selecionado';
-      return 'Deseja realmente excluir "'+descricao+'"?'
-    }
-    
-  },
-
   methods: {
 
     getData(evt) {
@@ -99,8 +91,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.form = Object.assign({}, item)
-      this.$refs.dlgExclusao.openDialog()
+      this.$refs.dlgExclusao.openDialog( 'Deseja realmente excluir a situação "'+item.descricao+'"?'  )
     },
 
     onDelete(evt) {

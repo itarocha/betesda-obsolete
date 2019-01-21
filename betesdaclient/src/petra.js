@@ -57,55 +57,68 @@ export default {
       //console.log("==============> ", decode)
     },
 
-    axiosGet(endpoint){
+    axiosGet(endpoint, showPostErrors){
+      showPostErrors = showPostErrors != null ? showPostErrors : true
       this.resolveToken()
       return new Promise((resolve, reject) => {
           axios.get(`${base_uri}${endpoint}`)
           .then(response => {
             resolve(response)
           }).catch(error => {
-            if ((error.response.status >= 401) && (error.response.status < 500)){
-              this.showMessageError("Erro: "+error.response.data.message)
-            }
-            reject(error)
+
+            this.tratarRequestError(error, showPostErrors)
+
           })
       })
     },
 
-    axiosPost(endpoint, data){
+    axiosPost(endpoint, data, showPostErrors){
+      showPostErrors = showPostErrors != null ? showPostErrors : true
       this.resolveToken()
       return new Promise((resolve, reject) => {
           axios.post(base_uri+endpoint, data)
           .then(response => {
             resolve(response)
           }).catch(error => {
-            if ((error.response.status >= 401) && (error.response.status < 500)){
-              this.showMessageError("Erro: "+error.response.data.message)
-            } else if ((error.response.status == 500)){
-              if (error.response.data.errors){
-                this.showMessageError("Erro: "+error.response.data.errors[0].errorMessage)
-              } else {
-                this.showMessageError("Erro: "+error.response.data)
-              }
-            }
-            reject(error)
+
+            this.tratarRequestError(error, reject, showPostErrors)
+
           })
       })
     },
 
-    axiosDelete(endpoint){
+    axiosDelete(endpoint, showPostErrors){
+      showPostErrors = showPostErrors != null ? showPostErrors : true
       this.resolveToken()
       return new Promise((resolve, reject) => {
           axios.delete(base_uri+endpoint)
           .then(response => {
             resolve(response)
           }).catch(error => {
-            if ((error.response.status >= 401) && (error.response.status < 500)){
-              this.showMessageError("Erro: "+error.response.data.message)
-            }
-            reject(error)
+
+            this.tratarRequestError(error, reject, showPostErrors)
+
           })
       })
+    },
+
+
+    tratarRequestError(error, reject, showPostErrors){
+      if ((error.response) && (error.response.status)) {
+        if ((error.response.status >= 400) && (error.response.status < 500) && showPostErrors){
+          this.showMessageError("Erro: "+error.response.data.errors[0].errorMessage)
+        } else if ((error.response.status == 500)){
+          if (error.response.data.errors){
+            this.showMessageError("Erro: "+error.response.data.message)
+          } else {
+            this.showMessageError("Erro: "+error.response.data)
+          }
+        }
+      } else {
+        this.showMessageError(error)
+      }
+
+      reject(error)
     },
 
 

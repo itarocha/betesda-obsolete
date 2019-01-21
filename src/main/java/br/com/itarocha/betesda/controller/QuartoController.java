@@ -91,7 +91,7 @@ public class QuartoController {
 		}
 		
 		if (!v.hasErrors() ) {
-			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 	
 		// TODO tratar exceção
@@ -114,7 +114,7 @@ public class QuartoController {
 			}
 			
 			if (!v.hasErrors() ) {
-				return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 			}
 		
 			Quarto saved = null;
@@ -161,7 +161,7 @@ public class QuartoController {
 			service.remove(id);
 			return new ResponseEntity<String>("sucesso", HttpStatus.OK);
 		} catch (Exception e) {
-			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
 		}
 	 }
 

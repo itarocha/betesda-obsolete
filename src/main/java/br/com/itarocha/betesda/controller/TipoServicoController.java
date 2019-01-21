@@ -36,7 +36,7 @@ public class TipoServicoController {
 		ItaValidator<TipoServico> v = new ItaValidator<TipoServico>(model);
 		v.validate();
 		if (!v.hasErrors() ) {
-			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 		
 		try {

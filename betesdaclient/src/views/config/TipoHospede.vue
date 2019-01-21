@@ -1,6 +1,6 @@
 <template>
   <div>
-    <dialogo-confirmacao ref="dlgExclusao" :mensagem="descricaoItemExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
     <tipo-hospede-edit ref="dlgEdit" @save="onSave"></tipo-hospede-edit>
 
     <v-layout row wrap>
@@ -66,13 +66,6 @@ export default {
     rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
   }),
 
-  computed: {
-    descricaoItemExclusao(){
-      var descricao = this.form.descricao ? this.form.descricao : 'Não selecionado';
-      return 'Deseja realmente excluir "'+descricao+'"?'
-    }
-  },
-
   methods: {
     
     getData(evt) {
@@ -96,8 +89,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.form = Object.assign({}, item)
-      this.$refs.dlgExclusao.openDialog()
+      this.$refs.dlgExclusao.openDialog(  `Deseja realmente excluir o tipo de hóspede "${item.descricao}"?` )
     },
 
     onDelete(evt) {

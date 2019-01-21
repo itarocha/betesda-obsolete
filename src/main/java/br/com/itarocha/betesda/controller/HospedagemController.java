@@ -64,7 +64,7 @@ public class HospedagemController {
 		}
 		
 		if (!v.hasErrors() ) {
-			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 		
 		try {
@@ -115,7 +115,7 @@ public class HospedagemController {
 			service.baixarHospede(model.hospedeId, model.data);
 			return new ResponseEntity<String>("ok", HttpStatus.OK); 
 		} catch(ValidationException e) {
-			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	

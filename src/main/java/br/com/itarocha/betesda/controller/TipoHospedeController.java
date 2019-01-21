@@ -36,7 +36,7 @@ public class TipoHospedeController {
 		ItaValidator<TipoHospede> v = new ItaValidator<TipoHospede>(model);
 		v.validate();
 		if (!v.hasErrors() ) {
-			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 		
 		try {
@@ -58,38 +58,4 @@ public class TipoHospedeController {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	 }
-
-	/*
-    @Inject
-    private KeyGenerator keyGenerator;
-    @POST
-    @Path("/login")
-    @Consumes(APPLICATION_FORM_URLENCODED)
-    public Response authenticateUser(@FormParam("login") String login,
-                                     @FormParam("password") String password) {
-        try {
-            // Authenticate the user using the credentials provided
-            authenticate(login, password);
-            // Issue a token for the user
-            String token = issueToken(login);
-            // Return the token on the response
-            return Response.ok().header(AUTHORIZATION, "Bearer " + token).build();
-        } catch (Exception e) {
-            return Response.status(UNAUTHORIZED).build();
-        }
-    }	
-	
-
-    private String issueToken(String login) {
-        Key key = keyGenerator.generateKey();
-        String jwtToken = Jwts.builder()
-                .setSubject(login)
-                .setIssuer(uriInfo.getAbsolutePath().toString())
-                .setIssuedAt(new Date())
-                .setExpiration(toDate(LocalDateTime.now().plusMinutes(15L)))
-                .signWith(SignatureAlgorithm.HS512, key)
-                .compact();
-        return jwtToken;
-    }
-    */
 }

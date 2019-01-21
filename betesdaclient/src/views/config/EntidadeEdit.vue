@@ -54,7 +54,7 @@
         <v-card-actions class="grey lighten-4"> 
           <v-spacer></v-spacer>
           <v-btn small dark color="cyan darken-4" @click.native="save">
-            Ok
+            Gravar
           </v-btn>
           <v-btn small color="secondary" @click.native="close(false)">
             Cancelar
@@ -170,7 +170,7 @@ export default {
     save(evt) {
       this.errors = []
 
-      petra.axiosPost("/app/entidades/", this.form)
+      petra.axiosPost("/app/entidades/", this.form, false)
         .then(response => {
           this.dialogVisible = false
           this.$emit('close',true)
@@ -182,7 +182,25 @@ export default {
     },
 
     reset(evt) {
-      this.errors = [];
+      this.errors = []
+
+      this.form = {
+        id : null,
+        nome : null,
+        cnpj : null,
+        telefone : null,
+        email : null,
+        endereco : {
+          logradouro : null,
+          numero : 0,
+          complemento : null,
+          bairro : null,
+          cep : null,
+          cidade : null,
+          uf : null
+        }
+
+      }
     },
 
     getErrors(fieldName) {

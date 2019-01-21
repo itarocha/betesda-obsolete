@@ -6,13 +6,13 @@
           {{titulo}}
         </v-card-title>
         <v-card-text>
-          {{mensagem}}{{message}}
+          {{message}}
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions class="grey lighten-4"> 
           <v-spacer></v-spacer>
           <v-btn small dark color="cyan darken-4" @click.native="ok(true)">
-            Ok
+            Sim
           </v-btn>
           <v-btn small color="secondary" @click.native="cancel(false)">
             Cancelar
@@ -30,11 +30,11 @@ export default {
   
   props: {
     titulo : String,
-    mensagem : String,
   },
 
   data: () =>({
-    dialogVisible : false
+    dialogVisible : false,
+    message : null,
   }),
 
   created(){

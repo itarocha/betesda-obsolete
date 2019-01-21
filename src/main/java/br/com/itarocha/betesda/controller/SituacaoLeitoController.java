@@ -36,7 +36,7 @@ public class SituacaoLeitoController {
 		ItaValidator<SituacaoLeito> v = new ItaValidator<SituacaoLeito>(model);
 		v.validate();
 		if (!v.hasErrors() ) {
-			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 		
 		try {

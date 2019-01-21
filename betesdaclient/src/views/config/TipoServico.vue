@@ -1,6 +1,6 @@
 <template>
   <div>
-    <dialogo-confirmacao ref="dlgExclusao" :mensagem="descricaoItemExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
     <tipo-servico-edit ref="dlgEdit" @save="onSave"></tipo-servico-edit>
 
     <v-layout row wrap>
@@ -19,8 +19,14 @@
                 <td class="text-xs-left">{{ props.item.descricao }}</td>
                 <td class="text-xs-left">{{ props.item.ativo == 'S' ? 'Sim' : 'Não' }}</td>
                 <td class="text-xs-left">
-                  <v-icon small class="mr-2" @click="editar(props.item)">edit</v-icon>
-                  <v-icon small @click="deleteItemConfirm(props.item)">delete</v-icon>
+                  <v-tooltip bottom>
+                    <v-icon slot="activator" color="blue" class="mr-2" @click="editar(props.item)">edit</v-icon>
+                    <span>Editar Tipo de Serviço</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <v-icon slot="activator" color="red" @click="deleteItemConfirm(props.item)">delete</v-icon>
+                    <span>Excluir Tipo de Serviço "{{props.item.descricao}}"</span>
+                  </v-tooltip>
                 </td>
             </template>
           </v-data-table>    
@@ -68,13 +74,6 @@ export default {
     rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
   }),
 
-  computed: {
-    descricaoItemExclusao(){
-      var descricao = this.form.descricao ? this.form.descricao : 'Não selecionado';
-      return 'Deseja realmente excluir "'+descricao+'"?'
-    }
-  },
-
   methods: {
 
     getData(evt) {
@@ -98,8 +97,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.form = Object.assign({}, item)
-      this.$refs.dlgExclusao.openDialog()
+      this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir o tipo de serviço "${item.descricao}"?`)
     },
 
     onDelete(evt) {

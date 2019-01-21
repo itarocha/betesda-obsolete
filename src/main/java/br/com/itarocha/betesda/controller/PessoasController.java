@@ -59,7 +59,7 @@ public class PessoasController {
 		ItaValidator<Pessoa> v = new ItaValidator<Pessoa>(model);
 		v.validate();
 		if (!v.hasErrors() ) {
-			return new ResponseEntity<>(v.getErrors(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 		
 		try {

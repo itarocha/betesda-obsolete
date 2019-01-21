@@ -174,7 +174,7 @@
                       <v-btn icon slot="activator" @click="removerHospede(item)">
                         <v-icon>cancel</v-icon>
                       </v-btn>
-                      <span>Remover Hóspede</span>
+                      <span>Remover da Hospedagem</span>
                     </v-tooltip>
                   </v-card-actions>
                 </v-card>

@@ -26,9 +26,18 @@
                 <td class="text-xs-left">{{ props.item.telefone }}</td>
                 <td class="text-xs-left">{{ props.item.endereco.descricao }}</td>
                 <td class="text-xs-left">
-                  <v-icon small class="mr-2" @click="editarEntidade(props.item)">edit</v-icon>
-                  <v-icon small class="mr-2" @click="deleteItemConfirm(props.item)">delete</v-icon>
-                  <v-icon small color="red darken-4" @click="gerenciarEncaminhadores(props.item)">fa-user</v-icon>
+                  <v-tooltip bottom>
+                    <v-icon class="mr-2" slot="activator" color="blue" @click="editarEntidade(props.item)">edit</v-icon>
+                    <span>Editar Entidade</span>
+                  </v-tooltip>  
+                  <v-tooltip bottom>
+                    <v-icon slot="activator" color="red" class="mr-2" @click="deleteItemConfirm(props.item)">delete</v-icon>
+                    <span>Excluir</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <v-icon slot="activator" color="red darken-4" @click="gerenciarEncaminhadores(props.item)">fa-users</v-icon>
+                    <span>Gerenciar Encaminhadores</span>
+                  </v-tooltip>
                 </td>
             </template>
           </v-data-table>    
