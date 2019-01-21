@@ -57,15 +57,6 @@ export default {
     rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
   }),
 
-  computed: {
-
-    descricaoItemExclusao(){
-      var descricao = this.form.descricao ? this.form.descricao : 'Não selecionado';
-      return 'Deseja realmente excluir "'+descricao+'"?'
-    }
-    
-  },
-
   created(){
     this.getData()
   },
@@ -97,8 +88,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.form = Object.assign({}, item)
-      this.$refs.dlgExclusao.openDialog()
+      this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir a Destinação de Hospedagem "${item.descricao}"?`)
     },
 
     onDelete(evt) {

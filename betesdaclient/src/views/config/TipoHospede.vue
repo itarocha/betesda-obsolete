@@ -89,7 +89,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.$refs.dlgExclusao.openDialog(  `Deseja realmente excluir o tipo de hóspede "${item.descricao}"?` )
+      this.$refs.dlgExclusao.openDialog( `Deseja realmente excluir o tipo de hóspede "${item.descricao}"?` )
     },
 
     onDelete(evt) {

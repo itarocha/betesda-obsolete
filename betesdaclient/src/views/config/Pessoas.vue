@@ -1,6 +1,6 @@
 <template>
   <div>
-    <dialogo-confirmacao ref="dlgExclusao" :mensagem="nomeItemExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
     <pessoa-edit ref="dlgEdit" @save="onSave"></pessoa-edit>
 
     <v-layout row wrap>
@@ -100,13 +100,6 @@ export default {
     },500)
   },
 
-  computed: {
-    nomeItemExclusao(){
-      var nome = this.form.nome ? this.form.nome : 'Não selecionado';
-      return 'Deseja realmente excluir "'+nome+'"?'
-    }
-  },
-
   methods: {
     
     getData(evt) {
@@ -131,8 +124,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.form = Object.assign({}, item)
-      this.$refs.dlgExclusao.openDialog()
+      this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir "${item.nome}"?`)
     },
 
     onDelete(evt) {

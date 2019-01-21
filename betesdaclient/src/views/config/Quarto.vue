@@ -1,7 +1,7 @@
 <template>
   <div>
-    <dialogo-confirmacao ref="dlgExclusaoQuarto" :mensagem="descricaoExclusaoQuarto" titulo="Confirmação" @ok="onDeleteQuarto"></dialogo-confirmacao>
-    <dialogo-confirmacao ref="dlgExclusaoLeito" :mensagem="descricaoExclusaoLeito" titulo="Confirmação" @ok="onDeleteLeito"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusaoQuarto" titulo="Confirmação" @ok="onDeleteQuarto"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusaoLeito" titulo="Confirmação" @ok="onDeleteLeito"></dialogo-confirmacao>
     <quarto-insert ref="dlgQuartoInsert" @save="onSaveQuarto"></quarto-insert>
     <quarto-edit ref="dlgQuartoEdit" @save="onSaveQuarto"></quarto-edit>
     <quarto-leito-edit ref="dlgQuartoLeitoEdit" @save="onSaveLeito"></quarto-leito-edit>
@@ -115,8 +115,6 @@ export default {
     },
   }),
 
-  computed: {},
-
   created() {
     this.getData()
   },
@@ -216,8 +214,7 @@ export default {
 
     deleteItem(item) {
       this.formQuarto = Object.assign({}, item);
-      this.descricaoExclusaoQuarto = 'Deseja realmente excluir o Quarto "'+this.formQuarto.numero+'"?'
-      this.$refs.dlgExclusaoQuarto.openDialog()
+      this.$refs.dlgExclusaoQuarto.openDialog(`Deseja realmente excluir o Quarto "${item.numero}"?`)
     },
 
     onDeleteQuarto(evt) {
@@ -234,8 +231,7 @@ export default {
 
     deleteLeito(leito) {
       this.formLeito = Object.assign({}, leito);
-      this.descricaoExclusaoLeito = 'Deseja realmente excluir o Leito "'+this.formLeito.numero+'"?'
-      this.$refs.dlgExclusaoLeito.openDialog()
+      this.$refs.dlgExclusaoLeito.openDialog(`Deseja realmente excluir o Leito "${leito.numero}"?`)
     },
 
     onDeleteLeito(evt) {

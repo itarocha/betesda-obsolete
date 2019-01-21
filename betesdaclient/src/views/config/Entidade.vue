@@ -190,14 +190,12 @@ rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
 
     deleteItemConfirm(item) {
       this.idToDelete = item.id
-      var mensagem = 'Deseja realmente excluir "'+item.nome+'"?'
-      this.$refs.dlgExclusao.openDialog(mensagem)
+      this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir a Entidade "${item.nome}"?`)
     },
 
     deleteEncaminhadorConfirm (item) {
       this.idToDelete = item.id
-      var mensagem = 'Deseja realmente excluir "'+item.nome+'"?'
-      this.$refs.dlgExclusao.openDialog(mensagem)
+      this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir o Encaminhador "${item.nome}"?`)
     },
 
     onDelete(evt) {

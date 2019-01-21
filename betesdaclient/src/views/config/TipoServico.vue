@@ -61,6 +61,7 @@ export default {
 
   data: () =>({
     dados: [],
+    idToDelete : null,
 
     form : {},
 
@@ -97,11 +98,12 @@ export default {
     },
 
     deleteItemConfirm (item) {
+      this.idToDelete = item.id;
       this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir o tipo de serviço "${item.descricao}"?`)
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/tipo_servico/"+this.form.id)
+      petra.axiosDelete("/app/tipo_servico/"+this.idToDelete)
         .then(response => {
           petra.showMessageSuccess('Tipo de Serviço excluído com sucesso')
           this.getData()

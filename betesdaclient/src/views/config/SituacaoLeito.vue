@@ -1,6 +1,6 @@
 <template>
   <div>
-    <dialogo-confirmacao ref="dlgExclusao" :mensagem="descricaoItemExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
+    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDelete"></dialogo-confirmacao>
     <situacao-leito-edit ref="dlgEdit" @save="onSave"></situacao-leito-edit>
 
     <v-layout row wrap>
@@ -91,7 +91,7 @@ export default {
     },
 
     deleteItemConfirm (item) {
-      this.$refs.dlgExclusao.openDialog( 'Deseja realmente excluir a situação "'+item.descricao+'"?'  )
+      this.$refs.dlgExclusao.openDialog( `Deseja realmente excluir a Situação de Leito "${item.descricao}"?`  )
     },
 
     onDelete(evt) {
