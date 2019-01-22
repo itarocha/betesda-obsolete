@@ -69,6 +69,7 @@ export default {
   
   data: () =>({
     dados: [],
+    idToDelete : null,
 
     searchText : '',
 
@@ -93,7 +94,7 @@ export default {
         this.dados = []
         return
       }
-      petra.axiosGet("/app/pessoas/consultar/" +this.searchText).then(
+      petra.axiosGet("/app/pessoas/consultar/" +this.searchText, false).then(
         response => {
            this.dados = response.data
         })
@@ -103,7 +104,13 @@ export default {
   methods: {
     
     getData(evt) {
-      petra.axiosGet("/app/pessoas/consultar/" +this.searchText).then(
+
+      if (this.searchText == '') {
+        this.dados = []
+        return
+      }
+
+      petra.axiosGet("/app/pessoas/consultar/" +this.searchText, false).then(
         response => {
            this.dados = response.data
         })
@@ -124,11 +131,12 @@ export default {
     },
 
     deleteItemConfirm (item) {
+      this.idToDelete = item.id
       this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir "${item.nome}"?`)
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/pessoas/"+this.form.id)
+      petra.axiosDelete("/app/pessoas/"+this.idToDelete, false)
         .then(response => {
           petra.showMessageSuccess('Pessoa excluída com sucesso')
           this.getData()
@@ -143,7 +151,7 @@ export default {
     },
 
     onChangeText: _.debounce((evt) => {
-      petra.axiosGet("/app/pessoas/consultar/" +evt.target.value).then(
+      petra.axiosGet("/app/pessoas/consultar/" +evt.target.value, false).then(
         response => {
            this.dados = response.data
         })

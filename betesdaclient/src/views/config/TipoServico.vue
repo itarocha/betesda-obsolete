@@ -103,7 +103,7 @@ export default {
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/tipo_servico/"+this.idToDelete)
+      petra.axiosDelete("/app/tipo_servico/"+this.idToDelete, false)
         .then(response => {
           petra.showMessageSuccess('Tipo de Serviço excluído com sucesso')
           this.getData()

@@ -47,6 +47,7 @@ export default {
 
   data: () =>({
     dados: [],
+    idToDelete : null,
 
     form : {},
 
@@ -90,12 +91,13 @@ export default {
       this.getData()
     },
 
-    deleteItemConfirm (item) {
+    deleteItemConfirm(item) {
+      this.idToDelete = item.id
       this.$refs.dlgExclusao.openDialog(this.$refs.dlgExclusao.openDialog(  `Deseja realmente excluir o tipo de leito "${item.descricao}"?` ))
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/tipo_leito/"+this.form.id, false)
+      petra.axiosDelete("/app/tipo_leito/"+this.idToDelete, false)
         .then(response => {
           petra.showMessageSuccess('Tipo de Leito excluído com sucesso')
           this.getData()

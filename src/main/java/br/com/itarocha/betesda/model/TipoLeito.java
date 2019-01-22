@@ -12,10 +12,13 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import br.com.itarocha.betesda.model.audit.UserDateAudit;
 
 @Entity
 @Table(name="tipo_leito")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class TipoLeito extends UserDateAudit implements Serializable{
 
 	private static final long serialVersionUID = -732012434360084121L;

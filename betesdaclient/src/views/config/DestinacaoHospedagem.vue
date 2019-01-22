@@ -45,6 +45,7 @@ export default {
   },
   data: () =>({
     dados: [],
+    idToDelete : null,
 
     form : {},
 
@@ -68,7 +69,7 @@ export default {
   methods: {
 
     getData(evt) {
-      petra.axiosGet("/app/destinacao_hospedagem").then(
+      petra.axiosGet("/app/destinacao_hospedagem", false).then(
         response => this.dados = response.data
       )
     },
@@ -87,12 +88,13 @@ export default {
       this.getData()
     },
 
-    deleteItemConfirm (item) {
+    deleteItemConfirm(item) {
+      this.idToDelete = item.id
       this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir a Destinação de Hospedagem "${item.descricao}"?`)
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/destinacao_hospedagem/"+this.form.id)
+      petra.axiosDelete("/app/destinacao_hospedagem/"+this.idToDelete, false)
         .then(response => {
           petra.showMessageSuccess('Destinação de Hospedagem excluída com sucesso')
           this.getData()

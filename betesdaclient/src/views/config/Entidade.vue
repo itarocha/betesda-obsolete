@@ -133,7 +133,7 @@ rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
   methods: {
 
     getData(evt) {
-      petra.axiosGet("/app/entidades").then(
+      petra.axiosGet("/app/entidades", false).then(
         response => this.dados = response.data
       )
     },
@@ -166,7 +166,7 @@ rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
     },
 
     getEncaminhadores(entidadeId) {
-      petra.axiosGet("/app/encaminhadores/por_encaminhador/"+entidadeId).then(
+      petra.axiosGet("/app/encaminhadores/por_encaminhador/"+this.entidadeId, false).then(
         response => {
           this.encaminhadores = response.data
         } 
@@ -193,14 +193,14 @@ rowsperpage: [10,20,30,{"text":"Todos","value":-1}],
       this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir a Entidade "${item.nome}"?`)
     },
 
-    deleteEncaminhadorConfirm (item) {
+    deleteEncaminhadorConfirm(item) {
       this.idToDelete = item.id
       this.$refs.dlgExclusao.openDialog(`Deseja realmente excluir o Encaminhador "${item.nome}"?`)
     },
 
     onDelete(evt) {
       if (this.mode == 'entidades') {
-        petra.axiosDelete("/app/entidades/"+this.idToDelete)
+        petra.axiosDelete("/app/entidades/"+this.idToDelete, false)
           .then(response => {
             petra.showMessageSuccess('Entidade excluída com sucesso')
             this.getData()

@@ -15,12 +15,6 @@
                 <v-text-field v-model="form.descricao" label="Descrição" :error-messages="getErrors('descricao')"></v-text-field>
               </v-flex>
 
-              <!--
-              <v-flex xs12 sm6 md8>
-                <v-select v-model="form.destinacaoHospedagem" :items="itensDestinacaoHospedagem" label="Destinação Hospedagem" :error-messages="getErrors('destinacaoHospedagem')"></v-select>
-              </v-flex>
-              -->
-
               <v-flex xs12 sm12 md12>
                 <v-select
                   :items="itensDestinacaoHospedagem"
@@ -65,10 +59,6 @@
 export default {
   name: 'QuartoInsert',
   
-  props: {
-    
-  },
-
   data: () =>({
     form:{
       numero: 0,
@@ -121,7 +111,7 @@ export default {
 
     save(evt) {
       this.errors = []
-      petra.axiosPost("/app/quarto", this.form)
+      petra.axiosPost("/app/quarto", this.form, false)
         .then(response => {
           this.dialogVisible = false
           this.$emit('close',true)

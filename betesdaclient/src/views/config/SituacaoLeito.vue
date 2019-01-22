@@ -47,6 +47,7 @@ export default {
 
   data: () =>({
     dados: [],
+    idToDelete : null,
 
     form : {},
 
@@ -91,11 +92,12 @@ export default {
     },
 
     deleteItemConfirm (item) {
+      this.idToDelete = item.id
       this.$refs.dlgExclusao.openDialog( `Deseja realmente excluir a Situação de Leito "${item.descricao}"?`  )
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/situacao_leito/"+this.form.id)
+      petra.axiosDelete("/app/situacao_leito/"+this.idToDelete)
         .then(response => {
           petra.showMessageSuccess('Situação de Leito excluída com sucesso')
           this.getData()

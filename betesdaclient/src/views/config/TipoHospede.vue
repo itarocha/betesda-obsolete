@@ -54,6 +54,7 @@ export default {
   
   data: () =>({
     dados: [],
+    idToDelete : null,
 
     form : {},
 
@@ -88,12 +89,13 @@ export default {
       this.getData()
     },
 
-    deleteItemConfirm (item) {
+    deleteItemConfirm(item) {
+      this.idToDelete = item.id
       this.$refs.dlgExclusao.openDialog( `Deseja realmente excluir o tipo de hóspede "${item.descricao}"?` )
     },
 
     onDelete(evt) {
-      petra.axiosDelete("/app/tipo_hospede/"+this.form.id)
+      petra.axiosDelete("/app/tipo_hospede/"+this.idToDelete)
         .then(response => {
           petra.showMessageSuccess('Tipo de Hóspede excluído com sucesso')
           this.getData()

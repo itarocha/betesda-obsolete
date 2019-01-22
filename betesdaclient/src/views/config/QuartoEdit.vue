@@ -88,7 +88,7 @@ export default {
     loadListas(evt) {
       this.itensDestinacaoHospedagem = []
 
-      petra.axiosGet("/app/quarto/listas").then(
+      petra.axiosGet("/app/quarto/listas", false).then(
         response => {
           this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
           this.itensTipoLeito = response.data.listaTipoLeito
@@ -104,7 +104,7 @@ export default {
     save(evt) {
       this.errors = []
 
-      petra.axiosPost("/app/quarto/alterar", this.form)
+      petra.axiosPost("/app/quarto/alterar", this.form, false)
         .then(response => {
           this.dialogVisible = false
           this.$emit('close',true)

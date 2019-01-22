@@ -76,7 +76,7 @@ export default {
     save(evt) {
       this.errors = [];
 
-      petra.axiosPost("/app/tipo_leito/", this.form)
+      petra.axiosPost("/app/tipo_leito/", this.form, false)
         .then(response => {
           this.dialogVisible = false
           this.$emit('close',true)

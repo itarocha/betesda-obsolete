@@ -19,6 +19,9 @@ export default {
     
     // Converte data no formato DDMMYYYY em YYYY-MM-DD
     formatDateBrNoMaskToDb(st){
+      if (!st){
+        return null
+      }
       var pattern = /(\d{2})(\d{2})(\d{4})/;
       var retorno = st.replace(pattern,'$3-$2-$1');
       return retorno;

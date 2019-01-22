@@ -239,7 +239,7 @@ export default {
       var toSave = this.form;
       toSave.dataNascimento = petraDateTime.formatDateBrNoMaskToDb(this.dataNascimento)
 
-      petra.axiosPost("/app/pessoas", toSave)
+      petra.axiosPost("/app/pessoas", toSave, false)
         .then(response => {
             this.dialogVisible = false
             this.$emit('close',true)
