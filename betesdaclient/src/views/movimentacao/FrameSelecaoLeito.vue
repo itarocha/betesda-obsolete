@@ -39,6 +39,9 @@ export default {
     this.reset()
   },
 
+  mounted(){
+  },
+
   watch: {
     quarto(value) {
       this.$emit('selecionarQuarto',value)

@@ -66,7 +66,7 @@ export default {
             resolve(response)
           }).catch(error => {
 
-            this.tratarRequestError(error, showPostErrors)
+            this.tratarRequestError(error, reject, showPostErrors)
 
           })
       })

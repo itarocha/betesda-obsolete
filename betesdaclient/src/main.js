@@ -16,6 +16,9 @@ global.axios = axios
 import petra from './petra'
 global.petra = petra
 
+import apiBetesda from './apiBetesda'
+global.apiBetesda = apiBetesda
+
 import petraDateTime from './petra-date-time'
 import VueRouter from 'vue-router';
 global.petraDateTime = petraDateTime

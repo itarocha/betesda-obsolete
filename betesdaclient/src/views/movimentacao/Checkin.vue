@@ -6,296 +6,184 @@
         <v-btn dark small color="cyan darken-4" @click="incluirHospedagem" v-if="estado == 'vendo'">
             Incluir
         </v-btn>
-        <v-btn dark small color="cyan darken-4" @click="resetHospedagem" v-if="estado != 'vendo'">
+        <v-btn dark small color="cyan darken-4" @click="resetHospedagem" v-if="estado == 'incluindo'">
             Limpar
         </v-btn>
-        <v-btn dark small color="cyan darken-4" @click="gravarHospedagem" v-if="estado != 'vendo'">
+        <v-btn dark small color="cyan darken-4" @click="gravarHospedagem" v-if="estado == 'incluindo'">
             Lançar Hospedagem
+        </v-btn>
+        <v-btn small color="yellow" @click.stop="testarFrameHospedagem">
+            Testar Frame Hospedagem
         </v-btn>
       </v-flex>
     </v-layout>
 
-    <v-container fluid grid-list-lg v-if="dialogIncluirHospedagem">
+    <v-layout row wrap class="ml-2 mr-2" v-if="estado == 'incluindo'">
+      <v-flex xs12 sm12 md12 v-if="errors">
+        <v-alert :value="true" type="error" v-for="(item, i)  in errors" :key="i">
+          {{item.errorMessage}}
+        </v-alert>
+      </v-flex>
 
-        <v-layout row wrap class="ml-2 mr-2">
-            <v-flex xs12 sm12 md12 v-if="errors">
-              <v-alert :value="true" type="error" v-for="(item, i)  in errors" :key="i">
-                {{item.errorMessage}}
-              </v-alert>
-          </v-flex>
+      <v-flex xs6 sm6 md6>
+        <dialogo-selecao-pessoa ref="dlgSelecaoPessoa" @selecionar="onSelecionarPessoa" @close="onCloseSelecionarPessoa"></dialogo-selecao-pessoa>
+        <dialogo-selecao-leito ref="dlgSelecaoLeito" @close="onSelecionarLeito"></dialogo-selecao-leito>
+        <pessoa-edit ref="dlgPessoaEdit" @save="onUpdatePessoa"></pessoa-edit>
+        <dialogo-selecao-tipo-hospede ref="dlgSelTipoHospede" :valores="itensSelecaoTipoHospede" @close="onCloseSelecaoTipoHospede"></dialogo-selecao-tipo-hospede>
 
-          <v-flex xs6 sm6 md6>
-            <dialogo-selecao-pessoa ref="dlgSelecaoPessoa" @selecionar="onSelecionarPessoa" @close="onCloseSelecionarPessoa"></dialogo-selecao-pessoa>
-            <dialogo-selecao-leito ref="dlgSelecaoLeito" @close="onSelecionarLeito"></dialogo-selecao-leito>
-            <pessoa-edit ref="dlgPessoaEdit" @save="onUpdatePessoa"></pessoa-edit>
-            <dialogo-selecao-tipo-hospede ref="dlgSelTipoHospede" :valores="itensSelecaoTipoHospede" @close="onCloseSelecaoTipoHospede"></dialogo-selecao-tipo-hospede>
+        <v-card class="elevation-0 pr-2">
+          <v-toolbar card height="45px" class="grey lighten-2">Opções</v-toolbar> 
 
-            <v-card class="elevation-0">
-              <v-toolbar card height="45px" class="grey lighten-2">
-                Opções
-              </v-toolbar> 
-
-              <!-- EXPLODE -->
-              <v-card-text >
-                  <v-layout wrap>
-                    <v-flex xs12 sm12 md12>
-                      <v-select label="Entidade" ref="edtEntidadeId" :items="itensEntidades" v-model="formOpcoes.entidadeId" hide-details></v-select>
-                    </v-flex>
-
-                    <v-flex xs12 sm12 md12>
-                      <v-select label="Encaminhador" :items="itensEncaminhadores" v-model="formOpcoes.encaminhadorId" hide-details></v-select>
-                    </v-flex>
-
-                    <v-flex xs12 sm6 md6>
-                      <v-menu
-                          ref="menu1"
-                          :close-on-content-click="false"
-                          v-model="menu1"
-                          :nudge-right="40"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          max-width="290px"
-                          min-width="290px"
-                        >
-                          <v-text-field
-                            slot="activator"
-                            ref="edtDataEntrada"
-                            v-model="formOpcoes.dataEntradaFmt"
-                            label="Data de Entrada"
-                            persistent-hint
-                            prepend-icon="event"
-                            v-mask="'##/##/####'"
-                            @blur="dataEntradaBlur"
-                            hide-details
-                          ></v-text-field>
-                          <v-date-picker v-model="dataEntrada" locale="pt-br" no-title @input="menu1 = false"></v-date-picker>
-                      </v-menu>
-                    </v-flex>
-
-                    <v-flex xs12 sm6 md6>
-                      <v-menu
-                          ref="menu2"
-                          :close-on-content-click="false"
-                          v-model="menu2"
-                          :nudge-right="40"
-                          lazy
-                          transition="scale-transition"
-                          offset-y
-                          full-width
-                          max-width="290px"
-                          min-width="290px">
-                          <v-text-field
-                            slot="activator"
-                            ref="edtDataPrevistaSaida"
-                            v-model="formOpcoes.dataPrevistaSaidaFmt"
-                            label="Data Prevista de Saída"
-                            persistent-hint
-                            prepend-icon="event"
-                            v-mask="'##/##/####'"
-                            @blur="dataPrevistaSaidaBlur"
-                            hide-details>
-                          </v-text-field>
-                          <v-date-picker v-model="dataPrevistaSaida" locale="pt-br" no-title @input="menu2 = false"></v-date-picker>
-                        </v-menu>
-                    </v-flex>
-
-                    <v-flex xs12 sm6 md6>
-                      <v-select label="Destinação de Hospedagem" :items="itensDestinacaoHospedagem" v-model="formOpcoes.destinacaoHospedagem" hide-details></v-select>
-                    </v-flex>
-
-                    <v-flex xs12 sm6 md6>
-                      <v-select label="Tipo de Utilização" :items="itensUtilizacao" v-model="formOpcoes.tipoUtilizacao" hide-details></v-select>
-                    </v-flex>
-
-                    <v-flex xs12 sm12 md12 v-if="(formOpcoes.tipoUtilizacao == 'P')" >
-                      <v-select
-                        :items="itensTipoServico"
-                        label="Serviços"
-                        multiple
-                        chips
-                        v-model="formOpcoes.servicos"
-                      ></v-select>
-                    </v-flex>
-
-                  </v-layout>
-              </v-card-text>
-            </v-card>
-          </v-flex>
-
-          <v-flex xs6 sm6 md6>
-            <v-card class="elevation-0">
-              <v-toolbar card height="45px" class="grey lighten-2">
-                Hóspedes
-                <v-spacer></v-spacer>
-                <v-btn dark small color="cyan darken-4" @click="adicionarPessoa"  v-if="estado != 'vendo'">
-                  Incluir Hóspede
-                </v-btn>
-              </v-toolbar>
-
-              <v-flex xs12 sm12 md12 v-for="(item, i)  in hospedes" :key="i">
-                <v-card color="amber lighten-4">
-                  <v-card-title primary-title>
-                    <div>
-                      <h3>{{item.pessoa.nome}}</h3>
-                      <div class="body-1">{{item.tipoHospede.descricao}}</div>
-                      <h4 v-if="item.acomodacao != null">Quarto: {{item.acomodacao.quarto.numero}} Leito: {{item.acomodacao.leito.numero}}</h4>
-                      <div v-if="(formOpcoes.tipoUtilizacao == 'T') && (item.acomodacao == null)" class="red lighten-4">Selecione o Leito</div> 
-                    </div>
-                  </v-card-title>
-
-                  <v-divider light></v-divider>
-                  <v-card-actions class="grey lighten-4">
-                    <v-spacer></v-spacer>
-    
-                    <v-tooltip bottom>
-                      <v-btn icon slot="activator" @click="editarHospede(item)" >
-                        <v-icon>edit</v-icon>
-                      </v-btn>
-                      <span>Conferir/Editar dados do Hóspede</span>
-                    </v-tooltip>
-
-                    <v-tooltip bottom >
-                      <v-btn icon slot="activator" @click="selecionarTipoHospede(item)" >
-                        <v-icon>fa-users</v-icon>
-                      </v-btn>
-                      <span>Alterar Tipo de Hóspede</span>
-                    </v-tooltip>
-
-                    <v-tooltip bottom v-if="formOpcoes.tipoUtilizacao == 'T'">
-                      <v-btn icon slot="activator" @click="selecionarLeito(item)" >
-                        <v-icon>fa-bed</v-icon>
-                      </v-btn>
-                      <span>Selecionar Leito</span>
-                    </v-tooltip>
-
-                    <v-tooltip bottom>
-                      <v-btn icon slot="activator" @click="removerHospede(item)">
-                        <v-icon>cancel</v-icon>
-                      </v-btn>
-                      <span>Remover da Hospedagem</span>
-                    </v-tooltip>
-                  </v-card-actions>
-                </v-card>
+          <v-card-text >
+            <v-layout wrap>
+              <v-flex xs12 sm12 md12>
+                <v-select label="Entidade" ref="edtEntidadeId" :items="itensEntidades" v-model="formOpcoes.entidadeId" hide-details></v-select>
               </v-flex>
 
+              <v-flex xs12 sm12 md12>
+                <v-select label="Encaminhador" :items="itensEncaminhadores" v-model="formOpcoes.encaminhadorId" hide-details></v-select>
+              </v-flex>
+
+              <v-flex xs12 sm6 md6>
+                <v-menu
+                    ref="menu1"
+                    :close-on-content-click="false"
+                    v-model="menu1"
+                    :nudge-right="40"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <v-text-field
+                      slot="activator"
+                      ref="edtDataEntrada"
+                      v-model="formOpcoes.dataEntradaFmt"
+                      label="Data de Entrada"
+                      persistent-hint
+                      prepend-icon="event"
+                      v-mask="'##/##/####'"
+                      @blur="dataEntradaBlur"
+                      hide-details
+                    ></v-text-field>
+                    <v-date-picker v-model="dataEntrada" locale="pt-br" no-title @input="menu1 = false"></v-date-picker>
+                </v-menu>
+              </v-flex>
+
+              <v-flex xs12 sm6 md6>
+                <v-menu
+                    ref="menu2"
+                    :close-on-content-click="false"
+                    v-model="menu2"
+                    :nudge-right="40"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px">
+                    <v-text-field
+                      slot="activator"
+                      ref="edtDataPrevistaSaida"
+                      v-model="formOpcoes.dataPrevistaSaidaFmt"
+                      label="Data Prevista de Saída"
+                      persistent-hint
+                      prepend-icon="event"
+                      v-mask="'##/##/####'"
+                      @blur="dataPrevistaSaidaBlur"
+                      hide-details>
+                    </v-text-field>
+                    <v-date-picker v-model="dataPrevistaSaida" locale="pt-br" no-title @input="menu2 = false"></v-date-picker>
+                  </v-menu>
+              </v-flex>
+
+              <v-flex xs12 sm6 md6>
+                <v-select label="Destinação de Hospedagem" :items="itensDestinacaoHospedagem" v-model="formOpcoes.destinacaoHospedagem" hide-details></v-select>
+              </v-flex>
+
+              <v-flex xs12 sm6 md6>
+                <v-select label="Tipo de Utilização" :items="itensUtilizacao" v-model="formOpcoes.tipoUtilizacao" hide-details></v-select>
+              </v-flex>
+
+              <v-flex xs12 sm12 md12 v-if="(formOpcoes.tipoUtilizacao == 'P')" >
+                <v-select :items="itensTipoServico" label="Serviços" multiple chipsv-model="formOpcoes.servicos"></v-select>
+              </v-flex>
+
+            </v-layout>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+
+      <v-flex xs6 sm6 md6>
+        <v-card class="elevation-0">
+          <v-toolbar card height="45px" class="grey lighten-2">
+            Hóspedes
+            <v-spacer></v-spacer>
+            <v-btn dark small color="cyan darken-4" @click="adicionarPessoa">
+              Incluir Hóspede
+            </v-btn>
+          </v-toolbar>
+
+          <v-flex xs12 sm12 md12 v-for="(item, i)  in hospedes" :key="i">
+            <v-card color="amber lighten-4">
+              <v-card-title primary-title>
+                <div>
+                  <h3>{{item.pessoa.nome}}</h3>
+                  <div class="body-1">{{item.tipoHospede.descricao}}</div>
+                  <h4 v-if="item.acomodacao != null">Quarto: {{item.acomodacao.quarto.numero}} Leito: {{item.acomodacao.leito.numero}}</h4>
+                  <div v-if="(formOpcoes.tipoUtilizacao == 'T') && (item.acomodacao == null)" class="red lighten-4">Selecione o Leito</div> 
+                </div>
+              </v-card-title>
+
+              <v-divider light></v-divider>
+              <v-card-actions class="grey lighten-4">
+                <v-spacer></v-spacer>
+
+                <v-tooltip bottom>
+                  <v-btn icon slot="activator" @click="editarHospede(item)" >
+                    <v-icon>edit</v-icon>
+                  </v-btn>
+                  <span>Conferir/Editar dados do Hóspede</span>
+                </v-tooltip>
+
+                <v-tooltip bottom >
+                  <v-btn icon slot="activator" @click="selecionarTipoHospede(item)" >
+                    <v-icon>fa-users</v-icon>
+                  </v-btn>
+                  <span>Alterar Tipo de Hóspede</span>
+                </v-tooltip>
+
+                <v-tooltip bottom v-if="formOpcoes.tipoUtilizacao == 'T'">
+                  <v-btn icon slot="activator" @click="selecionarLeito(item)" >
+                    <v-icon>fa-bed</v-icon>
+                  </v-btn>
+                  <span>Selecionar Leito</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <v-btn icon slot="activator" @click="removerHospede(item)">
+                    <v-icon>cancel</v-icon>
+                  </v-btn>
+                  <span>Remover da Hospedagem</span>
+                </v-tooltip>
+              </v-card-actions>
             </v-card>
           </v-flex>
-        </v-layout>
-    </v-container>
+        </v-card>
+      </v-flex>
+    </v-layout>
 
-    <div v-if="(!dialogIncluirHospedagem) && (hospedagemGravada.id > 0)">
-      <v-container grid-list-md>
-          <v-layout row wrap>
-            <v-flex xs12 sm2 md6 class="title">
-              Hospedagem Gravada com sucesso! Id=#{{hospedagemGravada.id}}
-            </v-flex>
-              
-            <v-flex xs12 xm12 md12>
-                <v-tabs v-model="tabActive" slider-color="cyan darken-2" fixed-tabs>
-                  <v-tab>Hospedagem</v-tab>
-                  <v-tab>Hóspede(s)</v-tab>
-                  <v-tab>Encaminhador</v-tab>
-
-                  <v-tab-item>
-                    <v-layout justify-space-between row wrap fill-height>
-                      <v-flex  xs12 sm12 md12><div style="height:50px;"></div></v-flex>
-
-                      <v-flex  xs12 sm2 md4 offset-md2>
-                        Data de Entrada:
-                      </v-flex>
-                      <v-flex xs12 sm2 md6 class="title">
-                        {{dma(hospedagemGravada.dataEntrada)}}
-                      </v-flex>
-
-                      <v-flex xs12 sm2 md4 offset-md2>
-                        Data Prevista de Saída:
-                      </v-flex>
-                      <v-flex md6 class="title">
-                        {{dma(hospedagemGravada.dataPrevistaSaida)}}
-                      </v-flex>
-
-
-                      <v-flex xs12 sm2 md4 offset-md2>
-                        Data de Saída:
-                      </v-flex>
-                      <v-flex xs12 sm2 md6 class="title">
-                        {{dma(hospedagemGravada.dataEfetivaSaida)}}
-                      </v-flex>
-
-                      <v-flex xs12 sm2 md4 offset-md2>
-                        Destinação de Hospedagem:
-                      </v-flex>
-                      <v-flex xs12 sm2 md6 class="title">
-                        {{hospedagemGravada.destinacaoHospedagemDescricao}}
-                      </v-flex>
-
-                      <v-flex xs12 sm2 md4 offset-md2>
-                        Tipo de Utilização:
-                      </v-flex>
-                      <v-flex xs12 sm2 md6 class="title">
-                        {{traduzTipoUtilizacao(hospedagemGravada.tipoUtilizacao)}}
-                      </v-flex>
-                      <!--                      
-                      <v-flex xs12 sm2 md4 offset-md2>
-                        Situação:
-                      </v-flex>
-                      <v-flex xs12 sm2 md6 class="text-uppercase title">
-                        {{hospedagemGravada.status}}
-                      </v-flex>
-                      -->
-
-                    </v-layout>
-                  </v-tab-item>
-
-                  <v-tab-item>
-
-                      <v-expansion-panel>
-                        <v-expansion-panel-content v-for="(hpd, i) in hospedagemGravada.hospedes" :key="i" expand>
-                          <div slot="header"><span class="text-uppercase title">{{hpd.pessoaNome}}</span> - {{hpd.tipoHospedeDescricao}}</div>  
-                          <v-card>
-                            <v-card-text class="grey lighten-3">
-                            <v-layout row wrap>
-                              <v-flex xs12 sm2 md2>
-                                <span class="caption">Nascimento:</span>
-                              </v-flex>
-                              <v-flex xs12 sm10 md10>
-                                {{dma(hpd.pessoaDataNascimento)}}
-                              </v-flex>
-                              <!--
-                              <v-flex xs12 sm2 md2 class="caption">
-                                Endereço:
-                              </v-flex>
-                              <v-flex xs12 sm2 md10>
-                                {{hpd.pessoa.endereco.descricao}}
-                              </v-flex>
-                              <v-flex xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
-                                <v-list>
-                                  <v-list-tile v-for="leito in hpd.leitos" :key="leito.id">
-                                    <v-list-tile-content>
-                                      {{dma(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
-                                    </v-list-tile-content>
-                                  </v-list-tile>
-                                </v-list>
-                              </v-flex>  
-                              -->
-                            </v-layout>
-                            </v-card-text>
-                          </v-card>
-                        </v-expansion-panel-content>
-                      </v-expansion-panel>
-
-                  </v-tab-item>
-
-                  <v-tab-item>
-                  </v-tab-item>
-                </v-tabs>
-
-            </v-flex>
-          </v-layout>
-      </v-container>
-    </div>        
+    <v-layout row wrap v-if="estado == 'vendo'" class="ml-2 mr-2">
+      <v-flex xs12 sm2 md6 class="title">
+        Hospedagem Gravada com sucesso! Id=#{{hospedagemGravadaId}}
+      </v-flex>
+        
+      <v-flex xs12 xm12 md12>
+        <frame-hospedagem ref="frameHospedagem"></frame-hospedagem>
+      </v-flex>
+    </v-layout>
 
 
   </div>
@@ -307,6 +195,7 @@ import DialogoSelecaoPessoa from "./DialogoSelecaoPessoa.vue"
 import DialogoSelecaoLeito from "./DialogoSelecaoLeito.vue"
 import DialogoSelecaoTipoHospede from "./DialogoSelecaoTipoHospede.vue"
 import PessoaEdit from "../config/PessoaEdit.vue"
+import FrameHospedagem from "./FrameHospedagem.vue"
 import {mask} from "vue-the-mask"
 
 var moment = require('moment')
@@ -324,12 +213,12 @@ export default {
     DialogoSelecaoPessoa,
     DialogoSelecaoLeito,
     DialogoSelecaoTipoHospede,
-    PessoaEdit
+    PessoaEdit,
+    FrameHospedagem
   },
 
   data: () =>({
     estado : 'incluindo', 
-    dialogIncluirHospedagem : true,
     show : true,
     hospedeSelecionado : null,
     dados: [],
@@ -357,7 +246,8 @@ export default {
     itensUtilizacao: [{ text: "Total", value: "T" }, { text: "Parcial", value: "P" }],
 
     tabActive : null,
-    hospedagemGravada : {},
+    hospedagemGravadaId : 0,
+    xhospedagem : null,
 
     menu1: false,
     menu2: false,    
@@ -402,7 +292,7 @@ export default {
     },
 
     entidadeId(newValue, oldValue){
-      console.log(`mudou de ${oldValue} para ${newValue}`)
+      //console.logconsole.log(`mudou de ${oldValue} para ${newValue}`)
       if (newValue == null){
         this.itensEncaminhadores = []
       } else {
@@ -439,6 +329,19 @@ export default {
   },
 
   methods: {
+    testarFrameHospedagem(){
+      this.showHospedagemGravada(36)  
+    },
+
+    showHospedagemGravada(hospedagemId){
+      this.hospedagemGravadaId = hospedagemId
+      this.estado = 'vendo'
+
+      this.$nextTick(() =>{
+        this.$refs.frameHospedagem.open(hospedagemId)
+      })
+    },
+
     reset(){
       this.formOpcoes = {
         entidadeId: null,
@@ -453,13 +356,13 @@ export default {
       },
       this.hospedes = []
       this.errors = []
-      this.hospedagemGravada = {}
+      this.hospedagemGravadaId = 0
       this.itensEncaminhadores = []
       this.itensEntidades = []
     },
 
     focus(){
-      if (this.dialogIncluirHospedagem) {
+      if (this.estado = 'incluindo') {
         setTimeout(() => {
           this.$refs.edtEntidadeId.focus()
         }, 500)
@@ -468,7 +371,7 @@ export default {
 
     loadListas() {
       this.itensDestinacaoHospedagem = [];
-      petra.axiosGet("/app/quarto/listas").then(
+      petra.axiosGet("/app/quarto/listas",false).then(
         response => {
           this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
           this.itensTipoLeito = response.data.listaTipoLeito
@@ -482,7 +385,7 @@ export default {
     loadEncaminhadores(id) {
       this.itensEncaminhadores = [];
       var endpoint = "/app/encaminhadores/lista/"+id
-      console.log(endpoint)
+      //console.log(endpoint)
       petra.axiosGet("/app/encaminhadores/lista/"+id).then(
         response => {
           this.itensEncaminhadores = response.data
@@ -521,12 +424,10 @@ export default {
     },    
 
     incluirHospedagem() {
-      this.dialogIncluirHospedagem = true
       this.estado = 'incluindo'
     },
 
     resetHospedagem() {
-      this.dialogIncluirHospedagem = true
       this.estado = 'incluindo'
       this.reset()
     },
@@ -537,9 +438,6 @@ export default {
        setTimeout(() => {
           this.errors = []
         }, 20000)
-
-      //this.dialogIncluirHospedagem = false
-      //this.estado = 'vendo'
     },
 
     postarHospedagem() {
@@ -581,7 +479,7 @@ export default {
         .then(response => {
             this.errors = []
             this.resetHospedagem()
-            this.showHospedagemGravada(response.data)
+            this.showHospedagemGravada(response.data.id)
         })
         .catch(error => {
           this.errors = petra.tratarErros(error)
@@ -592,11 +490,6 @@ export default {
         if (error.response) {
           return error.response.data.errors
         }
-    },
-
-    showHospedagemGravada(dados) {
-      this.dialogIncluirHospedagem = false
-      this.hospedagemGravada = dados
     },
 
     rerender(){

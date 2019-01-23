@@ -392,7 +392,7 @@ export default {
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
-            console.log("getData() ",this.dados)
+            //console.log("getData() ",this.dados)
             this.pessoas = response.data.hospedagens
             //console.log(this.pessoas)
             this.showEstatisticas()
