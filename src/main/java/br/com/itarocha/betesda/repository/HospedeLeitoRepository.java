@@ -67,4 +67,10 @@ public interface HospedeLeitoRepository extends JpaRepository<HospedeLeito, Long
 	"WHERE      h.hospedagem_id = :hospedagemId ",nativeQuery = true)	
 	LocalDate ultimaDataEntradaByHospedagemId(@Param("hospedagemId") Long hospedagemId);
 	
+	
+	@Query(value = 	"SELECT     DISTINCT hl.leito_id "+
+					"FROM       hospede_leito hl "+
+					"WHERE      (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim)) "+
+					"OR          ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim))) ",nativeQuery = true)
+	List<Long> leitosNoPeriodo(@Param("dataIni") LocalDate dataIni, @Param("dataFim") LocalDate dataFim);
 }

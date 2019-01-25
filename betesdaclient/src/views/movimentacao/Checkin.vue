@@ -12,9 +12,11 @@
         <v-btn dark small color="cyan darken-4" @click="gravarHospedagem" v-if="estado == 'incluindo'">
             Lançar Hospedagem
         </v-btn>
+        <!--
         <v-btn small color="yellow" @click.stop="testarFrameHospedagem">
             Testar Frame Hospedagem
         </v-btn>
+        -->
       </v-flex>
     </v-layout>
 
@@ -118,7 +120,7 @@
 
       <v-flex xs6 sm6 md6>
         <v-card class="elevation-0">
-          <v-toolbar card height="45px" class="grey lighten-2">
+          <v-toolbar card height="45px" class="grey lighten-2 mb-2">
             Hóspedes
             <v-spacer></v-spacer>
             <v-btn dark small color="cyan darken-4" @click="adicionarPessoa">
@@ -127,7 +129,7 @@
           </v-toolbar>
 
           <v-flex xs12 sm12 md12 v-for="(item, i)  in hospedes" :key="i">
-            <v-card color="amber lighten-4">
+            <v-card color="amber lighten-4 mb-2">
               <v-card-title primary-title>
                 <div>
                   <h3>{{item.pessoa.nome}}</h3>
@@ -329,9 +331,11 @@ export default {
   },
 
   methods: {
+    /*
     testarFrameHospedagem(){
       this.showHospedagemGravada(36)  
     },
+    */
 
     showHospedagemGravada(hospedagemId){
       this.hospedagemGravadaId = hospedagemId
@@ -487,9 +491,9 @@ export default {
     },
 
     tratarErros(error){
-        if (error.response) {
-          return error.response.data.errors
-        }
+      if (error.response) {
+        return error.response.data.errors
+      }
     },
 
     rerender(){
@@ -512,7 +516,7 @@ export default {
 
     selecionarLeito(hospede) {
       this.selecionarAcomodacao(hospede)
-      this.$refs.dlgSelecaoLeito.openDialog(hospede, this.formOpcoes.destinacaoHospedagem)
+      this.$refs.dlgSelecaoLeito.openDialog(hospede, this.formOpcoes.destinacaoHospedagem, this.dataEntrada, this.dataPrevistaSaida)
     },
 
     selecionarTipoHospede(hospede) {

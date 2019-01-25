@@ -5,11 +5,11 @@
         <v-select v-model="quarto" :items="itensQuarto" item-text="displayText" item-value="id" label="Quarto" required></v-select>
       </v-flex>
       <v-flex xs12 sm12 md12 v-if="quarto != null">
-        <p style="color:'red'">Clique sobre a representação do leito para selecionar...</p>
+        <p style="color:'red'">Clique sobre a representação do leito para selecionar...{{dataIni}} - {{dataFim}}</p>
       </v-flex>
 
       <v-flex xs3 v-for="(leito, i) in leitos" :key="i">
-        <v-card v-bind:class="{'amber lighten-4':leitoSelecionado(leito), 'grey lighten-4':!leitoSelecionado(leito), 'ma-1':true}" @click.native="selecionarLeito(leito)">
+        <v-card :class="classeSituacaoLeito(leito)" @click.native="selecionarLeito(leito)">
           <v-card-text class="text-sm">
             <h3>{{leito.numero}}</h3>
             <div class="caption">{{leito.tipoLeito.descricao}}</div>
@@ -25,6 +25,9 @@
 
 export default {
   name: "FrameSelecaoLeito",
+  
+  dataIni : null,
+  dataFim : null,
 
   data: () =>({
     nomeHospede : "",
@@ -33,6 +36,7 @@ export default {
     leito: null,
     leitos : [],
     quartos : [],
+    leitosOcupados : []
   }),
 
   created(){
@@ -45,15 +49,9 @@ export default {
   watch: {
     quarto(value) {
       this.$emit('selecionarQuarto',value)
-      var leitos = []
       this.leito = null
-      for(var i=0; i < this.quartos.length; i++){
-        if (this.quartos[i].id == value){
-          leitos = this.quartos[i].leitos
-          break
-        }
-      }
-      this.leitos = leitos
+
+      this.refreshLeitos(value)
     }
   },
 
@@ -68,20 +66,72 @@ export default {
   },
 
   methods: {
-    openDialog(hospede, destinacaoHospedagemId){
+    openDialog(hospede, destinacaoHospedagemId, dataIni, dataFim){
       this.reset()
-      this.loadQuartosPorTipoUtilizacao(destinacaoHospedagemId)
+
+      var hoje = petraDateTime.hoje()
+      this.dataIni = dataIni || hoje
+      this.dataFim = dataFim || hoje
+
+      this.loadLeitosOcupados(() =>{
+        this.loadQuartosPorTipoUtilizacao(destinacaoHospedagemId)
+      })
+
       this.hospede = hospede
       this.nomeHospede = hospede.pessoa.nome
     },
 
-    leitoSelecionado(leito){
-      return this.leito && leito.id == this.leito.id
+    loadQuartosPorTipoUtilizacao(destinacaoHospedagemId){
+      this.quartos = [];
+      if (destinacaoHospedagemId != null){
+        petra.axiosGet("/app/quarto/por_destinacao_hospedagem/"+destinacaoHospedagemId)
+          .then(response => {
+            this.quartos = response.data
+
+            if (this.quartos.length > 0){
+              this.quarto = this.quartos[0].id
+              this.refreshLeitos(this.quarto.id)
+            }
+
+          })
+      }
+    },
+
+    refreshLeitos(quartoId){
+      var leitos = []
+      for(var i=0; i < this.quartos.length; i++){
+        if (this.quartos[i].id == quartoId){
+          leitos = this.quartos[i].leitos
+          break
+        }
+      }
+      this.leitos = leitos
+    },
+
+    leitoSelecionado(id){
+      return this.leito && id == this.leito.id
+    },
+
+    classeSituacaoLeito(leito){
+      var id = leito ? leito.id : -1
+
+      var leitoSelecionado = this.leitoSelecionado(id)
+      var leitoOcupado = this.isLeitoOcupado(id)
+      return leitoSelecionado ? "amber lighten-4 ma-1" : leitoOcupado ? "red lighten-2 ma-1" : "grey lighten-4 ma-1"
+    },
+
+    isLeitoOcupado(id){
+      return (this.leitosOcupados.indexOf(id) >= 0);
     },
 
     selecionarLeito(leito){
-      this.leito = leito
-      this.$emit('selecionarLeito',leito)
+      if (this.isLeitoOcupado(leito.id)){
+        // mensagem
+      } else {
+        this.leito = leito
+        this.$emit('selecionarLeito',leito)
+      }
+
     },
 
     // publico
@@ -101,14 +151,19 @@ export default {
       return null
     },
 
-    loadQuartosPorTipoUtilizacao(destinacaoHospedagemId){
-      this.quartos = [];
-      if (destinacaoHospedagemId != null){
-        petra.axiosGet("/app/quarto/por_destinacao_hospedagem/"+destinacaoHospedagemId)
-          .then(response => {
-            this.quartos = response.data
-          })
+    loadLeitosOcupados(callback, reject) {
+
+      var request = {
+        dataIni : this.dataIni,
+        dataFim : this.dataFim
       }
+
+      this.leitosOcupados = []
+      petra.axiosPost("/app/hospedagem/leitos_ocupados", request).then(
+        response => {
+          this.leitosOcupados = response.data
+          callback(response)
+        })
     },
 
     reset(){

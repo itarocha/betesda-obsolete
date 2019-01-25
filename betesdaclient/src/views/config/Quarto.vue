@@ -36,18 +36,40 @@
               <v-container fluid grid-list-lg>
                 <v-layout row wrap>
                   <v-flex xs3 v-for="(leito, i)  in dados[index].leitos" :key="i" >
-                    <v-card color="amber lighten-4">
-                      <h2 class="headline ml-2 mt-2">{{leito.numero}}</h2>  
+                    <v-card :class="classeSituacaoLeito(leito.id)">
+                      <h2 class="headline ml-2 mt-0">{{leito.numero}}</h2>  
                       <v-card-text class="body-1 mb-0">
                         <div>{{leito.tipoLeito.descricao}} - {{leito.tipoLeito.quantidadeCamas}} cama(s)</div>
-                        <div>{{leito.situacao.descricao}}</div>
+                        <!--<div>{{leito.situacao.descricao}}</div>-->
                       </v-card-text>
 
                       <v-divider light></v-divider>
                       <v-card-actions class="grey lighten-4">
                         <v-spacer></v-spacer>
-                        <v-icon @click="editLeito(quarto, leito)">edit</v-icon>
-                        <v-icon @click="deleteLeito(leito)">delete</v-icon>
+
+                        <v-tooltip bottom>
+                          <v-btn icon slot="activator" @click="editLeito(quarto, leito)">
+                            <v-icon>edit</v-icon>
+                          </v-btn>
+                          <span>Editar Leito</span>
+                        </v-tooltip>
+                        
+
+                        <v-tooltip bottom>
+                          <v-btn icon slot="activator" @click="deleteLeito(quarto, leito)">
+                            <v-icon>delete</v-icon>
+                          </v-btn>
+                          <span>Excluir Leito</span>
+                        </v-tooltip>
+
+                        <v-tooltip bottom v-if="isLeitoOcupado(leito.id)" >
+                          <v-btn icon slot="activator" @click="visualizarHospedagemNoLeito(leito.id)" >
+                            <v-icon color="red darken-4">fa-users</v-icon>
+                          </v-btn>
+                          <span>Visualizar Hospedagem atual</span>
+                        </v-tooltip>
+
+
                       </v-card-actions>
                     </v-card>
                   </v-flex>
@@ -84,6 +106,7 @@ export default {
   data: () => ({
     dados: [],
     leitos: [],
+    leitosOcupados: [],
     
     descricaoExclusaoQuarto : "",
     descricaoExclusaoLeito : "",
@@ -121,6 +144,7 @@ export default {
 
   mounted(){
     this.$store.dispatch('setAcao','Quartos')
+    this.loadLeitosOcupados();
   },
 
   methods: {
@@ -200,12 +224,41 @@ export default {
 
     inputTabEvent(event){
       const ativo = parseInt(event);
+      this.loadLeitosOcupados()
 
       if (this.dados.length > 0) {
         this.quartoSelecionado = this.dados[ativo]
       } else {
         this.quartoSelecionado = {}
       }
+    },
+
+    loadLeitosOcupados() {
+      var dataIni = petraDateTime.hoje()
+
+      var request = {
+        dataIni : dataIni,
+        dataFim : dataIni
+      }
+
+      this.leitosOcupados = []
+      petra.axiosPost("/app/hospedagem/leitos_ocupados", request).then(
+        response => {
+          this.leitosOcupados = response.data
+        })
+    },
+
+    visualizarHospedagemNoLeito(leitoId){
+      petra.showMessageSuccess('Em breve será apresentada a hospedagem do leito')
+    },
+
+    classeSituacaoLeito(id){
+      var ocupado = this.isLeitoOcupado(id)
+      return ocupado ? "red lighten-2" : "amber lighten-4"
+    },
+
+    isLeitoOcupado(id){
+      return (this.leitosOcupados.indexOf(id) >= 0);
     },
 
     setQuartoSelecionado(quarto){

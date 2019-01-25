@@ -60,8 +60,8 @@ export default {
   },
 
   methods: {
-    openDialog(hospede, destinacaoHospedagemId){
-      this.$refs.frameSelecaoLeito.openDialog(hospede, destinacaoHospedagemId)
+    openDialog(hospede, destinacaoHospedagemId, dataIni, dataFim){
+      this.$refs.frameSelecaoLeito.openDialog(hospede, destinacaoHospedagemId, dataIni, dataFim)
       this.reset()
       this.nomeHospede = hospede.pessoa.nome
       this.dialogVisible = true

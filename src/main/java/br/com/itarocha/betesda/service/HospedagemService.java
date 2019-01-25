@@ -386,6 +386,12 @@ public class HospedagemService {
 		return retorno;
 	}
 
+	public List<Long> getLeitosOcupadosNoPeriodo(LocalDate dataIni, LocalDate dataFim){
+		
+		return hospedeLeitoRepo.leitosNoPeriodo(dataIni, dataFim);
+		
+	}
+	
 	private void atualizarDashBoard(MapaRetorno mapaRetorno, Integer qtdLeitos) {
 		Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
 		Integer[] qtdVencidos 			= {0,0,0,0,0,0,0};

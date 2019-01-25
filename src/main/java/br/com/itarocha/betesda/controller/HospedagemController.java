@@ -1,6 +1,7 @@
 package br.com.itarocha.betesda.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,6 +84,18 @@ public class HospedagemController {
 		return retorno;
 	}
 
+	@RequestMapping(value="/leitos_ocupados", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> leitosOcupados(@RequestBody PeriodoRequest model)
+	{
+		try {
+			List<Long> retorno = service.getLeitosOcupadosNoPeriodo(model.dataIni, model.dataFim);
+			return new ResponseEntity<List<Long>>(retorno, HttpStatus.OK);
+		} catch(Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> encerramento(@RequestBody OperacoesRequest model)
@@ -152,6 +165,11 @@ public class HospedagemController {
 	
 	private static class MapaHospedagemRequest{
 		public LocalDate data;
+	}
+
+	private static class PeriodoRequest{
+		public LocalDate dataIni;
+		public LocalDate dataFim;
 	}
 
 	private static class BaixaRequest{
