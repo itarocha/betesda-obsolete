@@ -30,9 +30,6 @@ import br.com.itarocha.betesda.model.audit.UserDateAudit;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "hospedes"})
 public class Hospedagem  extends UserDateAudit implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1841335162635443594L;
 
 	@Id
@@ -55,16 +52,13 @@ public class Hospedagem  extends UserDateAudit implements Serializable {
 	private DestinacaoHospedagem destinacaoHospedagem;
 			
 	@NotNull(message="Data de Entrada precisa ser informado")
-	//@Temporal(TemporalType.DATE)
 	@Column(name = "data_entrada")
 	private LocalDate dataEntrada;
 	
 	@NotNull(message="Data Prevista de Saída precisa ser informada")
-	//@Temporal(TemporalType.DATE)
 	@Column(name = "data_prevista_saida")
 	private LocalDate dataPrevistaSaida;
 	
-	//@Temporal(TemporalType.DATE)
 	@Column(name = "data_efetiva_saida")
 	private LocalDate dataEfetivaSaida;
 

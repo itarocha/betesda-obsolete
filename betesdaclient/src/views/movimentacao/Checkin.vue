@@ -113,6 +113,10 @@
                 <v-select :items="itensTipoServico" label="Serviços" multiple chipsv-model="formOpcoes.servicos"></v-select>
               </v-flex>
 
+              <v-flex xs12 sm12 md12>
+                <v-textarea label="Observações" box :height="200" v-model="formOpcoes.observacoes" hide-details></v-textarea>
+              </v-flex>
+
             </v-layout>
           </v-card-text>
         </v-card>
@@ -236,7 +240,8 @@ export default {
       dataPrevistaSaidaFmt: null,
       destinacaoHospedagem: null,
       tipoUtilizacao: null,
-      servicos: []
+      servicos: [],
+      observacoes : null,
     },
 
     hospedes: [],
@@ -356,7 +361,8 @@ export default {
         dataPrevistaSaidaFmt: null,
         destinacaoHospedagem: null,
         tipoUtilizacao: null,
-        servicos: []
+        servicos: [],
+        observacoes : null
       },
       this.hospedes = []
       this.errors = []
@@ -454,6 +460,7 @@ export default {
         dataPrevistaSaida : this.dataPrevistaSaida,
         destinacaoHospedagemId : this.formOpcoes.destinacaoHospedagem,
         tipoUtilizacao : this.formOpcoes.tipoUtilizacao,
+        observacoes : this.formOpcoes.observacoes,
         servicos : [],
         hospedes : []
 

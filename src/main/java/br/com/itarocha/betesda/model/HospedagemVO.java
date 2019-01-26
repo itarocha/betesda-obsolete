@@ -34,6 +34,8 @@ public class HospedagemVO {
 	@NotNull(message="Tipo de Utilização precisa ser informada")
     private String tipoUtilizacao;
 	
+	private String observacoes;
+	
 	private Long[] servicos;
 	
 	private List<HospedeVO> hospedes = new ArrayList<HospedeVO>();
@@ -116,6 +118,14 @@ public class HospedagemVO {
 
 	public void setTipoUtilizacao(String tipoUtilizacao) {
 		this.tipoUtilizacao = tipoUtilizacao;
+	}
+
+	public String getObservacoes() {
+		return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+		this.observacoes = observacoes;
 	}
 
 	public Long[] getServicos() {

@@ -7,6 +7,15 @@
     <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onCloseTransferencia"></dialogo-selecao-leito-transferencia>
     <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
 
+    <v-layout justify-space-between row wrap fill-height>
+      <v-flex xs12 sm12 md12 v-if="errors">
+        <v-alert :value="true" type="error" v-for="(item, i)  in errors" :key="i">
+          {{item.errorMessage}}
+        </v-alert>
+      </v-flex>
+    </v-layout>
+
+
     <!-- begin frame-hospedagem -->
     <div v-if="hospedagem != null">
       <v-tabs v-model="tabActive" slider-color="cyan darken-2" fixed-tabs>
@@ -19,42 +28,42 @@
           <v-layout justify-space-between row wrap fill-height>
             <v-flex  xs12 sm12 md12><div style="height:50px;"></div></v-flex>
 
-            <v-flex  xs12 sm2 md4 offset-md2>
+            <v-flex  xs12 sm2 md4>
               Data de Entrada:
             </v-flex>
             <v-flex xs12 sm2 md6 class="title">
               {{formatDate(hospedagem.dataEntrada)}}
             </v-flex>
 
-            <v-flex xs12 sm2 md4 offset-md2>
+            <v-flex xs12 sm2 md4>
               Data Prevista de Saída:
             </v-flex>
             <v-flex md6 class="title">
               {{formatDate(hospedagem.dataPrevistaSaida)}}
             </v-flex>
 
-            <v-flex xs12 sm2 md4 offset-md2>
+            <v-flex xs12 sm2 md4>
               Data de Saída:
             </v-flex>
             <v-flex xs12 sm2 md6 class="title">
               {{formatDate(hospedagem.dataEfetivaSaida)}}
             </v-flex>
 
-            <v-flex xs12 sm2 md4 offset-md2>
+            <v-flex xs12 sm2 md4>
               Destinação de Hospedagem:
             </v-flex>
             <v-flex xs12 sm2 md6 class="title">
               {{destinacaoHospedagem.descricao}}
             </v-flex>
 
-            <v-flex xs12 sm2 md4 offset-md2>
+            <v-flex xs12 sm2 md4>
               Tipo de Utilização:
             </v-flex>
             <v-flex xs12 sm2 md6 class="title">
               {{tipoUtilizacao(hospedagem.tipoUtilizacao)}}
             </v-flex>
 
-            <v-flex xs12 sm2 md4 offset-md2>
+            <v-flex xs12 sm2 md4>
               Situação:
             </v-flex>
             <v-flex xs12 sm2 md6 class="text-uppercase title">
@@ -67,6 +76,12 @@
             <v-flex xs12 sm2 md12 v-if="servicos.length > 0" class="subheading ml-2">
                 <v-chip color="amber lighten-2" v-for="(servico, idx) in servicos" :key="idx">{{servico.descricao}}</v-chip>
             </v-flex>
+
+            <v-flex xs12 sm12 md12>
+              <v-textarea label="Observações" class="caption" box :height="150" readonly v-model="hospedagem.observacoes"></v-textarea>
+            </v-flex>
+
+
 
           </v-layout>
         </v-tab-item>
@@ -230,18 +245,6 @@ export default {
     this.reset()
   },
 
-  /*
-  props: {
-    h: Object
-  },
-
-  watch : {
-    h(newVal, oldVal){
-      console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-    }
-  },
-  */
-
   methods: {
 
     // public
@@ -254,7 +257,6 @@ export default {
 
     // public
     showSelecionarDataEncerramento(){
-      //console.log("this.hospedagem.dataPrevistaSaida = ", this.hospedagem.dataPrevistaSaida)
       this.$refs.dlgSelecaoDataEncerramento.openDialog(this.hospedagem.id, this.hospedagem.dataPrevistaSaida);
     },
 
@@ -278,8 +280,6 @@ export default {
       this.$refs.dlgExclusao.openDialog("Deseja realmente excluir esta Hospedagem?")
     },
 
-
-
     formatDate(data, formato){
       return petraDateTime.formatDate(data) || '---'
     },
@@ -297,7 +297,7 @@ export default {
         hospedagemId : hospedagemId
       }
 
-      petra.axiosPost("/app/hospedagem/mapa/hospedagem_info", dados)
+      petra.axiosPost("/app/hospedagem/mapa/hospedagem_info", dados, false)
         .then(response => { 
             this.hospedagem = response.data
             this.entidade = (this.hospedagem && this.hospedagem.entidade) ? this.hospedagem.entidade : null
@@ -306,6 +306,8 @@ export default {
             this.servicos = (this.hospedagem && this.hospedagem.servicos) ? this.hospedagem.servicos : []
             this.tipoHospede = this.hospedagem.hospedes[0].tipoHospede
             this.destinacaoHospedagem = this.hospedagem.destinacaoHospedagem
+
+            this.$emit('refresh',this.hospedagem)
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
@@ -323,7 +325,7 @@ export default {
         data : data
       }
 
-      petra.axiosPost("/app/hospedagem/mapa/encerramento", dados)
+      petra.axiosPost("/app/hospedagem/mapa/encerramento", dados, false)
         .then(response => {
           this.$emit('encerrada',hospedagemId)
         }).catch(error => {
@@ -343,13 +345,13 @@ export default {
         data : data
       }
       
-      petra.axiosPost("/app/hospedagem/mapa/baixar", dados)
+      petra.axiosPost("/app/hospedagem/mapa/baixar", dados, false)
         .then(response => {
-          //this.$emit('baixada',hospedeId)
-          //this.dialogVisible = false
+          this.getInfo(this.hospedagemId)
+          petra.showMessageSuccess('Hospedagem encerrada com sucesso')
+          this.$emit('close',true)
         }).catch(error => {
           this.errors = petra.tratarErros(error);
-          //this.dialogVisible = false
         })
     },
 
@@ -365,10 +367,9 @@ export default {
         data : data
       }
       
-      petra.axiosPost("/app/hospedagem/mapa/renovacao", dados)
+      petra.axiosPost("/app/hospedagem/mapa/renovacao", dados, false)
         .then(response => {
-          this.$emit('close',true)
-          this.dialogVisible = false
+          this.$emit('renovada',hospedagemId)
         }).catch(error => {
           this.errors = petra.tratarErros(error);
         })
@@ -380,19 +381,18 @@ export default {
     },
 
     onCloseTransferencia(sucesso){
-      if (sucesso){
+      if (sucesso) {
         this.getInfo(this.hospedagemId)
       }
     },  
 
     onDeleteConfirmed(evt) {
-      petra.axiosDelete("/app/hospedagem/"+this.hospedagemId)
+      petra.axiosDelete("/app/hospedagem/"+this.hospedagemId, false)
         .then(response => {
-          petra.showMessageSuccess('Hospedagem excluída com sucesso')
-          this.$emit('close',true)
-          this.dialogVisible = false
+          this.$emit('excluida',this.hospedagemId)
         })
         .catch(error => {
+          this.errors = petra.tratarErros(error);
         })
     },
 

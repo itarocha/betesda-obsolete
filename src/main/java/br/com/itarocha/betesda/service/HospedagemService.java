@@ -104,90 +104,103 @@ public class HospedagemService {
 	@Autowired
 	private HospedagemTipoServicoRepository hospedagemTipoServicoRepo;
 
-	public Hospedagem create(HospedagemVO model) throws Exception {
+	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	
+	public Hospedagem create(HospedagemVO model) throws ValidationException {
 		Hospedagem hospedagem = null;
-		try {
-			hospedagem = new Hospedagem();
-			
-			Optional<Entidade> entidade = entidadeRepo.findById(model.getEntidadeId());
-			hospedagem.setEntidade(entidade.get());
-			model.setEntidade(entidade.get());
-			
-			Optional<Encaminhador> encaminhador = encaminhadorRepo.findById(model.getEncaminhadorId());
-			hospedagem.setEncaminhador(encaminhador.get());
-			model.setEncaminhador(encaminhador.get());
-			
-			hospedagem.setDataEntrada(model.getDataEntrada());
-			hospedagem.setDataPrevistaSaida(model.getDataPrevistaSaida());
-			
-			Optional<DestinacaoHospedagem> dest = destinacaoHospedagemRepo.findById(model.getDestinacaoHospedagemId());// em.find(DestinacaoHospedagem.class, model.getDestinacaoHospedagemId());
-			hospedagem.setDestinacaoHospedagem(dest.get());
-			model.setDestinacaoHospedagemDescricao(dest.get().getDescricao());
-			
-			TipoUtilizacaoHospedagem tu = TipoUtilizacaoHospedagem.valueOf(model.getTipoUtilizacao());
-			hospedagem.setTipoUtilizacao(tu);
-			hospedagem = hospedagemRepo.save(hospedagem);
-			
-			model.setId(hospedagem.getId()); 
-			
-			for (HospedeVO hvo: model.getHospedes()) {
-				Hospede h = new Hospede();
-				h.setHospedagem(hospedagem);
-				
-				Optional<Pessoa> p = pessoaRepo.findById(hvo.getPessoaId());
-				// se p == null throw
-				h.setPessoa(p.get());
-				hvo.setPessoaId(p.get().getId());
-				hvo.setPessoaNome(p.get().getNome());
-				hvo.setPessoaDataNascimento(p.get().getDataNascimento());
-				
-				Optional<TipoHospede> th = tipoHospedeRepo.findById(hvo.getTipoHospedeId());
-				h.setTipoHospede(th.get());
-				hvo.setTipoHospedeDescricao(th.get().getDescricao());
-				h = hospedeRepo.save(h);
-				hvo.setId(h.getId());
-				
-				hospedagem.getHospedes().add(h);
-				
-			    if ((hvo.getAcomodacao() != null) && (TipoUtilizacaoHospedagem.T.equals(hospedagem.getTipoUtilizacao())) ) {
-			    	//TODO: Tem um código igual no transferir. Refatorar criar método
-			    	Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
-			    	Optional<Leito> leito = leitoRepo.findById(hvo.getAcomodacao().getLeitoId());
 
-			    	if (quarto.isPresent() && leito.isPresent()) {
-			    		HospedeLeito hl = new HospedeLeito();
-			    		hl.setHospede(h);
-			    		hl.setDataEntrada(hospedagem.getDataEntrada());
-			    		hl.setDataSaida(hospedagem.getDataPrevistaSaida());
-
-			    		hvo.getAcomodacao().setQuartoNumero(quarto.get().getNumero());
-			    		hl.setQuarto(quarto.get());
-
-			    		hvo.getAcomodacao().setLeitoNumero(leito.get().getNumero());
-			    		hl.setLeito(leito.get());
-
-			    		hospedeLeitoRepo.save(hl);
-			    		hvo.getAcomodacao().setId(hl.getId());
-			    		
-			    		h.getLeitos().add(hl);
-			    	}
-			    }
-			}
-			if ((model.getServicos().length > 0) && (TipoUtilizacaoHospedagem.P.equals(hospedagem.getTipoUtilizacao())) ) {
-				for (Long tipoServicoId : model.getServicos()) {
-					Optional<TipoServico> ts = tipoServicoRepo.findById(tipoServicoId);
-					if (ts.isPresent()) {
-						HospedagemTipoServico servico = new HospedagemTipoServico();
-						servico.setTipoServico(ts.get());
-						servico.setHospedagem(hospedagem);
-						hospedagemTipoServicoRepo.save(servico);
-						hospedagem.getServicos().add(servico);
-					}
-				}
-			}	 
-		} catch (Exception e) {
-			throw e;
+		LocalDate hoje = LocalDate.now();
+			
+		if (model.getDataEntrada().isAfter(hoje)) {
+			throw new ValidationException(new ResultError().addError("*", 
+					String.format("Data de Entrada não pode ser superior a data atual (%s)",fmt.format(hoje))));
 		}
+		
+		if (model.getDataPrevistaSaida().isBefore(model.getDataEntrada())) {
+			throw new ValidationException(new ResultError().addError("*", 
+					String.format("Data Prevista de Saída não pode ser inferior a Data de Entrada (%s)",fmt.format(model.getDataEntrada()))));
+		}
+		
+		hospedagem = new Hospedagem();
+		
+		Optional<Entidade> entidade = entidadeRepo.findById(model.getEntidadeId());
+		hospedagem.setEntidade(entidade.get());
+		model.setEntidade(entidade.get());
+		
+		Optional<Encaminhador> encaminhador = encaminhadorRepo.findById(model.getEncaminhadorId());
+		hospedagem.setEncaminhador(encaminhador.get());
+		model.setEncaminhador(encaminhador.get());
+		
+		hospedagem.setDataEntrada(model.getDataEntrada());
+		hospedagem.setDataPrevistaSaida(model.getDataPrevistaSaida());
+		
+		Optional<DestinacaoHospedagem> dest = destinacaoHospedagemRepo.findById(model.getDestinacaoHospedagemId());
+		hospedagem.setDestinacaoHospedagem(dest.get());
+		model.setDestinacaoHospedagemDescricao(dest.get().getDescricao());
+		
+		TipoUtilizacaoHospedagem tu = TipoUtilizacaoHospedagem.valueOf(model.getTipoUtilizacao());
+		hospedagem.setTipoUtilizacao(tu);
+		hospedagem.setObservacoes(model.getObservacoes());
+		
+		hospedagem = hospedagemRepo.save(hospedagem);
+		
+		model.setId(hospedagem.getId()); 
+		
+		for (HospedeVO hvo: model.getHospedes()) {
+			Hospede h = new Hospede();
+			h.setHospedagem(hospedagem);
+			
+			Optional<Pessoa> p = pessoaRepo.findById(hvo.getPessoaId());
+			// se p == null throw
+			h.setPessoa(p.get());
+			hvo.setPessoaId(p.get().getId());
+			hvo.setPessoaNome(p.get().getNome());
+			hvo.setPessoaDataNascimento(p.get().getDataNascimento());
+			
+			Optional<TipoHospede> th = tipoHospedeRepo.findById(hvo.getTipoHospedeId());
+			h.setTipoHospede(th.get());
+			hvo.setTipoHospedeDescricao(th.get().getDescricao());
+			h = hospedeRepo.save(h);
+			hvo.setId(h.getId());
+			
+			hospedagem.getHospedes().add(h);
+			
+		    if ((hvo.getAcomodacao() != null) && (TipoUtilizacaoHospedagem.T.equals(hospedagem.getTipoUtilizacao())) ) {
+		    	//TODO: Tem um código igual no transferir. Refatorar criar método
+		    	Optional<Quarto> quarto = quartoRepo.findById(hvo.getAcomodacao().getQuartoId());
+		    	Optional<Leito> leito = leitoRepo.findById(hvo.getAcomodacao().getLeitoId());
+
+		    	if (quarto.isPresent() && leito.isPresent()) {
+		    		HospedeLeito hl = new HospedeLeito();
+		    		hl.setHospede(h);
+		    		hl.setDataEntrada(hospedagem.getDataEntrada());
+		    		hl.setDataSaida(hospedagem.getDataPrevistaSaida());
+
+		    		hvo.getAcomodacao().setQuartoNumero(quarto.get().getNumero());
+		    		hl.setQuarto(quarto.get());
+
+		    		hvo.getAcomodacao().setLeitoNumero(leito.get().getNumero());
+		    		hl.setLeito(leito.get());
+
+		    		hospedeLeitoRepo.save(hl);
+		    		hvo.getAcomodacao().setId(hl.getId());
+		    		
+		    		h.getLeitos().add(hl);
+		    	}
+		    }
+		}
+		if ((model.getServicos().length > 0) && (TipoUtilizacaoHospedagem.P.equals(hospedagem.getTipoUtilizacao())) ) {
+			for (Long tipoServicoId : model.getServicos()) {
+				Optional<TipoServico> ts = tipoServicoRepo.findById(tipoServicoId);
+				if (ts.isPresent()) {
+					HospedagemTipoServico servico = new HospedagemTipoServico();
+					servico.setTipoServico(ts.get());
+					servico.setHospedagem(hospedagem);
+					hospedagemTipoServicoRepo.save(servico);
+					hospedagem.getServicos().add(servico);
+				}
+			}
+		}	 
 		return hospedagem;
 	}
 	
@@ -528,13 +541,19 @@ public class HospedagemService {
 		*/
 		Optional<Hospedagem> opt  = hospedagemRepo.findById(hospedagemId);
 		if (opt.isPresent()) {
-			DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 			
 			Hospedagem h = opt.get();
 			if ((h.getDataEfetivaSaida() != null)) {
 				throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
 			}
 	
+			LocalDate hoje = LocalDate.now();
+			
+			if (dataEncerramento.isAfter(hoje)) {
+				throw new ValidationException(new ResultError().addError("*", 
+						String.format("Data de Encerramento não pode ser superior a data atual (%s)",fmt.format(hoje))));
+			}
+
 			if (TipoUtilizacaoHospedagem.P.equals(h.getTipoUtilizacao())) {
 				if (h.getDataEntrada().isBefore(dataEncerramento)) {
 					throw new ValidationException(new ResultError().addError("*", 

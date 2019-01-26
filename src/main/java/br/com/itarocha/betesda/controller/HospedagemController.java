@@ -71,6 +71,8 @@ public class HospedagemController {
 		try {
 			service.create(model);
 		    return new ResponseEntity<HospedagemVO>(model, HttpStatus.OK);
+		} catch (ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -104,7 +106,7 @@ public class HospedagemController {
 			service.encerrarHospedagem(model.hospedagemId, model.data);
 			return new ResponseEntity<String>("ok", HttpStatus.OK);
 		} catch(ValidationException e) {
-			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
@@ -116,7 +118,7 @@ public class HospedagemController {
 			service.renovarHospedagem(model.hospedagemId, model.data);
 			return new ResponseEntity<String>("ok", HttpStatus.OK);
 		} catch(ValidationException e) {
-			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
@@ -140,7 +142,7 @@ public class HospedagemController {
 			service.transferirHospede(model.hospedeId, model.leitoId, model.data);
 			return new ResponseEntity<String>("ok", HttpStatus.OK); 
 		} catch(ValidationException e) {
-			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		}
 	}
 	
