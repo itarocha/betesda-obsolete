@@ -1,8 +1,8 @@
 var moment = require('moment')
 moment.locale('pt-br');
 
-//var base_uri =  'http://localhost:8088/api'
-var base_uri = 'http://petrasistemas.com.br:8080/betesda/api'
+var base_uri =  'http://localhost:8088/api'
+//var base_uri = 'http://petrasistemas.com.br:8080/betesda/api'
 
 export default {
 
@@ -187,6 +187,51 @@ export default {
         }
         return errors
       },
+
+
+      sem_acento(val, replaceBy) {
+        replaceBy = replaceBy || '-';
+        var mapaAcentosHex 	= { // by @marioluan and @lelotnk
+          a : /[\xE0-\xE6]/g,
+          A : /[\xC0-\xC6]/g,
+          e : /[\xE8-\xEB]/g, // if you're gonna echo this
+          E : /[\xC8-\xCB]/g, // JS code through PHP, do
+          i : /[\xEC-\xEF]/g, // not forget to escape these
+          I : /[\xCC-\xCF]/g, // backslashes (\), by repeating
+          o : /[\xF2-\xF6]/g, // them (\\)
+          O : /[\xD2-\xD6]/g,
+          u : /[\xF9-\xFC]/g,
+          U : /[\xD9-\xDC]/g,
+          c : /\xE7/g,
+          C : /\xC7/g,
+          n : /\xF1/g,
+          N : /\xD1/g,
+        };
+        
+        for ( var letra in mapaAcentosHex ) {
+          var expressaoRegular = mapaAcentosHex[letra];
+          val = val.replace( expressaoRegular, letra );
+        }
+        
+        val = val.toLowerCase();
+        val = val.replace(/[^a-z0-9\-]/g, " ");
+        
+        val = val.replace(/ {2,}/g, " ");
+          
+        val = val.trim();    
+        //val = val.replace(/\s/g, replaceBy);
+        
+        return val;
+      },
+
+      removerAcentos(s) {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+      },
+
+      letrasENumeros(s) {
+        return s.replace(/[^a-zA-Z0-9]/g,"")
+      },
+
 
       randomColor(id) {
         //const r = () => Math.floor(256 * Math.random());

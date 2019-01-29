@@ -9,7 +9,7 @@
         <v-card-text style="height:400px;">
           <v-layout row wrap>
             <v-flex xs12 sm8 md8>
-              <v-text-field label="Nome" ref="edtNome" v-model="form.nome" :error-messages="getErrors('nome')"></v-text-field>
+              <v-text-field label="Nome" ref="edtNome" v-model="form.nome" @input="maiusculas('form.nome',$event)" :error-messages="getErrors('nome')" ></v-text-field>
             </v-flex>
             <v-flex xs12 sm4 md4>
               <v-text-field label="Nascimento" v-model="dataNascimento" :mask="'##/##/####'" :error-messages="getErrors('dataNascimento')"></v-text-field>
@@ -130,12 +130,42 @@ export default {
   name: "PessoaEdit",
 
   directives: {
-    mask
+    mask,
+
+    maiuscula :{
+      update(el) {
+       // console.log(el.model)
+
+        //el.value = el.value.toUpperCase()
+      }
+    }
   },
 
   props: {},
 
   data: () => ({
+
+    /*
+     hexTokens: {
+        'F': {
+          pattern: /[0-9a-fA-F]/,
+          transform: v => v.toLocaleUpperCase()
+        }
+      },
+
+    customTokens: {
+      mask: 'CCCCC',
+      tokens: {
+          'C': {
+              pattern: /[0-9A-Z]/,
+              transform: function(v) {
+                  return v.toLocaleUpperCase();
+              }
+          }
+      }
+    },
+    */
+
     tabActive : 0,
     dataNascimento: null,
     dataNascimentoFmt: null,
@@ -209,6 +239,60 @@ export default {
   },
 
   methods: {
+
+     maiusculas(a, evento){
+
+
+       //this.$set(this.$data,'form.naturalidade', 'Brasilia')
+
+       //_.set(this.form, "naturalidade", "Brasilia")
+
+       this.$data['form.naturalidade'] = "DF"
+
+       //var valor = this.$data[a] || ''
+       // valor.toLocaleUpperCase()
+       //this.$set(this.$data, 'form.naturalidade', 'Brasilia')
+
+
+       console.log(this.$data["form"]["nome"])
+
+       
+       //console.log(a, b)
+
+        //var x = this.$get(this,'form.nome')
+        //console.log(a, evento )
+
+        //vm.$set(this, 'options', newOptions);
+
+        //var x = Object.keys("this."+b)
+        //console.log("xis = ", x)
+        // console.log(this.$refs.myTestField.value)
+
+
+
+      //var context = this.$vnode.model
+    /*
+    Vue.nextTick(function () {
+        alert(context.myModel);
+    }
+    */
+
+
+       //console.log(item)
+       /*
+        this.$nextTick(() => {
+          this.form.nome = this.form.nome.toLocaleUpperCase()
+        })        
+      */  
+    
+    /*
+      if (parseFloat(this.price) > 5) {
+        this.$nextTick(() => {
+          this.price = 9
+        })        
+        */
+    },
+
     openDialog(form) {
       this.reset();
       this.loadListas();
@@ -221,7 +305,7 @@ export default {
       }
       this.dialogVisible = true;
       setTimeout(() => {
-        this.$refs.edtNome.focus()
+        //this.$refs.edtNome.focus()
       }, 500)
     },
 
