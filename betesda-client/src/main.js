@@ -3,6 +3,17 @@
 import Vue from 'vue'
 import BootstrapVue from "bootstrap-vue"
 import App from './App'
+
+// https://origin.fontawesome.com/how-to-use/on-the-web/using-with/vuejs
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCoffee } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faCoffee)
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+
 import router from './router'
 import store from './vuex/store'
 global.store = store
@@ -30,6 +41,7 @@ global.moment = moment
 
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import './assets/fontawesome-free-5.7.0-web/css/all.css'
 
 Vue.use(BootstrapVue)
 Vue.use(VueLodash)

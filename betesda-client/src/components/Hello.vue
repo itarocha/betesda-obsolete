@@ -1,5 +1,30 @@
 <template>
   <div>
+    <b-row>
+      <b-col offset="3" cols="6">
+        <b-card class="shadow"
+                header-tag="header"
+                header-bg-variant="info"
+                header-text-variant="white"
+                footer-tag="footer">
+            
+          <div slot="header" class="font-weight-bold">Header Slot</div>
+            
+            <div class="card-text">
+              <p>Header and footers using slots.</p>
+              <p>Eita....</p>
+            </div>
+
+          <div style="text-align:right;" slot="footer">
+            <b-button href="#" variant="primary" size="sm" class="text-uppercase font-weight-bold px-4" style="background-color:teal;"><i class="fa fa-users"></i> Ok</b-button>
+            <b-button href="#" variant="secondary" size="sm" class="text-uppercase font-weight-bold px-2">Cancelar</b-button>
+          </div>
+        </b-card>
+      </b-col>
+    </b-row>
+
+    <hr/>
+
     <b-form @submit="onSubmit" @reset="onReset" v-if="show">
       <b-container>
         <b-form-row>
@@ -106,7 +131,7 @@
 
         <b-form-row>
           <b-col>
-            <b-button type="submit" style="background-color: #ef0; color:#000;" variant="primary" >Submit</b-button>
+            <b-button type="submit" variant="primary" >Submit</b-button>
             <b-button type="reset" variant="danger">Reset</b-button>
           </b-col>
         </b-form-row>
@@ -172,6 +197,13 @@ export default {
 }
 </script>
 <style>
+
+  .varde {
+
+    background-color:  var(--cyan);
+    color: blue;
+  }
+
   .oua{
     background-color: #ef0; color:#000;
   }
