@@ -42,6 +42,7 @@ global.moment = moment
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import './assets/fontawesome-free-5.7.0-web/css/all.css'
+import './assets/scss/style.scss'
 
 Vue.use(BootstrapVue)
 Vue.use(VueLodash)

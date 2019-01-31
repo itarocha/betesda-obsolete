@@ -225,9 +225,20 @@ export default {
       },
 
       removerAcentos(s) {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z\s]/g,"")
+      },
+
+      // Não utilizado  
+      removerAcentosOriginal(s) {
         return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
       },
 
+      // Não utilizado
+      removerAcentos2(s) {
+        return s.replace(/[^a-zA-Z\s]/g,"")
+      },
+
+      // Para RG
       letrasENumeros(s) {
         return s.replace(/[^a-zA-Z0-9]/g,"")
       },
