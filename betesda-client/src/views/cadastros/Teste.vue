@@ -1,5 +1,31 @@
 <template>
   <div>
+    <b-row>
+      <b-col offset="3" cols="6">
+        <b-card class="shadow"
+                header-tag="header"
+                header-bg-variant="primary"
+                header-text-variant="white"
+                footer-tag="footer">
+            
+          <div slot="header" class="font-weight-bold">Teste</div>
+            
+            <div class="card-text">
+              <p>Header and footers using slots.</p>
+              <p>Eita....</p>
+            </div>
+
+          <div style="text-align:right;" slot="footer">
+            <b-button href="#" variant="primary" size="sm" class="text-uppercase font-weight-bold px-4" ><i class="fa fa-users"></i> Ok</b-button>
+            <b-button href="#" variant="secondary" size="sm" class="text-uppercase font-weight-bold px-2">Cancelar</b-button>
+            <b-button href="#" variant="danger" size="sm" class="rounded-circle px-2"><i class="fas fa-trash"></i></b-button>
+          </div>
+        </b-card>
+      </b-col>
+    </b-row>
+
+    <hr/>
+
     <b-form @submit="onSubmit" @reset="onReset" v-if="show">
       <b-container>
         <b-form-row>
@@ -106,8 +132,12 @@
 
         <b-form-row>
           <b-col>
-            <b-button type="submit" variant="primary" >Submit</b-button>
-            <b-button type="reset" variant="danger">Reset</b-button>
+            <b-button type="submit" variant="primary">Primary</b-button>
+            <b-button type="reset" variant="secondary">Secondary</b-button>
+            <b-button type="reset" variant="warning">Warning</b-button>
+            <b-button type="reset" variant="danger">Danger</b-button>
+            <b-button type="reset" variant="success">Success</b-button>
+            <b-button type="reset" variant="info">Info</b-button>
           </b-col>
         </b-form-row>
 
@@ -116,6 +146,17 @@
 
 
     </b-form>
+
+      <div class="imagem">
+
+      <i class="fas fa-igloo"></i> <!-- this icon's 1) style prefix == fas and 2) icon name == igloo -->
+      <i class="fas fa-igloo"></i> <!-- using an <i> element to reference the icon -->
+      <span class="fas fa-igloo"></span> <!-- using a <span> element to reference the icon -->
+
+      <img class="imagem" src="@/assets/logo-vue.png">
+       <p>Have a cup of coffee: <font-awesome-icon icon="coffee" /></p>
+      </div>
+
   </div>
 </template>
 
@@ -124,6 +165,8 @@
 
 export default {
   directives: {mask},
+
+  name:"Teste",
 
   data () {
     return {
@@ -172,6 +215,15 @@ export default {
 }
 </script>
 <style>
+
+.imagem {
+  text-align: center;
+}
+
+  .varde {
+    background-color:  var(--cyan);
+    color: blue;
+  }
 
   .oua{
     background-color: #ef0; color:#000;

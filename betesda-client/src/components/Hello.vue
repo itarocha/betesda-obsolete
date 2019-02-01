@@ -8,7 +8,7 @@
                 header-text-variant="white"
                 footer-tag="footer">
             
-          <div slot="header" class="font-weight-bold">Cabeçalho</div>
+          <div slot="header" class="font-weight-bold">Cabeçalho Hello</div>
             
             <div class="card-text">
               <p>Header and footers using slots.</p>
@@ -146,6 +146,17 @@
 
 
     </b-form>
+
+      <div class="imagem">
+
+      <i class="fas fa-igloo"></i> <!-- this icon's 1) style prefix == fas and 2) icon name == igloo -->
+      <i class="fas fa-igloo"></i> <!-- using an <i> element to reference the icon -->
+      <span class="fas fa-igloo"></span> <!-- using a <span> element to reference the icon -->
+
+      <img class="imagem" src="@/assets/logo-vue.png">
+       <p>Have a cup of coffee: <font-awesome-icon icon="coffee" /></p>
+      </div>
+
   </div>
 </template>
 
@@ -153,6 +164,8 @@
   import {mask} from 'vue-the-mask'
 
 export default {
+  name: 'Hello',
+
   directives: {mask},
 
   data () {
@@ -202,6 +215,10 @@ export default {
 }
 </script>
 <style>
+
+.imagem {
+  text-align: center;
+}
 
   .varde {
     background-color:  var(--cyan);

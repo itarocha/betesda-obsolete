@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-      <b-navbar toggleable="md" type="dark" variant="primary">
+      <b-navbar toggleable="md" type="dark" variant="primary" class="shadow mb-3">
 
         <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
 
@@ -9,20 +9,23 @@
 
         <b-collapse is-nav id="nav_collapse">
 
-
           <!-- Right aligned nav items -->
           <b-navbar-nav class="ml-auto">
 
 
           <b-navbar-nav>
             <b-nav-item-dropdown text="Cadastros" right>
-              <b-dropdown-item href="#"><i class="fas fa-home"></i> Home</b-dropdown-item>
+              <b-dropdown-item href="home"><i class="fas fa-home"></i> Home</b-dropdown-item>
+              <b-dropdown-item to="hello"><i class="fas fa-eye"></i> Hello</b-dropdown-item>
+              <b-dropdown-item to="teste"><i class="fas fa-book"></i> Teste</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item href="#"><i class="fas fa-check-circle"></i> Situações de Leitos</b-dropdown-item>
               <b-dropdown-item href="#"><i class="fas fa-tag"></i> Tipos de Hóspedes</b-dropdown-item>
               <b-dropdown-item href="#"><i class="fas fa-bed"></i> Tipos de Leitos</b-dropdown-item>
               <b-dropdown-item href="#"><i class="fas fa-coffee"></i> Tipos de Serviços</b-dropdown-item>
               <b-dropdown-item href="#"><i class="fas fa-heartbeat"></i> Destinações de Hospedagens</b-dropdown-item>
               <b-dropdown-item href="#"><i class="fas fa-hospital"></i> Quartos</b-dropdown-item>
+              <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item href="#"><i class="fas fa-university"></i> Entidades</b-dropdown-item>
               <b-dropdown-item href="#"><i class="fas fa-users"></i> Pessoas</b-dropdown-item>
             </b-nav-item-dropdown>
@@ -42,8 +45,6 @@
             -->
 
             <b-nav-item-dropdown right>
-
-
               <!-- Using button-content slot -->
               <template slot="button-content">
                 <em>User</em>
@@ -55,25 +56,9 @@
 
         </b-collapse>
       </b-navbar>    
-
-
-
-
-       <div class="imagem">
-
-    <p>Have a cup of coffee: <i class="fas fa-coffee"></i> </p>
-    <p>Have a module of JavaScript: <i class="fab fa-js"></i> </p>
-    <p>Have a module of Vue.js: <i class="fab fa-vuejs"></i> </p>
-
-
-      <i class="fas fa-igloo"></i> <!-- this icon's 1) style prefix == fas and 2) icon name == igloo -->
-      <i class="fas fa-igloo"></i> <!-- using an <i> element to reference the icon -->
-      <span class="fas fa-igloo"></span> <!-- using a <span> element to reference the icon -->
-
-      <img class="imagem" src="./assets/logo.png">
-       <p>Have a cup of coffee: <font-awesome-icon icon="coffee" /></p>
-    </div>
-    <router-view></router-view>
+      <div id="router">
+        <router-view></router-view>
+      </div>
   </div>
 </template>
 
@@ -83,18 +68,10 @@ export default {
 }
 </script>
 
-<style lang="scss">
-#app {
-  font-family: 'Roboto, Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /*color: #2c3e50;*/
-  /*color: var(--indigo);*/
+<style scoped lang="scss">
+  #router{
+    margin-top:10px;
+  }
 
-}
-.imagem {
-  text-align: center;
-}
   @import './assets/scss/style';
-  //@import './assets/scss/bs';
 </style>
