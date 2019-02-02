@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Hello from '@/components/Hello'
 import Teste from '@/views/cadastros/Teste'
+import Login from '@/views/util/Login'
 import Home from '@/views/Home'
 
 Vue.use(Router)
@@ -10,24 +11,37 @@ const router = new Router({
   routes: [
     {
       path: '/',
-      name: 'Home',
+      name: 'home',
       component: Home
     },
     {
+      path: '/login',
+      name: 'login',
+      component: Login,
+      meta: {
+        requiresVisitor: true
+      }
+    },
+    {
       path: '/hello',
-      name: 'Hello',
-      component: Hello
+      name: 'hello',
+      component: Hello,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/teste',
-      name: 'Teste',
-      component: Teste
+      name: 'teste',
+      component: Teste,
+      meta: {
+        requiresAuth: true
+      }
     },
     
   ]
 })
 
-/*
 router.beforeEach((to, from, next) => {
   if(to.matched.some(record => record.meta.requiresAuth)){
     var loggedIn = store.getters.loggedIn
@@ -44,7 +58,6 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
-*/
 
 export default router
 

@@ -163,57 +163,62 @@
 <script>
   import {mask} from 'vue-the-mask'
 
-export default {
-  name: 'Hello',
+  export default {
+    name: 'Hello',
 
-  directives: {mask},
+    directives: {mask},
 
-  data () {
-    return {
-      form: {
-        email: '',
-        name: '',
-        dataEntrada: null,
-        rg: '',
-        cpf: '',
-        outrocpf : '',
-        food: null,
-        checked: []
+    mounted(){
+      this.$store.dispatch('setAcao','Hello')
+    },
+
+    data () {
+      return {
+        form: {
+          email: '',
+          name: '',
+          dataEntrada: null,
+          rg: '',
+          cpf: '',
+          outrocpf : '',
+          food: null,
+          checked: []
+        },
+        foods: [
+          { text: 'Select One', value: null },
+          'Carrots', 'Beans', 'Tomatoes', 'Corn'
+        ],
+        show: true
+      }
+    },
+    methods: {
+      fmtMaiusculas(value, event){
+        return petra.removerAcentos(value).toUpperCase()
       },
-      foods: [
-        { text: 'Select One', value: null },
-        'Carrots', 'Beans', 'Tomatoes', 'Corn'
-      ],
-      show: true
-    }
-  },
-  methods: {
-    fmtMaiusculas(value, event){
-      return petra.removerAcentos(value).toUpperCase()
-    },
 
-    fmtLetrasENumeros(value, event){
-      return petra.letrasENumeros(value).toUpperCase()
-    },
+      fmtLetrasENumeros(value, event){
+        return petra.letrasENumeros(value).toUpperCase()
+      },
 
-    onSubmit (evt) {
-      evt.preventDefault();
-      alert(JSON.stringify(this.form));
-    },
-    onReset (evt) {
-      evt.preventDefault();
-      /* Reset our form values */
-      this.form.email = '';
-      this.form.name = '';
-      this.form.food = null;
-      this.form.checked = [];
-      /* Trick to reset/clear native browser form validation state */
-      this.show = false;
-      this.$nextTick(() => { this.show = true });
+      onSubmit (evt) {
+        evt.preventDefault();
+        alert(JSON.stringify(this.form));
+      },
+      onReset (evt) {
+        evt.preventDefault();
+        /* Reset our form values */
+        this.form.email = '';
+        this.form.name = '';
+        this.form.food = null;
+        this.form.checked = [];
+        /* Trick to reset/clear native browser form validation state */
+        this.show = false;
+        this.$nextTick(() => { this.show = true });
+      }
     }
   }
-}
 </script>
+
 <style>
 
 .imagem {

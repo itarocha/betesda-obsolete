@@ -136,7 +136,7 @@ export default {
     },
     logout(){
       this.$store.dispatch('destroyToken')
-      // promisse
+      // promise
       // .then(response => {this.$router.push({name:'home'})})
       this.$router.push({name:'home'})
     },

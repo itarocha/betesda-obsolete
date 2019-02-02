@@ -53,7 +53,7 @@ export default {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
       var decode = this.parseJwt(token)
-      //console.log("==============> ", decode)
+      console.log("==============> ", decode)
     },
 
     axiosGet(endpoint, showPostErrors){

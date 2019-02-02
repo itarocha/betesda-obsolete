@@ -29,8 +29,8 @@ export default new Vuex.Store({
         decrement(state) {
             state.count--
         },
-        SET_USER(store, obj){
-            store.user = obj.user
+        setUser(store, obj){
+            store.user = obj
         },
         setDescricao(state, descricao){
             state.tela.descricao = descricao
@@ -48,11 +48,19 @@ export default new Vuex.Store({
         retrieveToken(state, token){
             state.token = token
             axios.defaults.headers.common['Authorization'] = `Bearer ${state.token}`
-            console.log("AXIOS.HEADER = ",axios.defaults.headers.common)
+
+            var decode = petra.parseJwt(token)
+            state.user = decode
+
+            //console.log(".............. store.retrieveToken = ",decode)
+
+            //console.log("AXIOS.HEADER = ",axios.defaults.headers.common)
         },
         destroyToken(state){
             state.token = null
+            state.user = null
             //axios.defaults.headers.common['Authorization'] = null
+
             delete axios.defaults.headers.common['Authorization'];
         }
     },
@@ -65,7 +73,7 @@ export default new Vuex.Store({
                     password: credentials.password
                 })
                 .then(response => {
-                    //console.log(response)
+                    //console.log("store.js.retrieveToken",response)
                     const token = response.data.accessToken
                     localStorage.setItem('accessToken', token)
                     context.commit('retrieveToken', token)
@@ -121,5 +129,9 @@ export default new Vuex.Store({
         flashMessage(state){
             return state.flashMessage
         },
+        user(state){
+            // nem tudo...
+            return state.user
+        }
     }
 })

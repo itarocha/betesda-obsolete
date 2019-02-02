@@ -32,7 +32,8 @@ export default {
   },
 
   mounted() {
-    this.show = true;
+    this.$store.dispatch('setAcao','')
+    this.show = true
   },
 }
 </script>

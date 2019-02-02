@@ -8,7 +8,7 @@
                 header-text-variant="white"
                 footer-tag="footer">
             
-          <div slot="header" class="font-weight-bold">Teste</div>
+          <div slot="header" class="font-weight-bold">L o g i n</div>
             
             <div class="card-text">
               <p>Header and footers using slots.</p>
@@ -34,11 +34,7 @@
 export default {
   directives: {mask},
 
-  name:"Teste",
-
-  mounted(){
-    this.$store.dispatch('setAcao','Teste')
-  },
+  name:"Login",
 
   data () {
     return {
