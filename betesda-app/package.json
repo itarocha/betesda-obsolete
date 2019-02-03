@@ -10,10 +10,15 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.14",
+    "@fortawesome/free-solid-svg-icons": "^5.7.1",
+    "@fortawesome/vue-fontawesome": "^0.1.5",
     "ajv": "^6.8.1",
     "axios": "^0.18.0",
     "element-ui": "^2.5.4",
+    "i": "^0.3.6",
     "moment": "^2.24.0",
+    "npm": "^6.7.0",
     "vue": "^2.5.2",
     "vue-lodash": "^2.0.0",
     "vue-router": "^3.0.1",

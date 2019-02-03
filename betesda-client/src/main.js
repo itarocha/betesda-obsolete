@@ -5,6 +5,12 @@ import BootstrapVue from "bootstrap-vue"
 import App from './App'
 
 // https://origin.fontawesome.com/how-to-use/on-the-web/using-with/vuejs
+/*
+npm i --save @fortawesome/fontawesome-svg-core \
+  npm i --save @fortawesome/free-solid-svg-icons \
+  npm i --save @fortawesome/vue-fontawesome
+*/
+
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCoffee } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'

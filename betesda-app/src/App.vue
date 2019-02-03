@@ -13,15 +13,15 @@
             @open="handleOpen"
             @close="handleClose"
             background-color="#545c64"
-            text-color="#fff"
-            active-text-color="#ffd04b">
+            text-color="#F1F8E9"
+            active-text-color="#B2FF59">
             <el-submenu index="1">
               <template slot="title">
                 <i class="el-icon-location"></i>
-                <span>Navigator One</span>
+                <span>Cadastros</span>
               </template>
               <el-menu-item-group title="Group One">
-                <el-menu-item index="1-1">item one</el-menu-item>
+                <el-menu-item index="1-1" route="tela"><i class="fas fa-coffee pr"></i>Café</el-menu-item>
                 <el-menu-item index="1-2">item one</el-menu-item>
               </el-menu-item-group>
               <el-menu-item-group title="Group Two">
@@ -32,9 +32,11 @@
                 <el-menu-item index="1-4-1">item one</el-menu-item>
               </el-submenu>
             </el-submenu>
+
+
             <el-menu-item index="2">
               <i class="el-icon-menu"></i>
-              <span>Navigator Two</span>
+              <span>Movimentação</span>
             </el-menu-item>
             <el-menu-item index="3" disabled>
               <i class="el-icon-document"></i>
@@ -82,15 +84,22 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Dosis');
+
 body{
   margin: 0;
 }
 
 #app {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: Roboto, "Helvetica Neue", Dosis, Helvetica, Arial, sans-serif;
   --webkit-font-smoothing: antialiased;
   --moz-osx-font-smoothing: grayscale;
   color:#2c3e50;
+}
+
+.pr{
+  padding-right: 8pt;
 }
 
 .container {
@@ -114,7 +123,15 @@ body{
   border-right: 0 !important;
 }
 
+/*
+.el-submenu__title{
+  color:red !important;
+}
+*/
+
 .el-main {
   background: #EEF1F4;
 }
 </style>
+
+
