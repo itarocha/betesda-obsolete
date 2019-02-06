@@ -1,11 +1,9 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-
     <el-row type="flex" :gutter="20" class="row-bg" justify="center">
       <el-col :sm="24" :md="18" :lg="12">
 
-        <div class="grid-content bg-purple-light">
+        <div class="grid-content">
           <el-form
             :model="ruleForm"
             :rules="rules"
@@ -65,7 +63,7 @@
         </div>
       </el-col>
     </el-row>
-
+    <!--
     <el-tabs type="border-card">
       <el-tab-pane label="User">User</el-tab-pane>
       <el-tab-pane label="Config">Config</el-tab-pane>
@@ -74,6 +72,7 @@
         <el-button type="primary" @click="openMessageBox">MessageBox</el-button>
       </el-tab-pane>
     </el-tabs>
+    -->
   </div>
 </template>
 
@@ -82,8 +81,6 @@ export default {
   name: "HelloWorld",
   data() {
     return {
-      msg: "Bem vindo ao Vue.js App",
-
       ruleForm: {
         name: "",
         region: "",
@@ -200,27 +197,8 @@ export default {
 .el-col {
   border-radius: 4px;
 }
-.bg-purple-dark {
-  background: #99a9bf;
-}
-.bg-purple {
-  background: #d3dce6;
-}
-.bg-purple-light {
-  background: #e5e9f2;
-}
 .grid-content {
   border-radius: 4px;
   min-height: 36px;
 }
-.row-bg {
-  padding: 10px 0;
-  background-color: #f9fafc;
-}
-.el-form{
-  padding:10px;
-}
-</style>
-
-<style scoped>
 </style>
