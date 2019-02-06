@@ -9,11 +9,21 @@
             :rules="rules"
             ref="ruleForm"
             label-position="left"
+            size="small"
             label-width="140px"
           >
-            <el-form-item label="Activity name" prop="name">
-              <el-input v-model="ruleForm.name"></el-input>
+            <el-form-item label="Nome" prop="nome">
+              <el-input v-model="ruleForm.nome" @input.native="fmtMaiusculas($event, 'nome')"></el-input>
             </el-form-item>
+
+            <el-form-item label="RG:" prop="rg">
+              <el-input v-model="ruleForm.rg" @input.native="fmtLetrasENumeros($event, 'rg')"></el-input>
+            </el-form-item>
+
+            <el-form-item label="CPF:" prop="cpf">
+              <el-input v-model="ruleForm.cpf" v-mask="'###.###.###-##'" :masked="true"></el-input>
+            </el-form-item>
+
             <el-form-item label="Activity zone" prop="region">
               <el-select v-model="ruleForm.region" placeholder="Activity zone">
                 <el-option label="Zone one" value="shanghai"></el-option>
@@ -77,12 +87,19 @@
 </template>
 
 <script>
+import {mask} from 'vue-the-mask'
+
 export default {
   name: "HelloWorld",
+
+  directives: {mask},
+
   data() {
     return {
       ruleForm: {
-        name: "",
+        nome: "",
+        rg: "",
+        cpf:"",
         region: "",
         date1: "",
         date2: "",
@@ -92,18 +109,13 @@ export default {
         desc: ""
       },
       rules: {
-        name: [
-          {
-            required: true,
-            message: "Please input Activity name",
-            trigger: "blur"
-          },
-          {
-            min: 3,
-            max: 5,
-            message: "Length should be 3 to 5",
-            trigger: "blur"
-          }
+        nome: [
+          { required: true, message: "Preencha o nome",trigger: "blur"},
+          { min: 3, max: 64, message: "Nome deve haver de 3 a 64 caracteres",trigger: "blur"}
+        ],
+        rg: [
+          { required: true, message: "Preencha a RG",trigger: "blur"},
+          { min: 6, max: 32, message: "RG deve haver de 6 a 32 caracteres",trigger: "blur"}
         ],
         region: [
           {
@@ -155,6 +167,15 @@ export default {
   },
 
   methods: {
+    
+    fmtMaiusculas(event, campo){
+      this.$data["ruleForm"][campo] = petra.removerAcentos(event.target.value).toUpperCase()
+    },
+
+    fmtLetrasENumeros(event, campo){
+      this.$data["ruleForm"][campo] = petra.letrasENumeros(event.target.value).toUpperCase()
+    },
+
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {

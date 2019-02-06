@@ -14,8 +14,6 @@
           <el-menu
             default-active="2"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
             background-color="#545c64"
             text-color="#F1F8E9"
             active-text-color="#B2FF59">
@@ -103,12 +101,8 @@ body{
 
 .logo-container{
   text-align: center;
-  /*padding:22px;*/
   height: 60px;
   background: #434a50;
-  /*vertical-align: middle;
-  vertical-align: bottom;
-  */
 }
 
 .back-title{
