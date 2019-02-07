@@ -248,7 +248,7 @@ export default {
        //_.set(this.form, "naturalidade", "Brasilia")
 
        this.$data['form.naturalidade'] = "DF"
-
+ 
        //var valor = this.$data[a] || ''
        // valor.toLocaleUpperCase()
        //this.$set(this.$data, 'form.naturalidade', 'Brasilia')
