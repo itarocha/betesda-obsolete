@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Home from '@/views/Home'
 import Teste from '@/components/Teste'
 import Login from '@/views/auth/Login'
+import SituacoesLeitos from '@/views/cadastros/SituacoesLeitos'
 
 Vue.use(Router)
 
@@ -13,6 +14,11 @@ const router = new Router({
       path: '/',
       name: 'home',
       component: Home
+    },
+    {
+      path: '/situacoes_leitos',
+      name: 'situacoes_leitos',
+      component: SituacoesLeitos
     },
     {
       path: '/hello',

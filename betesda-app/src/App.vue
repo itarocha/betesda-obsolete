@@ -25,19 +25,22 @@
                 <i class="fas fa-folder-open pr"/>
                 <span>Cadastros</span>
               </template>
+
+                <el-menu-item index="1-2">
+                    <router-link to="/situacoes_leitos" tag="div"><i class="fas fa-check-circle pr"></i>Situações de Leitos</router-link>
+                </el-menu-item>
+
+                <el-menu-item index="1-3" route="/"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</el-menu-item>
+                <el-menu-item index="1-4" route="/"><i class="fas fa-bed pr"></i>Tipos de Leitos</el-menu-item>
+                <el-menu-item index="1-5" route="/"><i class="fas fa-coffee pr"></i>Tipos de Serviços</el-menu-item>
+                <el-menu-item index="1-6" route="/"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</el-menu-item>
+                <el-menu-item index="1-7" route="/"><i class="fas fa-hospital pr"></i>Quartos</el-menu-item>
                 <el-menu-item index="1-0-0">
                     <router-link to="/login" tag="div"><i class="fas fa-eye pr"></i>Login</router-link>
                 </el-menu-item>
                 <el-menu-item index="1-0-1">
                     <router-link to="/teste" tag="div"><i class="fas fa-file pr"></i>Teste</router-link>
                 </el-menu-item>
-
-                <el-menu-item index="1-2" route="/"><i class="fas fa-check-circle pr"></i>Situações de Leitos</el-menu-item>
-                <el-menu-item index="1-3" route="/"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</el-menu-item>
-                <el-menu-item index="1-4" route="/"><i class="fas fa-bed pr"></i>Tipos de Leitos</el-menu-item>
-                <el-menu-item index="1-5" route="/"><i class="fas fa-coffee pr"></i>Tipos de Serviços</el-menu-item>
-                <el-menu-item index="1-6" route="/"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</el-menu-item>
-                <el-menu-item index="1-7" route="/"><i class="fas fa-hospital pr"></i>Quartos</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template slot="title">
@@ -139,6 +142,27 @@ body{
   max-width: 1200px;
   margin:auto;
 }
+
+  .el-table .vermelho {
+    background: red !important;
+    color: white;
+    cursor: pointer;
+  }
+
+  .el-table .azul {
+    background-color: blue !important;
+    color: pink;
+    cursor: pointer;
+  }
+
+
+  .el-table .warning-row {
+    background-color:red !important;
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
 
 .el-aside {
   background: #F0F2F1;
