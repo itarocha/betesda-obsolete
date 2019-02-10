@@ -30,6 +30,21 @@ public class TipoLeitoController {
 	    return new ResponseEntity<List<TipoLeito>>(lista, HttpStatus.OK);
 	}
 
+	@RequestMapping(value="{id}")
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	public ResponseEntity<?> getById(@PathVariable("id") Long id) {
+		try {
+			TipoLeito model = service.find(id);
+			if (model != null) {
+				return new ResponseEntity<>(model, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>("Tipo de Leito não existe", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody TipoLeito model) {

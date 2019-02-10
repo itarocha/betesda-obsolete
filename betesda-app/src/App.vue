@@ -19,7 +19,6 @@
                 <router-link to="/" tag="div"><i class="fas fa-home pr"></i>Home</router-link>
             </el-menu-item>
 
-
             <el-submenu index="1">
               <template slot="title">
                 <i class="fas fa-folder-open pr"/>
@@ -30,10 +29,22 @@
                     <router-link to="/situacoes_leitos" tag="div"><i class="fas fa-check-circle pr"></i>Situações de Leitos</router-link>
                 </el-menu-item>
 
-                <el-menu-item index="1-3" route="/"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</el-menu-item>
-                <el-menu-item index="1-4" route="/"><i class="fas fa-bed pr"></i>Tipos de Leitos</el-menu-item>
-                <el-menu-item index="1-5" route="/"><i class="fas fa-coffee pr"></i>Tipos de Serviços</el-menu-item>
-                <el-menu-item index="1-6" route="/"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</el-menu-item>
+                <el-menu-item index="1-3">
+                    <router-link to="/tipos_hospedes" tag="div"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</router-link>
+                </el-menu-item>
+
+                <el-menu-item index="1-4">
+                    <router-link to="/tipos_leitos" tag="div"><i class="fas fa-bed pr"></i>Tipos de Leitos</router-link>
+                </el-menu-item>
+
+                <el-menu-item index="1-5">
+                    <router-link to="/tipos_servicos" tag="div"><i class="fas fa-coffee pr"></i>Tipos de Serviços</router-link>
+                </el-menu-item>
+
+                <el-menu-item index="1-6">
+                    <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</router-link>
+                </el-menu-item>
+
                 <el-menu-item index="1-7" route="/"><i class="fas fa-hospital pr"></i>Quartos</el-menu-item>
                 <el-menu-item index="1-0-0">
                   <router-link to="/login" tag="div"><i class="fas fa-eye pr"></i>Login</router-link>

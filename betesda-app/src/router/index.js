@@ -4,7 +4,12 @@ import HelloWorld from '@/components/HelloWorld'
 import Home from '@/views/Home'
 import Teste from '@/components/Teste'
 import Login from '@/views/auth/Login'
+
 import SituacoesLeitos from '@/views/cadastros/SituacoesLeitos'
+import TiposHospedes from '@/views/cadastros/TiposHospedes'
+import TiposServicos from '@/views/cadastros/TiposServicos'
+import DestinacoesHospedagens from '@/views/cadastros/DestinacoesHospedagens'
+import TiposLeitos from '@/views/cadastros/TiposLeitos'
 
 Vue.use(Router)
 
@@ -19,6 +24,26 @@ const router = new Router({
       path: '/situacoes_leitos',
       name: 'situacoes_leitos',
       component: SituacoesLeitos
+    },
+    {
+      path: '/tipos_hospedes',
+      name: 'tipos_hospedes',
+      component: TiposHospedes
+    },
+    {
+      path: '/tipos_servicos',
+      name: 'tipos_servicos',
+      component: TiposServicos
+    },
+    {
+      path: '/destinacoes_hospedagens',
+      name: 'destinacoes_hospedagens',
+      component: DestinacoesHospedagens
+    },
+    {
+      path: '/tipos_leitos',
+      name: 'tipos_leitos',
+      component: TiposLeitos
     },
     {
       path: '/hello',

@@ -26,7 +26,7 @@ public class DestinacaoHospedagem  extends UserDateAudit implements Serializable
 	private Long id;
 	
 	@NotNull(message="Descrição é obrigatória")
-	@Size(max = 64, message="Descrição da Destinação da Hospedagem não pode ter mais que 64 caracteres")
+	@Size(min = 3, max = 32, message="Descrição deve ter entre 3 e 32 caracteres")
 	private String descricao;
 
 	public Long getId() {

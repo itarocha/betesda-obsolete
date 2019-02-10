@@ -2,6 +2,7 @@ package br.com.itarocha.betesda.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 
@@ -43,9 +44,14 @@ public class TipoLeitoService {
 		}
 		return obj;
 	}
-
-	public TipoLeito find(Long id) {
-		return em.find(TipoLeito.class, id);
+	  
+  	public TipoLeito find(Long id) {
+		Optional<TipoLeito> retorno = repositorio.findById(id);
+		if (retorno.isPresent()) {
+			return retorno.get(); 
+		} else {
+			return null;
+		}
 	}
 
 	public List<TipoLeito> findAll() {

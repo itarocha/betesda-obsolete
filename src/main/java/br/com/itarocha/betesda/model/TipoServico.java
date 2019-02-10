@@ -29,7 +29,7 @@ public class TipoServico extends UserDateAudit implements Serializable {
 	private Long id;
 	
 	@NotNull(message="Descrição é obrigatória")
-	@Size(max = 32, message="Descrição do Tipo de Serviço não pode ter mais que 32 caracteres")
+	@Size(min = 3, max = 32, message="Descrição deve ter entre 3 e 32 caracteres")
 	private String descricao;
 	
 	@Enumerated(EnumType.STRING)

@@ -30,6 +30,21 @@ public class TipoHospedeController {
 	    return new ResponseEntity<List<TipoHospede>>(lista, HttpStatus.OK);
 	}
 
+	@RequestMapping(value="{id}")
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	public ResponseEntity<?> getById(@PathVariable("id") Long id) {
+		try {
+			TipoHospede model = service.find(id);
+			if (model != null) {
+				return new ResponseEntity<>(model, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>("Tipo de Hóspede não existe", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	 }
+	
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody TipoHospede model) {
