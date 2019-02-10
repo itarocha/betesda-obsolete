@@ -10,7 +10,8 @@ export default {
 
     showMessageInfo(texto){
       var mensagem = {
-        text : texto,
+        title : 'Informação',
+        message : texto,
         type : 'info'
       }
       store.dispatch('showFlashMessage', mensagem)
@@ -18,7 +19,8 @@ export default {
 
     showMessageWarning(texto){
       var mensagem = {
-        text : texto,
+        title : 'Atenção',
+        message : texto,
         type : 'warning'
       }
       store.dispatch('showFlashMessage', mensagem)
@@ -26,7 +28,8 @@ export default {
 
     showMessageError(texto){
       var mensagem = {
-        text : texto,
+        title : 'Erro',
+        message : texto,
         type : 'danger'
       }
       store.dispatch('showFlashMessage', mensagem)
@@ -34,7 +37,8 @@ export default {
 
     showMessageSuccess(texto){
       var mensagem = {
-        text : texto,
+        title : 'Sucesso',
+        message : texto,
         type : 'success'
       }
       store.dispatch('showFlashMessage', mensagem)
@@ -53,7 +57,7 @@ export default {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
 
       var decode = this.parseJwt(token)
-      console.log("==============> ", decode)
+      //console.log("==============> ", decode)
     },
 
     axiosGet(endpoint, showPostErrors){
@@ -105,12 +109,16 @@ export default {
     tratarRequestError(error, reject, showPostErrors){
       if ((error.response) && (error.response.status)) {
         if ((error.response.status >= 400) && (error.response.status < 500) && showPostErrors){
-          this.showMessageError("Erro: "+error.response.data.errors[0].errorMessage)
+          if (error.response.data.errors){
+            this.showMessageError(error.response.data.errors[0].errorMessage)  
+          } else {
+            this.showMessageError(error.response.data)
+          }
         } else if ((error.response.status == 500)){
           if (error.response.data.errors){
-            this.showMessageError("Erro: "+error.response.data.message)
+            this.showMessageError(error.response.data.message)
           } else {
-            this.showMessageError("Erro: "+error.response.data)
+            this.showMessageError(error.response.data)
           }
         }
       } else {

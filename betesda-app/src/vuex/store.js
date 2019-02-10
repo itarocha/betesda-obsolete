@@ -7,9 +7,11 @@ export default new Vuex.Store({
     state:{
         token: localStorage.getItem('accessToken') || null,
         snackbar : false,
+        numero : 0,
 
         flashMessage : {
-            text : 'Hello World',
+            title : 'Informação',
+            message : 'Hello World',
             type : 'info'
         },
         tela: {
@@ -41,6 +43,10 @@ export default new Vuex.Store({
         },
         setSnackbar(state, valor){
             state.snackbar = valor
+        },
+        setNumero(state, numero){
+            console.log("setNumero ",numero)
+            state.numero = numero
         },
         setFlashMessage(state, flashMessage){
             state.flashMessage = flashMessage
@@ -105,12 +111,15 @@ export default new Vuex.Store({
         setSnackbar(state, valor){
             state.commit('setSnackbar', valor)
         },
-        showFlashMessage(state, flashMessage){
-            state.commit('setFlashMessage', {
-                text : flashMessage.text,
-                type : flashMessage.type
-            });
-            state.commit('setSnackbar', true);
+        setNumero(state, numero){
+            console.log("actions.setNumero ",numero)
+            status.commit('setNumero',numero)
+        },
+        showFlashMessage(state, message){
+            var num = Math.floor(Math.random() * 10)
+            console.log("store.showFlashMessage ",num)
+            state.commit('setNumero', num)
+            state.commit('setFlashMessage', message)
         },
 
     },
@@ -125,6 +134,9 @@ export default new Vuex.Store({
         },
         snackbar(state){
             return state.snackbar
+        },
+        numero(state){
+            return state.numero
         },
         flashMessage(state){
             return state.flashMessage

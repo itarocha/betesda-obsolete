@@ -2,6 +2,7 @@ package br.com.itarocha.betesda.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,12 @@ public class SituacaoLeitoService {
 	}
 
 	public SituacaoLeito find(Long id) {
-		return repositorio.findById(id).get();
+		Optional<SituacaoLeito> retorno = repositorio.findById(id);
+		if (retorno.isPresent()) {
+			return retorno.get(); 
+		} else {
+			return null;
+		}
 	}
 
 	public List<SituacaoLeito> findAll() {

@@ -36,7 +36,7 @@
                 <el-menu-item index="1-6" route="/"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</el-menu-item>
                 <el-menu-item index="1-7" route="/"><i class="fas fa-hospital pr"></i>Quartos</el-menu-item>
                 <el-menu-item index="1-0-0">
-                    <router-link to="/login" tag="div"><i class="fas fa-eye pr"></i>Login</router-link>
+                  <router-link to="/login" tag="div"><i class="fas fa-eye pr"></i>Login</router-link>
                 </el-menu-item>
                 <el-menu-item index="1-0-1">
                     <router-link to="/teste" tag="div"><i class="fas fa-file pr"></i>Teste</router-link>
@@ -57,9 +57,7 @@
       <el-container>
         <el-header class="back-title">
           <el-row class="title-container" type="flex" justify="center" align="middle">
-            <el-col :span="12" class="header-title">
-              {{titulo}}
-            </el-col>
+            <el-col :span="12" class="header-title">{{titulo}}{{numero}}</el-col>
             <el-col :span="12" class="header-menu">
               login
             </el-col>
@@ -78,8 +76,12 @@
 export default {
   name: 'App',
 
-  computed: {
+  data : () => ({
 
+  }),
+
+  computed: {
+    
     titulo(){
       return this.$store.getters.titulo
     },
@@ -88,29 +90,11 @@ export default {
       return this.$store.getters.user
     },
 
-    flashMessageType(){
+    numero(){
       var fm = this.$store.getters.flashMessage
-      return fm.type
+      this.$notify(fm);
+      return null
     },
-
-    flashMessageText(){
-      var fm =  this.$store.getters.flashMessage
-      return fm.text
-    },
-
-    /*
-    snackbar: {
-      // getter
-      get: function () {
-        this.dismissCountDown = this.dismissSecs
-        return this.$store.getters.snackbar
-      },
-      // setter
-      set: function (newValue) {
-        this.$store.dispatch('setSnackbar',newValue)
-      }
-    }
-    */
 
   },
 
