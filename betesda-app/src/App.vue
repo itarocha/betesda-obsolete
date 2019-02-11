@@ -45,7 +45,10 @@
                     <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</router-link>
                 </el-menu-item>
 
-                <el-menu-item index="1-7" route="/"><i class="fas fa-hospital pr"></i>Quartos</el-menu-item>
+                <el-menu-item index="1-7">
+                    <router-link to="/quartos" tag="div"><i class="fas fa-hospital pr"></i>Quartos</router-link>
+                </el-menu-item>
+
                 <el-menu-item index="1-0-0">
                   <router-link to="/login" tag="div"><i class="fas fa-eye pr"></i>Login</router-link>
                 </el-menu-item>

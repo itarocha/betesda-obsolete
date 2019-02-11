@@ -10,6 +10,7 @@ import TiposHospedes from '@/views/cadastros/TiposHospedes'
 import TiposServicos from '@/views/cadastros/TiposServicos'
 import DestinacoesHospedagens from '@/views/cadastros/DestinacoesHospedagens'
 import TiposLeitos from '@/views/cadastros/TiposLeitos'
+import Quartos from '@/views/cadastros/Quartos'
 
 Vue.use(Router)
 
@@ -44,6 +45,11 @@ const router = new Router({
       path: '/tipos_leitos',
       name: 'tipos_leitos',
       component: TiposLeitos
+    },
+    {
+      path: '/quartos',
+      name: 'quartos',
+      component: Quartos
     },
     {
       path: '/hello',
