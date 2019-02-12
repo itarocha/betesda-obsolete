@@ -4,7 +4,7 @@
     <el-container v-if="state == 'browse'">
       <el-header>
         <el-tooltip content="Incluir novo Quarto" placement="bottom" :open-delay="toolTipDelay">
-          <el-button type="primary" @click="handleInsert">Incluir</el-button>
+          <el-button type="primary" @click="handleInsertQuarto">Incluir</el-button>
         </el-tooltip>
       </el-header>
       <el-main>
@@ -16,9 +16,9 @@
 
                 <el-row type="flex" style="margin-bottom:10px">
                   <el-col>
-                  <el-button type="primary" size="mini" @click="handleInsert">Novo Leito</el-button>
-                  <el-button type="primary" size="mini" @click="handleInsert">Alterar Quarto</el-button>
-                  <el-button type="danger" size="mini" @click="handleInsert">Excluir Quarto</el-button>
+                  <el-button type="primary" size="mini" @click="handleInsertLeito(quarto.id)">Novo Leito</el-button>
+                  <el-button type="primary" size="mini" @click="handleEditQuarto(quarto.id)">Alterar Quarto</el-button>
+                  <el-button type="danger" size="mini" @click="handleDeleteQuarto(quarto.id)">Excluir Quarto</el-button>
                   </el-col>
                 </el-row>
 
@@ -27,23 +27,10 @@
                 </el-row>
 
                 <div class="flex-container wrap">
-                  <el-card class="flex-item" v-for="(leito, i)  in dados[index].leitos" :key="i" shadow="always" style="width:400px;">
+                  <el-card class="flex-item" v-for="(leito, i)  in dados[index].leitos" :key="i" shadow="never" style="width:400px;">
 
                     <div slot="header" class="clearfix">
                       <span class="numero_leito">{{leito.numero}}</span>
-
-                      <!--
-
-                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="primary" plain size="mini" circle @click="handleEdit(scope.row)"><i class="fas fa-pencil-alt"></i></el-button>  
-                  </el-tooltip>
-                  <el-tooltip content="Excluir" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="danger"  plain size="mini" circle @click="handleDelete(scope.row)"><i class="fas fa-trash"></i></el-button>  
-                  </el-tooltip>
-
-
-                      -->  
-
 
                       <el-tooltip content="Excluir Leito" placement="bottom" :open-delay="toolTipDelay">
                           <el-button @click="handleDeleteLeito(leito.id)" style="float: right; margin-left:10px" plain size="mini" circle type="danger"><i class="fas fa-trash"></i></el-button>
@@ -129,41 +116,88 @@
       </el-main>
     </el-container>
 
-    <el-container v-if="state != 'browse'">
+    <!-- InsertQuarto -->
+    <el-container v-if="state != 'nada'">
       <el-header>
         <el-row type="flex">  
           <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button type="primary" @click="handleSave">Gravar</el-button></div>
+            <div style="margin-right:10px;"><el-button type="primary" @click="handleSaveQuarto">Gravar</el-button></div>
           </el-tooltip>
           <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button @click="handleCancel">Cancelar</el-button></div>
+            <div style="margin-right:10px;"><el-button @click="handleCancelQuarto">Cancelar</el-button></div>
           </el-tooltip>
-          <div>{{state=='edit' ? 'Editando Destinaçao de Hospedagem' : 'Incluindo Destinaçao de Hospedagem'}}</div>
+          <div>Incluindo Quarto</div>
         </el-row>
       </el-header>
       <el-main>
         
-        <el-row class="container" type="flex" justify="center" align="middle">
-          <el-col :sm="24" :md="24" :lg="18">
-
-              <el-form :model="form" :rules="rules" ref="form"
-                label-position="top" size="small" label-width="140px">
-
-                <el-form-item label="Descrição" prop="descricao" :error="getErro('descricao')">
-                  <el-input v-model="form.descricao" ref="edtdescricao"></el-input>
+        <el-form :model="formQuarto" :rules="rules" ref="formQuarto" label-position="top" size="small" label-width="140px">
+          <el-row :gutter="10">
+            <el-col :span="4">
+                <el-form-item label="Número" :error="getErro('numero')">
+                  <el-input-number v-model="formQuarto.numero" ref="edtnumero" :min="1" :max="999" style="width:100%"></el-input-number>
                 </el-form-item>
+            </el-col>
+            <el-col :span="20">
+                <el-form-item label="Descrição" prop="descricao" :error="getErro('descricao')">
+                  <el-input v-model="formQuarto.descricao" ref="edtdescricao" ></el-input>
+                </el-form-item>
+            </el-col>
+          </el-row>
 
-              </el-form>
-          </el-col>
-        </el-row>
+          <el-row :gutter="10">
+            <el-col :span="24">
+                <el-form-item label="Destinações de Hospedagem" prop="destinacoes" :error="getErro('destinacoes')">
+                  <el-select v-model="formQuarto.destinacoes" multiple placeholder="Selecione um ou mais" style="width:100%">
+                    <el-option
+                      v-for="item in itensDestinacaoHospedagem"
+                      :key="item.value"
+                      :label="item.text"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="10">
+            <el-col :span="4">
+                <el-form-item label="Qtd.Leitos" :error="getErro('quantidadeLeitos')">
+                  <el-input-number v-model="formQuarto.quantidadeLeitos" :min="1" :max="2" style="width:100%"></el-input-number>
+                </el-form-item>
+            </el-col>
+            <el-col :span="10">
+                <el-form-item label="Tipo de Leito" prop="tipoLeito" :error="getErro('tipoLeito')">
+                  <el-select v-model="formQuarto.tipoLeito" placeholder="Selecione" style="width:100%">
+                    <el-option
+                      v-for="item in itensTipoLeito"
+                      :key="item.value"
+                      :label="item.text"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="10">
+                <el-form-item label="Situação Inicial dos Leitos" prop="situacao" :error="getErro('situacao')">
+                  <el-select v-model="formQuarto.situacao" placeholder="Selecione" style="width:100%">
+                    <el-option
+                      v-for="item in itensSituacaoLeito"
+                      :key="item.value"
+                      :label="item.text"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
 
       </el-main>
     </el-container>
 
-    <el-dialog
-      title="Confirmação"
-      :visible.sync="dialogExclusaoVisible"
-      width="600px">
+
+    <el-dialog title="Confirmação" :visible.sync="dialogExclusaoVisible" width="600px">
       <span>{{textToDelete}}</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleConfirmDelete(false)">Cancelar</el-button>
@@ -187,6 +221,7 @@ export default {
   mounted(){
     this.$store.dispatch('setAcao','Quartos')
     this.doGetAll()
+    this.doLoadListas()
   },
 
   data: () =>({
@@ -201,10 +236,18 @@ export default {
     idToDelete : null,
     textToDelete : null,
 
-    form : {
+    itensDestinacaoHospedagem : [],
+    itensTipoLeito : [],
+    itensSituacaoLeito : [],
+
+    formQuarto : {
       id : null,
+      numero : null,
       descricao : null,
-      disponivel : null
+      destinacoes : null,
+      tipoLeito : null,
+      situacao : null,
+      quantidadeCamas : null
     },
 
     rules: {
@@ -240,6 +283,36 @@ export default {
       return null
     },
 
+    handleInsertQuarto(){
+      this.state = "insert"
+      this.resetData()
+      this.setDefaultData()
+      this.$nextTick(() => {
+        setTimeout(() => this.$refs.edtdescricao.focus(), 500)
+      })      
+    },
+
+    handleSaveQuarto(){
+      console.log("handleSaveQuarto")
+      this.doSaveQuarto()
+    },
+
+    handleCancelQuarto(){
+      console.log("handleCancelQuarto")
+    },
+
+    handleInsertLeito(quartoId){
+      console.log("handleInsertLeito ",quartoId)
+    },
+ 
+    handleEditQuarto(quartoId){
+      console.log("handleEditQuarto ",quartoId)
+    },
+ 
+    handleDeleteQuarto(quartoId){
+      console.log("handleDeleteQuarto ",quartoId)
+    },
+ 
     handleEditLeito(id){
       console.log("handleEditLeito ",id)
     },
@@ -248,19 +321,9 @@ export default {
       console.log("handleDeleteLeito ",id)
     },
 
-
     handleEdit(row){
       this.resetData()
       this.doGetById(row.id)
-    },
-
-    handleInsert(){
-      this.state = "insert"
-      this.resetData()
-      this.setDefaultData()
-      this.$nextTick(() => {
-        setTimeout(() => this.$refs.edtdescricao.focus(), 500)
-      })      
     },
     
     handleSave(){
@@ -283,6 +346,23 @@ export default {
       if (confirm){
         this.doDelete()
       }
+    },
+
+    doLoadListas(evt) {
+      this.itensDestinacaoHospedagem = []
+      this.itensTipoLeito = []
+      this.itensSituacaoLeito = []
+
+      console.log("ou")
+
+      petra.axiosGet("/app/quarto/listas", false).then(
+        response => {
+          this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
+          this.itensTipoLeito = response.data.listaTipoLeito
+          this.itensSituacaoLeito = response.data.listaSituacaoLeito
+
+          console.log(this.itensDestinacaoHospedagem)
+        })
     },
 
     doGetAll(evt) {
@@ -314,6 +394,18 @@ export default {
         })
         .catch(error => {
           petra.tratarErros(error)
+        })
+    },
+
+    doSaveQuarto() {
+      this.errors = []
+      console.log(this.formQuarto)
+      petra.axiosPost("/app/quarto", this.formQuarto, false)
+        .then(response => {
+        })
+        .catch(error => {
+          this.erros = petra.tratarErros(error)
+          console.log(this.erros)
         })
     },
 
@@ -389,7 +481,8 @@ export default {
 }
 
 .flex-item {
-  background: #FFF8E1;
+  /*background: #FFF8E1;*/
+  background: #FFF9C4;
   color: #455A64;
   padding: 2px;
   width: 300px;

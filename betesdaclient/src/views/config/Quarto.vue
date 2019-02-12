@@ -69,7 +69,6 @@
                           <span>Visualizar Hospedagem atual</span>
                         </v-tooltip>
 
-
                       </v-card-actions>
                     </v-card>
                   </v-flex>
