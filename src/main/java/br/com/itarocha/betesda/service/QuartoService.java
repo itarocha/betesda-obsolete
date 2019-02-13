@@ -92,7 +92,25 @@ public class QuartoService {
 		return q;
 	}
 	
-	public Leito saveLeito(EditLeitoVO model) throws Exception{
+  	public Quarto find(Long id) {
+		Optional<Quarto> retorno = quartoRepo.findById(id);
+		if (retorno.isPresent()) {
+			return retorno.get(); 
+		} else {
+			return null;
+		}
+	}
+
+  	public Leito findLeito(Long id) {
+		Optional<Leito> retorno = leitoRepo.findById(id);
+		if (retorno.isPresent()) {
+			return retorno.get(); 
+		} else {
+			return null;
+		}
+	}
+
+  	public Leito saveLeito(EditLeitoVO model) throws Exception{
 		Leito leito;
 		boolean isNovo = model.getId() == null; 
 		if (isNovo) {

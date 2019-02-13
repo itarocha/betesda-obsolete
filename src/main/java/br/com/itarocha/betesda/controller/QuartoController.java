@@ -59,6 +59,44 @@ public class QuartoController {
 		List<Quarto> lista = service.findAll();
 		return new ResponseEntity<List<Quarto>>(lista, HttpStatus.OK);
 	}
+
+	@RequestMapping(value="{id}")
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	public ResponseEntity<?> getById(@PathVariable("id") Long id) {
+		try {
+			Quarto model = service.find(id);
+			if (model != null) {
+				return new ResponseEntity<>(model, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>("Quarto não existe", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@RequestMapping(value="/leito/{id}")
+	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	public ResponseEntity<?> getLeitoById(@PathVariable("id") Long id) {
+		try {
+			Leito model = service.findLeito(id);
+			if (model != null) {
+				EditLeitoVO leito = new EditLeitoVO();
+				leito.setId(model.getId());
+				leito.setNumero(model.getNumero());
+				leito.setQuartoId(model.getQuarto().getId());
+				leito.setQuartoNumero(model.getQuarto().getNumero());
+				leito.setTipoLeito(model.getTipoLeito().getId());
+				leito.setSituacao(model.getSituacao().getId());
+				
+				return new ResponseEntity<>(leito, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>("Leito não existe", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 	@RequestMapping("/por_destinacao_hospedagem/{id}")
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")

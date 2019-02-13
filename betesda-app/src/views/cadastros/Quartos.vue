@@ -16,7 +16,7 @@
 
                 <el-row type="flex" style="margin-bottom:10px">
                   <el-col>
-                  <el-button type="primary" size="mini" @click="handleInsertLeito(quarto.id)">Novo Leito</el-button>
+                  <el-button type="primary" size="mini" @click="handleInsertLeito(quarto)">Novo Leito</el-button>
                   <el-button type="primary" size="mini" @click="handleEditQuarto(quarto.id)">Alterar Quarto</el-button>
                   <el-button type="danger" size="mini" @click="handleDeleteQuarto(quarto.id)">Excluir Quarto</el-button>
                   </el-col>
@@ -27,7 +27,7 @@
                 </el-row>
 
                 <div class="flex-container wrap">
-                  <el-card class="flex-item" v-for="(leito, i)  in dados[index].leitos" :key="i" shadow="never" style="width:400px;">
+                  <el-card class="flex-item" v-for="(leito, i)  in dados[index].leitos" :key="i" shadow="never" style="width:200px;">
 
                     <div slot="header" class="clearfix">
                       <span class="numero_leito">{{leito.numero}}</span>
@@ -117,7 +117,7 @@
     </el-container>
 
     <!-- InsertQuarto -->
-    <el-container v-if="state != 'nada'">
+    <el-container v-if="state == 'insertQuarto'">
       <el-header>
         <el-row type="flex">  
           <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
@@ -131,16 +131,16 @@
       </el-header>
       <el-main>
         
-        <el-form :model="formQuarto" :rules="rules" ref="formQuarto" label-position="top" size="small" label-width="140px">
+        <el-form :model="formQuartoInsert" :rules="rules" ref="formQuartoInsert" label-position="top" size="small" label-width="140px">
           <el-row :gutter="10">
             <el-col :span="4">
                 <el-form-item label="Número" :error="getErro('numero')">
-                  <el-input-number v-model="formQuarto.numero" ref="edtnumero" :min="1" :max="999" style="width:100%"></el-input-number>
+                  <el-input-number v-model="formQuartoInsert.numero" ref="edtnumero" :min="1" :max="999" style="width:100%"></el-input-number>
                 </el-form-item>
             </el-col>
             <el-col :span="20">
                 <el-form-item label="Descrição" prop="descricao" :error="getErro('descricao')">
-                  <el-input v-model="formQuarto.descricao" ref="edtdescricao" ></el-input>
+                  <el-input v-model="formQuartoInsert.descricao" ref="edtdescricao" ></el-input>
                 </el-form-item>
             </el-col>
           </el-row>
@@ -148,7 +148,7 @@
           <el-row :gutter="10">
             <el-col :span="24">
                 <el-form-item label="Destinações de Hospedagem" prop="destinacoes" :error="getErro('destinacoes')">
-                  <el-select v-model="formQuarto.destinacoes" multiple placeholder="Selecione um ou mais" style="width:100%">
+                  <el-select v-model="formQuartoInsert.destinacoes" multiple placeholder="Selecione um ou mais" style="width:100%">
                     <el-option
                       v-for="item in itensDestinacaoHospedagem"
                       :key="item.value"
@@ -163,12 +163,12 @@
           <el-row :gutter="10">
             <el-col :span="4">
                 <el-form-item label="Qtd.Leitos" :error="getErro('quantidadeLeitos')">
-                  <el-input-number v-model="formQuarto.quantidadeLeitos" :min="1" :max="2" style="width:100%"></el-input-number>
+                  <el-input-number v-model="formQuartoInsert.quantidadeLeitos" :min="1" :max="2" style="width:100%"></el-input-number>
                 </el-form-item>
             </el-col>
             <el-col :span="10">
                 <el-form-item label="Tipo de Leito" prop="tipoLeito" :error="getErro('tipoLeito')">
-                  <el-select v-model="formQuarto.tipoLeito" placeholder="Selecione" style="width:100%">
+                  <el-select v-model="formQuartoInsert.tipoLeito" placeholder="Selecione" style="width:100%">
                     <el-option
                       v-for="item in itensTipoLeito"
                       :key="item.value"
@@ -180,7 +180,112 @@
             </el-col>
             <el-col :span="10">
                 <el-form-item label="Situação Inicial dos Leitos" prop="situacao" :error="getErro('situacao')">
-                  <el-select v-model="formQuarto.situacao" placeholder="Selecione" style="width:100%">
+                  <el-select v-model="formQuartoInsert.situacao" placeholder="Selecione" style="width:100%">
+                    <el-option
+                      v-for="item in itensSituacaoLeito"
+                      :key="item.value"
+                      :label="item.text"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+
+      </el-main>
+    </el-container>
+
+    <!-- EditQuarto -->
+    <el-container v-if="state == 'editQuarto'">
+      <el-header>
+        <el-row type="flex">  
+          <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;"><el-button type="primary" @click="handleSaveEditQuarto">Gravar</el-button></div>
+          </el-tooltip>
+          <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;"><el-button @click="handleCancelQuarto">Cancelar</el-button></div>
+          </el-tooltip>
+          <div>Alterando Quarto</div>
+        </el-row>
+      </el-header>
+      <el-main>
+        
+        <el-form :model="formQuartoEdit" :rules="rules" ref="formQuartoEdit" label-position="top" size="small" label-width="140px">
+          <el-row :gutter="10">
+            <el-col :span="4">
+                <el-form-item label="Número" :error="getErro('numero')"> 
+                  <el-input-number v-model="formQuartoEdit.numero" ref="edtQuartoEditNumero" :min="1" :max="999" style="width:100%"></el-input-number>
+                </el-form-item>
+            </el-col>
+            <el-col :span="20">
+                <el-form-item label="Descrição" prop="descricao" :error="getErro('descricao')">
+                  <el-input v-model="formQuartoEdit.descricao" ref="edtQuartoEditDescricao" ></el-input>
+                </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="10">
+            <el-col :span="24">
+                <el-form-item label="Destinações de Hospedagem" prop="destinacoes" :error="getErro('destinacoes')">
+                  <el-select v-model="formQuartoEdit.destinacoes" multiple placeholder="Selecione um ou mais" style="width:100%">
+                    <el-option
+                      v-for="item in itensDestinacaoHospedagem"
+                      :key="item.value"
+                      :label="item.text"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-form>
+
+      </el-main>
+    </el-container>
+
+
+    <!-- Edit/Insert Leito -->
+    <el-container v-if="(state == 'insertLeito') || (state == 'editLeito')">
+      <el-header>
+        <el-row type="flex">  
+          <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;"><el-button type="primary" @click="handleSaveLeito">Gravar</el-button></div>
+          </el-tooltip>
+          <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;"><el-button @click="handleCancelLeito">Cancelar</el-button></div>
+          </el-tooltip>
+          <div>{{ state == "insertLeito" ? `Incluindo Leito no Quarto ${formLeito.quartoNumero}` : `Alterando Leito no Quarto ${formLeito.quartoNumero}`}}</div>
+        </el-row>
+      </el-header>
+      <el-main>
+        
+        <el-form :model="formLeito" :rules="rules" ref="formLeito" label-position="top" size="small" label-width="140px">
+          <el-row :gutter="10">
+            <el-col :span="4">
+                <el-form-item label="Número" :error="getErro('numero')">
+                  <el-input-number v-model="formLeito.numero" ref="edtnumero" :min="1" :max="999" style="width:100%"></el-input-number>
+                </el-form-item>
+            </el-col>
+
+            <el-col :span="20">
+                <el-form-item label="Tipo" prop="tipoLeito" :error="getErro('tipoLeito')">
+                  <el-select v-model="formLeito.tipoLeito" placeholder="Selecione" style="width:100%">
+                    <el-option
+                      v-for="item in itensTipoLeito"
+                      :key="item.value"
+                      :label="item.text"
+                      :value="item.value">
+                    </el-option>
+                  </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="10">
+            <el-col :span="24">
+                <el-form-item label="Situação" prop="situacao" :error="getErro('situacao')">
+                  <el-select v-model="formLeito.situacao" placeholder="Selecione" style="width:100%">
                     <el-option
                       v-for="item in itensSituacaoLeito"
                       :key="item.value"
@@ -240,7 +345,7 @@ export default {
     itensTipoLeito : [],
     itensSituacaoLeito : [],
 
-    formQuarto : {
+    formQuartoInsert : {
       id : null,
       numero : null,
       descricao : null,
@@ -248,6 +353,20 @@ export default {
       tipoLeito : null,
       situacao : null,
       quantidadeCamas : null
+    },
+
+    formQuartoEdit : {
+      id : null,
+      numero : null,
+      descricao : null,
+      destinacoes : null
+    },
+
+    formLeito:{
+      id : null,
+      numero: 0,
+      tipoLeito: null,
+      situacao: null
     },
 
     rules: {
@@ -284,7 +403,7 @@ export default {
     },
 
     handleInsertQuarto(){
-      this.state = "insert"
+      this.state = "insertQuarto"
       this.resetData()
       this.setDefaultData()
       this.$nextTick(() => {
@@ -297,15 +416,24 @@ export default {
       this.doSaveQuarto()
     },
 
+    handleSaveEditQuarto(){
+      console.log("handleSaveEditQuarto")
+      this.doSaveEditQuarto()
+    },
+
     handleCancelQuarto(){
+      this.state = "browse"
       console.log("handleCancelQuarto")
     },
 
-    handleInsertLeito(quartoId){
-      console.log("handleInsertLeito ",quartoId)
+    handleInsertLeito(quarto){
+      this.doInsertLeito(quarto)
     },
  
     handleEditQuarto(quartoId){
+      
+      this.doEditQuarto(quartoId)
+
       console.log("handleEditQuarto ",quartoId)
     },
  
@@ -315,6 +443,7 @@ export default {
  
     handleEditLeito(id){
       console.log("handleEditLeito ",id)
+      this.doEditLeito(id)
     },
 
     handleDeleteLeito(id){
@@ -348,6 +477,15 @@ export default {
       }
     },
 
+    handleSaveLeito(){
+      console.log("handleSaveLeito")
+    },
+
+    handleCancelLeito(){
+      this.state = "browse"
+      console.log("handleCancelLeito")
+    },
+
     doLoadListas(evt) {
       this.itensDestinacaoHospedagem = []
       this.itensTipoLeito = []
@@ -360,8 +498,6 @@ export default {
           this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
           this.itensTipoLeito = response.data.listaTipoLeito
           this.itensSituacaoLeito = response.data.listaSituacaoLeito
-
-          console.log(this.itensDestinacaoHospedagem)
         })
     },
 
@@ -399,8 +535,8 @@ export default {
 
     doSaveQuarto() {
       this.errors = []
-      console.log(this.formQuarto)
-      petra.axiosPost("/app/quarto", this.formQuarto, false)
+      console.log(this.formQuartoInsert)
+      petra.axiosPost("/app/quarto", this.formQuartoInsert, false)
         .then(response => {
         })
         .catch(error => {
@@ -409,17 +545,90 @@ export default {
         })
     },
 
-    doSave(evt) {
-      this.errors = [];
+    doEditQuarto(id) {
+      petra.axiosGet(`/app/quarto/${id}`).then(
+        response => {
+          this.state = "editQuarto"
+          var item = response.data  
+          var destinacoes = []
+          for(var i = 0; i < item.destinacoes.length; i++){
+            destinacoes.push(item.destinacoes[i].id)
+          }
+          this.formQuartoEdit = {
+            id: item.id,
+            numero: item.numero,
+            descricao: item.descricao,
+            destinacoes : destinacoes
+          }
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.$refs.edtQuartoEditNumero.focus()
+            }, 500)
+          })
+        })
+    },
 
-      petra.axiosPost("/app/destinacao_hospedagem/", this.form, false)
+    doSaveEditQuarto() {
+      this.errors = []
+
+      petra.axiosPost("/app/quarto/alterar", this.formQuartoEdit, false)
         .then(response => {
-          petra.showMessageSuccess('Destinação de Hospedagem gravada com sucesso')
-          this.state="browse"
-          this.doGetAll()
+          //this.dialogVisible = false
+          //this.$emit('close',true)
+          //this.$emit('save',response.data)
         })
         .catch(error => {
-          this.erros = petra.tratarErros(error)
+          this.errors = petra.tratarErros(error)
+        })
+    },
+
+    doInsertLeito(quarto) {
+      this.state = "insertLeito"
+      this.formLeito = {
+        id: null,
+        numero: null,
+        descricao: null,
+        situacao: null,
+        tipoLeito : null,
+        quartoId : quarto.id,
+        quartoNumero : quarto.numero,
+      }
+      this.$nextTick(() => {
+        setTimeout(() => {
+          //this.$refs.edtQuartoEditNumero.focus()
+        }, 500)
+      })
+    },
+
+    doEditLeito(id) {
+      petra.axiosGet(`/app/quarto/leito/${id}`).then(
+        response => {
+          this.state = "editLeito"
+          var item = response.data  
+          console.log(response.data)
+
+          this.formLeito = {
+            id: item.id,
+            numero: item.numero,
+            descricao: item.descricao,
+            situacao : item.situacao,
+            tipoLeito : item.tipoLeito,
+            quartoId : item.quartoId,
+            quartoNumero : item.quartoNumero,
+          }
+
+        })
+    },
+
+    doSaveLeito(evt) {
+      this.errors = [];
+
+      petra.axiosPost("/app/quarto/leito", this.formLeito)
+        .then(response => {
+
+        })
+        .catch(error => {
+          this.errors = petra.tratarErros(error)
         })
     },
 

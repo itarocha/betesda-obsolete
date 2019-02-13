@@ -9,6 +9,8 @@ public class EditLeitoVO {
 
 	@NotNull(message="Identificador do Quarto precisa ser informado")
 	private Long quartoId;
+
+	private Integer quartoNumero;
 	
 	@NotNull(message="Número precisa ser informado")
 	@Min(value=1, message="Número do Quarto deve ser maior que zero")
@@ -37,6 +39,14 @@ public class EditLeitoVO {
 
 	public void setQuartoId(Long quartoId) {
 		this.quartoId = quartoId;
+	}
+
+	public Integer getQuartoNumero() {
+		return quartoNumero;
+	}
+
+	public void setQuartoNumero(Integer quartoNumero) {
+		this.quartoNumero = quartoNumero;
 	}
 
 	public Integer getNumero() {
