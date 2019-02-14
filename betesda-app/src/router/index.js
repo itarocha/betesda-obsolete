@@ -73,7 +73,7 @@ const router = new Router({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log('beforeEach in route from ', from)
+  //console.log('beforeEach in route from ', from)
   if(to.matched.some(record => record.meta.requiresAuth)){
     var loggedIn = store.getters.loggedIn
     //console.log("Path: ",to.path," loggedIn = ",loggedIn," meta = ", to.meta)

@@ -11,8 +11,8 @@
         <el-row type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="24">
 
-            <el-tabs type="border-card">
-              <el-tab-pane v-for="(quarto, index) in dados" :key="index" :label="'Quarto ' + quarto.numero">
+            <el-tabs type="border-card" ref="tab" v-model="activeTabName">
+              <el-tab-pane v-for="(quarto, index) in dados" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)">
 
                 <el-row type="flex" style="margin-bottom:10px">
                   <el-col>
@@ -121,7 +121,7 @@
       <el-header>
         <el-row type="flex">  
           <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button type="primary" @click="handleSaveQuarto">Gravar</el-button></div>
+            <div style="margin-right:10px;"><el-button type="primary" @click="handleSaveInsertQuarto">Gravar</el-button></div>
           </el-tooltip>
           <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
             <div style="margin-right:10px;"><el-button @click="handleCancelQuarto">Cancelar</el-button></div>
@@ -163,7 +163,7 @@
           <el-row :gutter="10">
             <el-col :span="4">
                 <el-form-item label="Qtd.Leitos" :error="getErro('quantidadeLeitos')">
-                  <el-input-number v-model="formQuartoInsert.quantidadeLeitos" :min="1" :max="2" style="width:100%"></el-input-number>
+                  <el-input-number v-model="formQuartoInsert.quantidadeLeitos" :min="1" :max="20" style="width:100%"></el-input-number>
                 </el-form-item>
             </el-col>
             <el-col :span="10">
@@ -264,7 +264,7 @@
           <el-row :gutter="10">
             <el-col :span="4">
                 <el-form-item label="Número" :error="getErro('numero')">
-                  <el-input-number v-model="formLeito.numero" ref="edtnumero" :min="1" :max="999" style="width:100%"></el-input-number>
+                  <el-input-number v-model="formLeito.numero" ref="edtLeitoNumero" :min="1" :max="999" style="width:100%"></el-input-number>
                 </el-form-item>
             </el-col>
 
@@ -301,7 +301,6 @@
       </el-main>
     </el-container>
 
-
     <el-dialog title="Confirmação" :visible.sync="dialogExclusaoVisible" width="600px">
       <span>{{textToDelete}}</span>
       <span slot="footer" class="dialog-footer">
@@ -329,10 +328,16 @@ export default {
     this.doLoadListas()
   },
 
+  computed: {
+  },  
+
   data: () =>({
     dados: [],
 
     erros: [],
+
+    activeTabName: null,
+    activeTabNameOld : null,
 
     state : 'browse',
 
@@ -391,6 +396,11 @@ export default {
       this.erros = []
     },
 
+    getNomeTab(quarto){
+      var retorno = `quarto${quarto.numero}`
+      return retorno
+    },
+
     setDefaultData(){
     },
 
@@ -404,37 +414,36 @@ export default {
 
     handleInsertQuarto(){
       this.state = "insertQuarto"
+      this.activeTabNameOld = this.activeTabName
       this.resetData()
       this.setDefaultData()
+      this.doLoadListas()
       this.$nextTick(() => {
         setTimeout(() => this.$refs.edtdescricao.focus(), 500)
       })      
     },
 
-    handleSaveQuarto(){
-      console.log("handleSaveQuarto")
-      this.doSaveQuarto()
+    handleSaveInsertQuarto(){
+      this.doSaveInsertQuarto()
     },
 
     handleSaveEditQuarto(){
-      console.log("handleSaveEditQuarto")
       this.doSaveEditQuarto()
     },
 
     handleCancelQuarto(){
       this.state = "browse"
-      console.log("handleCancelQuarto")
+      this.activeTabName = this.activeTabNameOld
     },
 
     handleInsertLeito(quarto){
+      this.activeTabNameOld = this.activeTabName
       this.doInsertLeito(quarto)
     },
  
     handleEditQuarto(quartoId){
-      
+      this.activeTabNameOld = this.activeTabName
       this.doEditQuarto(quartoId)
-
-      console.log("handleEditQuarto ",quartoId)
     },
  
     handleDeleteQuarto(quartoId){
@@ -442,7 +451,10 @@ export default {
     },
  
     handleEditLeito(id){
-      console.log("handleEditLeito ",id)
+      this.activeTabNameOld = this.activeTabName
+      this.resetData()
+      this.setDefaultData()
+      this.doLoadListas()
       this.doEditLeito(id)
     },
 
@@ -478,20 +490,18 @@ export default {
     },
 
     handleSaveLeito(){
-      console.log("handleSaveLeito")
+      this.doSaveLeito()
     },
 
     handleCancelLeito(){
       this.state = "browse"
-      console.log("handleCancelLeito")
+      this.activeTabName = this.activeTabNameOld      
     },
 
     doLoadListas(evt) {
       this.itensDestinacaoHospedagem = []
       this.itensTipoLeito = []
       this.itensSituacaoLeito = []
-
-      console.log("ou")
 
       petra.axiosGet("/app/quarto/listas", false).then(
         response => {
@@ -501,12 +511,22 @@ export default {
         })
     },
 
-    doGetAll(evt) {
-      petra.axiosGet("/app/quarto").then(
-        response => {
-          console.log(response.data)
-          this.dados = response.data
-        })
+    doGetAll() {
+
+      return new Promise((resolve, reject) => {
+        petra.axiosGet("/app/quarto").then(
+          response => {
+            this.dados = response.data
+            if (this.dados.length > 0){
+              var q = this.dados[0]
+              this.activeTabName = `quarto${q.numero}`
+            }
+            resolve(response)
+          }).catch(error => {
+            reject(error)
+          })
+      })
+
     },
 
     doGetById(id) {
@@ -533,15 +553,19 @@ export default {
         })
     },
 
-    doSaveQuarto() {
+    doSaveInsertQuarto() {
       this.errors = []
-      console.log(this.formQuartoInsert)
       petra.axiosPost("/app/quarto", this.formQuartoInsert, false)
         .then(response => {
+          var newTab = this.getNomeTab(response.data)
+          petra.showMessageSuccess('Quarto gravado com sucesso')
+          this.state="browse"
+          this.doGetAll().then(sucesso => {
+            this.activeTabName = newTab
+          })
         })
         .catch(error => {
           this.erros = petra.tratarErros(error)
-          console.log(this.erros)
         })
     },
 
@@ -573,9 +597,13 @@ export default {
 
       petra.axiosPost("/app/quarto/alterar", this.formQuartoEdit, false)
         .then(response => {
-          //this.dialogVisible = false
-          //this.$emit('close',true)
-          //this.$emit('save',response.data)
+          petra.showMessageSuccess('Quarto gravado com sucesso')
+          var thetab = this.getNomeTab(response.data)
+          this.state="browse"
+
+          this.doGetAll().then( x => {
+            this.activeTabName = thetab
+          })
         })
         .catch(error => {
           this.errors = petra.tratarErros(error)
@@ -584,6 +612,8 @@ export default {
 
     doInsertLeito(quarto) {
       this.state = "insertLeito"
+      this.resetData()
+      this.setDefaultData()
       this.formLeito = {
         id: null,
         numero: null,
@@ -595,7 +625,7 @@ export default {
       }
       this.$nextTick(() => {
         setTimeout(() => {
-          //this.$refs.edtQuartoEditNumero.focus()
+          this.$refs.edtLeitoNumero.focus()
         }, 500)
       })
     },
@@ -605,7 +635,6 @@ export default {
         response => {
           this.state = "editLeito"
           var item = response.data  
-          console.log(response.data)
 
           this.formLeito = {
             id: item.id,
@@ -620,15 +649,19 @@ export default {
         })
     },
 
-    doSaveLeito(evt) {
+    doSaveLeito() {
       this.errors = [];
 
-      petra.axiosPost("/app/quarto/leito", this.formLeito)
+      petra.axiosPost("/app/quarto/leito", this.formLeito, false)
         .then(response => {
-
+          petra.showMessageSuccess('Leito gravado com sucesso')
+          this.state="browse"
+          this.doGetAll().then(success => {
+            this.activeTabName = this.activeTabNameOld
+          })
         })
         .catch(error => {
-          this.errors = petra.tratarErros(error)
+          this.erros = petra.tratarErros(error)
         })
     },
 

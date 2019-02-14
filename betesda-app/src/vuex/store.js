@@ -45,7 +45,7 @@ export default new Vuex.Store({
             state.snackbar = valor
         },
         setNumero(state, numero){
-            console.log("setNumero ",numero)
+            //console.log("setNumero ",numero)
             state.numero = numero
         },
         setFlashMessage(state, flashMessage){
@@ -112,12 +112,12 @@ export default new Vuex.Store({
             state.commit('setSnackbar', valor)
         },
         setNumero(state, numero){
-            console.log("actions.setNumero ",numero)
+            //console.log("actions.setNumero ",numero)
             status.commit('setNumero',numero)
         },
         showFlashMessage(state, message){
             var num = Math.floor(Math.random() * 10)
-            console.log("store.showFlashMessage ",num)
+            //console.log("store.showFlashMessage ",num)
             state.commit('setNumero', num)
             state.commit('setFlashMessage', message)
         },

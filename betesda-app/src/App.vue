@@ -61,10 +61,12 @@
                 <i class="fas fa-forward pr"/>
                 <span>Movimentação</span>
               </template>
-                <el-menu-item index="2-1" route="tela"><i class="fas fa-sign-in-alt pr"></i>Checkin</el-menu-item>
-                <el-menu-item index="2-2" route="tela"><i class="fas fa-suitcase pr"></i>Hospedagens</el-menu-item>
-                <el-menu-item index="2-3" route="tela"><i class="fas fa-utensils pr"></i>Serviços</el-menu-item>
-                <el-menu-item index="2-4" route="tela"><i class="fas fa-id-card pr"></i>Histórico de Hospedagens</el-menu-item>
+                <el-menu-item index="2-1" route="tela"><i class="fas fa-university pr"></i>Entidades</el-menu-item>
+                <el-menu-item index="2-2" route="tela"><i class="fas fa-users pr"></i>Pessoas</el-menu-item>
+                <el-menu-item index="2-3" route="tela"><i class="fas fa-sign-in-alt pr"></i>Checkin</el-menu-item>
+                <el-menu-item index="2-4" route="tela"><i class="fas fa-suitcase pr"></i>Hospedagens</el-menu-item>
+                <el-menu-item index="2-5" route="tela"><i class="fas fa-utensils pr"></i>Serviços</el-menu-item>
+                <el-menu-item index="2-6" route="tela"><i class="fas fa-id-card pr"></i>Histórico de Hospedagens</el-menu-item>
             </el-submenu>
           </el-menu>
         </el-aside>
