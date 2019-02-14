@@ -18,7 +18,7 @@
                   <el-col>
                   <el-button type="primary" size="mini" @click="handleInsertLeito(quarto)">Novo Leito</el-button>
                   <el-button type="primary" size="mini" @click="handleEditQuarto(quarto.id)">Alterar Quarto</el-button>
-                  <el-button type="danger" size="mini" @click="handleDeleteQuarto(quarto.id)">Excluir Quarto</el-button>
+                  <el-button type="danger" size="mini" @click="handleConfirmDeleteQuarto(quarto)">Excluir Quarto</el-button>
                   </el-col>
                 </el-row>
 
@@ -33,7 +33,7 @@
                       <span class="numero_leito">{{leito.numero}}</span>
 
                       <el-tooltip content="Excluir Leito" placement="bottom" :open-delay="toolTipDelay">
-                          <el-button @click="handleDeleteLeito(leito.id)" style="float: right; margin-left:10px" plain size="mini" circle type="danger"><i class="fas fa-trash"></i></el-button>
+                          <el-button @click="handleConfirmDeleteLeito(leito)" style="float: right; margin-left:10px" plain size="mini" circle type="danger"><i class="fas fa-trash"></i></el-button>
                       </el-tooltip>
                       <el-tooltip content="Editar Leito" placement="bottom" :open-delay="toolTipDelay">
                           <el-button @click="handleEditLeito(leito.id)" style="float: right;" plain size="mini" circle type="primary"><i class="fas fa-pencil-alt"></i></el-button>
@@ -301,14 +301,21 @@
       </el-main>
     </el-container>
 
-    <el-dialog title="Confirmação" :visible.sync="dialogExclusaoVisible" width="600px">
+    <el-dialog title="Confirmação" :visible.sync="dialogDeleteLeitoVisible" width="600px">
       <span>{{textToDelete}}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleConfirmDelete(false)">Cancelar</el-button>
-        <el-button type="primary" @click="handleConfirmDelete(true)">Sim</el-button>
+        <el-button @click="handleDeleteLeito(false)">Cancelar</el-button>
+        <el-button type="primary" @click="handleDeleteLeito(true)">Sim</el-button>
       </span>
     </el-dialog>
 
+    <el-dialog title="Confirmação" :visible.sync="dialogDeleteQuartoVisible" width="600px">
+      <span>{{textToDelete}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleDeleteQuarto(false)">Cancelar</el-button>
+        <el-button type="primary" @click="handleDeleteQuarto(true)">Sim</el-button>
+      </span>
+    </el-dialog>
   </div>
 
 </template>
@@ -333,15 +340,16 @@ export default {
 
   data: () =>({
     dados: [],
-
     erros: [],
+    leitosOcupados: [],
 
     activeTabName: null,
     activeTabNameOld : null,
 
     state : 'browse',
 
-    dialogExclusaoVisible : false,
+    dialogDeleteLeitoVisible : false,
+    dialogDeleteQuartoVisible : false,
 
     idToDelete : null,
     textToDelete : null,
@@ -458,8 +466,31 @@ export default {
       this.doEditLeito(id)
     },
 
-    handleDeleteLeito(id){
-      console.log("handleDeleteLeito ",id)
+    handleConfirmDeleteLeito(leito){
+      this.activeTabNameOld = this.activeTabName
+      this.textToDelete = `Deseja realmente excluir o Leito "${leito.numero}"?`
+      this.idToDelete = leito.id
+      this.dialogDeleteLeitoVisible = true
+    },
+
+    handleDeleteLeito(ok){
+      this.dialogDeleteLeitoVisible = false
+      if (ok){
+        this.doDeleteLeito()
+      }
+    },
+
+    handleConfirmDeleteQuarto(quarto){
+      this.textToDelete = `Deseja realmente excluir o Quarto "${quarto.numero}"?`
+      this.idToDelete = quarto.id
+      this.dialogDeleteQuartoVisible = true
+    },
+
+    handleDeleteQuarto(ok){
+      this.dialogDeleteQuartoVisible = false
+      if (ok){
+        this.doDeleteQuarto()
+      }
     },
 
     handleEdit(row){
@@ -476,6 +507,37 @@ export default {
       this.idToDelete = row.id
       this.dialogExclusaoVisible = true
     },
+
+/*
+    loadLeitosOcupados() {
+      var dataIni = petraDateTime.hoje()
+
+      var request = {
+        dataIni : dataIni,
+        dataFim : dataIni
+      }
+
+      this.leitosOcupados = []
+      petra.axiosPost("/app/hospedagem/leitos_ocupados", request).then(
+        response => {
+          this.leitosOcupados = response.data
+        })
+    },
+
+    visualizarHospedagemNoLeito(leitoId){
+      petra.showMessageSuccess('Em breve será apresentada a hospedagem do leito')
+    },
+
+    classeSituacaoLeito(id){
+      var ocupado = this.isLeitoOcupado(id)
+      return ocupado ? "red lighten-2" : "amber lighten-4"
+    },
+
+    isLeitoOcupado(id){
+      return (this.leitosOcupados.indexOf(id) >= 0);
+    },
+
+*/
 
     handleCancel(row){
       this.state = "browse"
@@ -542,6 +604,7 @@ export default {
         })
     },
 
+    /*
     doDelete(evt) {
       petra.axiosDelete("/app/destinacao_hospedagem/"+this.idToDelete)
         .then(response => {
@@ -552,6 +615,7 @@ export default {
           petra.tratarErros(error)
         })
     },
+    */
 
     doSaveInsertQuarto() {
       this.errors = []
@@ -664,6 +728,35 @@ export default {
           this.erros = petra.tratarErros(error)
         })
     },
+
+    doDeleteLeito() {
+      this.errors = [];
+
+      petra.axiosDelete("/app/quarto/leito/"+this.idToDelete)
+        .then(response => {
+          petra.showMessageSuccess('Leito excluído com sucesso')
+          this.doGetAll().then(success => {
+            this.activeTabName = this.activeTabNameOld
+          })
+        })
+        .catch(error => {
+          petra.tratarErros(error)
+        })
+    },
+
+    doDeleteQuarto() {
+      this.errors = [];
+
+      petra.axiosDelete("/app/quarto/"+this.idToDelete)
+        .then(response => {
+          petra.showMessageSuccess('Quarto excluído com sucesso')
+          this.doGetAll()
+        })
+        .catch(error => {
+          petra.tratarErros(error)
+        })
+    },
+
 
   }
 }
