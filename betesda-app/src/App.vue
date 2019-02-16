@@ -62,7 +62,9 @@
                 <span>Movimentação</span>
               </template>
                 <el-menu-item index="2-1" route="tela"><i class="fas fa-university pr"></i>Entidades</el-menu-item>
-                <el-menu-item index="2-2" route="tela"><i class="fas fa-users pr"></i>Pessoas</el-menu-item>
+                <el-menu-item index="2-2">
+                    <router-link to="/pessoas" tag="div"><i class="fas fa-users pr"></i>Pessoas</router-link>
+                </el-menu-item>
                 <el-menu-item index="2-3" route="tela"><i class="fas fa-sign-in-alt pr"></i>Checkin</el-menu-item>
                 <el-menu-item index="2-4" route="tela"><i class="fas fa-suitcase pr"></i>Hospedagens</el-menu-item>
                 <el-menu-item index="2-5" route="tela"><i class="fas fa-utensils pr"></i>Serviços</el-menu-item>
@@ -155,6 +157,18 @@ body{
     cursor: pointer;
   }
 
+  /*
+  .el-table .wordwrap{
+    color:green;
+    word-break: normal !important;
+    text-transform: uppercase;
+  }
+  */
+
+  /* Mantenha isso para evitar que as palavras quebrem no meio*/
+  .el-table .cell{
+    word-break: keep-all;
+  }
 
   .el-table .warning-row {
     background-color:red !important;
