@@ -56,6 +56,16 @@ public class PessoasController {
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody Pessoa model) {
+		if (model.getCartaoSus() != null) {
+			model.setCartaoSus(model.getCartaoSus().replaceAll("\\.", ""));
+		}
+		if (model.getCpf() != null) {
+			model.setCpf(model.getCpf().replaceAll("\\.", "").replaceAll("\\-", ""));
+		}
+		if (model.getEndereco() != null && model.getEndereco().getCep() != null) {
+			model.getEndereco().setCep((model.getEndereco().getCep().replaceAll("\\-", "")));
+		}
+		
 		ItaValidator<Pessoa> v = new ItaValidator<Pessoa>(model);
 		v.validate();
 		if (!v.hasErrors() ) {
