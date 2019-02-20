@@ -13,11 +13,11 @@
       <el-main>
         <el-row type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="24">
-            <el-table :data="dados" stripe style="width: 100%" border size="small" :default-sort="{prop: 'descricao', order: 'ascending'}" height="400">
+            <el-table :data="dados" stripe style="width: 100%" border size="small" :default-sort="{prop: 'descricao', order: 'ascending'}" :height="tableHeight">
               <el-table-column fixed header-align="left" align="right" prop="id" label="Código" width="100"></el-table-column>
               <el-table-column fixed prop="nome" sortable label="Nome" width="250"></el-table-column>
               <el-table-column prop="dataNascimento" :formatter="fmtDate" label="Nascimento" header-align="left" width="120" sortable></el-table-column>
-              <el-table-column prop="endereco.descricao" sortable label="Endereço" class-name="wordwrap" width="350"></el-table-column>
+              <el-table-column prop="endereco.descricao" label="Endereço" class-name="wordwrap" width="350"></el-table-column>
               <el-table-column prop="naturalidadeCidade" sortable label="Naturalidade" width="120"></el-table-column>
               <el-table-column prop="naturalidadeUf" sortable label="UF"></el-table-column>
               <el-table-column label="Ações" fixed="right" width="120">
@@ -239,6 +239,12 @@ export default {
   mounted() {
     this.$store.dispatch("setAcao", "Pessoas");
     
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.tableHeight = window.innerHeight - 200
+      })
+    })
+
     this.doGetAll();
   },
 
@@ -255,6 +261,10 @@ export default {
 
     idToDelete: null,
     textToDelete: null,
+
+    windowHeight: 0,
+
+    tableHeight: window.innerHeight - 200,
 
     rules: {
       descricao: [

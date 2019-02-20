@@ -42,7 +42,10 @@ public class PessoasController {
 	@RequestMapping
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listar() {
-		List<Pessoa> lista = service.findAll();
+		//List<Pessoa> lista = service.findAll();
+		
+		List<Pessoa> lista = service.findByFieldNameAndValue("nome", "%MAR%");
+		//List<Pessoa> lista = service.findByFieldNameAndValue("cpf", "%282%");
 		return new ResponseEntity<List<Pessoa>>(lista, HttpStatus.OK);
 	}
 	
