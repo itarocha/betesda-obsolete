@@ -11,6 +11,17 @@
         </el-tooltip>
       </el-header>
       <el-main>
+        <el-row>
+          <el-col :sm="24" :md="24" :lg="24">
+            <el-input placeholder="Entre com o texto para busca" v-model="searchValue" :class="'input-with-select'">
+              <el-select v-model="searchField" slot="prepend" placeholder="Select">
+                <el-option v-for="item in itensBusca" :key="item.value" :label="item.text" :value="item.value"></el-option>
+              </el-select>
+              <el-button slot="append" @click="handleSearch" icon="el-icon-search"></el-button>
+            </el-input>
+          </el-col>
+        </el-row>
+
         <el-row type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="24">
             <el-table :data="dados" stripe style="width: 100%" border size="small" :default-sort="{prop: 'descricao', order: 'ascending'}" :height="tableHeight">
@@ -251,6 +262,9 @@ export default {
   data: () => ({
     dados: [],
 
+    searchField : 'nome',
+    searchValue : '',
+
     form : {},
 
     erros: [],
@@ -281,6 +295,13 @@ export default {
     itensDestinacaoHospedagem: [],
     itensTipoLeito: [],
     itensSituacaoLeito: [],
+
+    itensBusca: [
+      {text: "Nome", value: "nome", type: "text"},
+      {text: "CPF", value: "cpf", type: "text"},
+      {text: "RG", value: "rg", type: "text"},
+    ],
+
     itensSexo: [
       { text: "MASCULINO", value: "M" }, 
       { text: "FEMININO", value: "F" }],
@@ -396,6 +417,10 @@ export default {
       return null;
     },
 
+    handleSearch(){
+      this.doGetAll(true)
+    },
+
     handleEdit(row) {
       this.resetData();
       this.doGetById(row.id);
@@ -411,7 +436,7 @@ export default {
     },
 
     handleSave() {
-      this.doSave();
+      this.doSave(true);
     },
 
     handleDelete(row) {
@@ -432,8 +457,20 @@ export default {
       }
     },
 
-    doGetAll(evt) {
-      petra.axiosGet("/app/pessoas").then(response => {
+    doGetAll(showMessage) {
+      if (this.searchValue.length < 3){
+        if (showMessage) {
+          petra.showMessageError("Texto de busca deve ter pelo menos 3 caracteres");
+        }
+        return
+      }
+
+      var searchRequest = {
+        fieldName : this.searchField,
+        value : this.searchValue
+      }
+
+      petra.axiosPost("/app/pessoas/filtrar", searchRequest).then(response => {
         this.dados = response.data;
       });
     },
@@ -482,7 +519,6 @@ export default {
       // column = mostra os detalhes da coluna. Exemplo: property (prop)
       // rowIndex e columnIndex os indices absolutos. A primeira linha de registros é 0
       if (rowIndex === 2 && columnIndex === 2) {
-        //console.log(row)
         return "vermelho";
       } else if (rowIndex === 1 && columnIndex === 1) {
         return "azul";
@@ -517,4 +553,5 @@ export default {
 .el-form {
   padding: 10px;
 }
+
 </style>

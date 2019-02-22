@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.itarocha.betesda.model.Pessoa;
+import br.com.itarocha.betesda.model.SearchRequest;
 import br.com.itarocha.betesda.service.PessoaService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 
@@ -39,6 +41,20 @@ public class PessoasController {
 		}
 	}
 
+	@RequestMapping(value = "/filtrar", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> listarComCriterio(@RequestBody SearchRequest search) {
+		
+		List<Pessoa> lista = new ArrayList<>();
+		if (search.getValue().length() >= 3) {
+			lista = service.findByFieldNameAndValue(search.getFieldName(), "%"+search.getValue()+"%");
+		}
+		
+		//List<Pessoa> lista = service.findByFieldNameAndValue("cpf", "%282%");
+		return new ResponseEntity<List<Pessoa>>(lista, HttpStatus.OK);
+	}
+	
+	@Deprecated
 	@RequestMapping
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> listar() {

@@ -108,8 +108,9 @@ public class PessoaService {
 			//Path<Endereco> endereco = root.<Endereco> get("endereco");
             
             //Predicate endfilter = cb.equal(endereco.get("uf").as(String.class),"MG");
-			return Specification.where(campoContem(campo, conteudo))
-					.or(endereco("uf","MA")).toPredicate(root, query, cb);
+			//return Specification.where(campoContem(campo, conteudo)).or(endereco("uf","MA")).toPredicate(root, query, cb);
+			
+			return Specification.where(campoContem(campo, conteudo)).toPredicate(root, query, cb);
 		};
 		
 		

@@ -232,6 +232,15 @@ body{
 .el-main {
   background: #FAFAFA;
 }
+
+.el-select .el-input {
+  width: 180px;
+}
+
+.input-with-select .el-input-group__prepend {
+  background-color: #fff;
+}
+
 </style>
 
 
