@@ -75,12 +75,19 @@
       <el-container>
         <el-header class="back-title">
           <el-row class="title-container" type="flex" justify="center" align="middle">
-            <el-col :span="12" class="header-title">{{titulo}}{{numero}}</el-col>
-            <el-col :span="12" class="header-menu">
-              login
+            <el-col :span="18" class="header-title">{{titulo}}{{numero}}</el-col>
+
+            <el-col :span="3" class="header-menu">
+              <el-badge :value="aguardando.length" class="item" v-if="aguardando.length > 0">
+                <el-button size="small" @click="handleOpenCheckin">Checkin</el-button>
+              </el-badge>
+            </el-col>
+            <el-col :span="3" class="header-menu">
+              <router-link to="/login" tag="div">Login</router-link>
             </el-col>
           </el-row>
         </el-header>
+
         <el-main>
           <router-view/>
         </el-main>
@@ -98,6 +105,12 @@ export default {
 
   }),
 
+  watch:{
+    aguardando(){
+      deep: true
+    }
+  },
+
   computed: {
     
     titulo(){
@@ -110,12 +123,33 @@ export default {
 
     numero(){
       var fm = this.$store.getters.flashMessage
-      this.$notify(fm);
+      if (fm.message != null){
+        fm.onClose = this.handleCloseNotify;
+        this.$notify(fm);
+      }
       return null
     },
 
+    aguardando(){
+      return this.$store.getters.aguardando;
+    },
+
+    qtdAguardando(){
+      var qtdAguardando = this.$store.getters.qtdAguardando;
+    }
+
   },
 
+  methods: {
+    handleOpenCheckin(){
+      //console.log("open checkin")
+      this.$router.push({name: 'checkin'})
+    },
+
+    handleCloseNotify(){
+      this.$store.dispatch('clearFlashMessage')
+    }
+  },
 
 }
 </script>

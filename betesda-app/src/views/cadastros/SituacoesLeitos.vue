@@ -20,7 +20,7 @@
               <el-table-column fixed header-align="left" align="right" prop="id" label="Código" width="150"></el-table-column>
               <el-table-column prop="descricao" sortable label="Descrição" width="300"></el-table-column>
               <el-table-column prop="disponivel" label="Disponível?" width="100" :formatter="fmtSimNao"></el-table-column>
-              <el-table-column label="Ações">
+              <el-table-column label="Ações" width="120" align="center">
                 <template slot-scope="scope">
                   <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
                     <el-button type="primary" plain size="mini" circle @click="handleEdit(scope.row)"><i class="fas fa-pencil-alt"></i></el-button>  

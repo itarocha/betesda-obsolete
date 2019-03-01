@@ -12,6 +12,7 @@ import DestinacoesHospedagens from '@/views/cadastros/DestinacoesHospedagens'
 import TiposLeitos from '@/views/cadastros/TiposLeitos'
 import Pessoas from '@/views/cadastros/Pessoas'
 import Quartos from '@/views/cadastros/Quartos'
+import Checkin from '@/views/movimentacao/Checkin'
 
 Vue.use(Router)
 
@@ -61,6 +62,11 @@ const router = new Router({
       path: '/hello',
       name: 'hello',
       component: HelloWorld
+    },
+    {
+      path: '/checkin',
+      name: 'checkin',
+      component: Checkin
     },
     {
       path: '/teste',

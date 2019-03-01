@@ -31,7 +31,7 @@
               <el-table-column prop="endereco.descricao" label="Endereço" class-name="wordwrap" width="350"></el-table-column>
               <el-table-column prop="naturalidadeCidade" sortable label="Naturalidade" width="120"></el-table-column>
               <el-table-column prop="naturalidadeUf" sortable label="UF"></el-table-column>
-              <el-table-column label="Ações" fixed="right" width="120">
+              <el-table-column label="Ações" fixed="right" align="center" width="140">
                 <template slot-scope="scope">
                   <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
                     <el-button type="primary" plain size="mini" circle @click="handleEdit(scope.row)">
@@ -41,6 +41,11 @@
                   <el-tooltip content="Excluir" placement="bottom" :open-delay="toolTipDelay">
                     <el-button type="danger" plain size="mini" circle @click="handleDelete(scope.row)">
                       <i class="fas fa-trash"></i>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip content="Selecionar para Hospedagem" placement="bottom" :open-delay="toolTipDelay">
+                    <el-button type="warning" plain size="mini" circle @click="handleSelecionarParaHospedagem(scope.row)">
+                      <i class="fas fa-star"></i>
                     </el-button>
                   </el-tooltip>
                 </template>
@@ -433,6 +438,10 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => this.$refs.edtNome.focus(), 500)
       });
+    },
+
+    handleSelecionarParaHospedagem(row){
+      this.$store.dispatch('addAguardando', row)
     },
 
     handleSave() {
