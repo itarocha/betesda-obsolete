@@ -12,7 +12,8 @@ export default {
       var mensagem = {
         title : 'Informação',
         message : texto,
-        type : 'info'
+        type : 'info',
+        customClass : 'notify_info'
       }
       store.dispatch('showFlashMessage', mensagem)
     },

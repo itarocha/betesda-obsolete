@@ -65,7 +65,9 @@
                 <el-menu-item index="2-2">
                     <router-link to="/pessoas" tag="div"><i class="fas fa-users pr"></i>Pessoas</router-link>
                 </el-menu-item>
-                <el-menu-item index="2-3" route="tela"><i class="fas fa-sign-in-alt pr"></i>Checkin</el-menu-item>
+                <el-menu-item index="2-3">
+                    <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
+                </el-menu-item>
                 <el-menu-item index="2-4" route="tela"><i class="fas fa-suitcase pr"></i>Hospedagens</el-menu-item>
                 <el-menu-item index="2-5" route="tela"><i class="fas fa-utensils pr"></i>Serviços</el-menu-item>
                 <el-menu-item index="2-6" route="tela"><i class="fas fa-id-card pr"></i>Histórico de Hospedagens</el-menu-item>
@@ -179,6 +181,7 @@ body{
   margin:auto;
 }
 
+
   .el-table .vermelho {
     background: red !important;
     color: white;
@@ -267,13 +270,27 @@ body{
   background: #FAFAFA;
 }
 
+/*
 .el-select .el-input {
   width: 180px;
 }
+*/
 
 .input-with-select .el-input-group__prepend {
   background-color: #fff;
 }
+
+/*
+.notify_warning {
+  background-color: orange;
+  color: white !important;
+}
+
+.el-notification div{
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+*/
 
 </style>
 

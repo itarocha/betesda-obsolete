@@ -13,7 +13,7 @@
       <el-main>
         <el-row>
           <el-col :sm="24" :md="24" :lg="24">
-            <el-input placeholder="Entre com o texto para busca" v-model="searchValue" :class="'input-with-select'">
+            <el-input placeholder="Entre com o texto para busca" v-model="searchValue" ref="edtLocalizar" :class="'input-with-select'">
               <el-select v-model="searchField" slot="prepend" placeholder="Select">
                 <el-option v-for="item in itensBusca" :key="item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
@@ -259,6 +259,7 @@ export default {
       window.addEventListener('resize', () => {
         this.tableHeight = window.innerHeight - 200
       })
+      setTimeout(() => this.$refs.edtLocalizar.focus(), 500)
     })
 
     this.doGetAll();

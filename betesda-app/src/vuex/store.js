@@ -114,9 +114,6 @@ export default new Vuex.Store({
         }
     },
 
-
-
-
     mutations:{ //changing the state - call mutations
         increment(state){
             state.count++
@@ -162,7 +159,21 @@ export default new Vuex.Store({
 
         //Onde as coisas acontecem
         addAguardando(state, pessoa){
-            state.aguardando.push(pessoa)
+            
+            var p = _.find(state.aguardando, {nome: pessoa.nome})
+            if (p){
+                petra.showMessageWarning(`${pessoa.nome} já foi adicionada` )    
+            } else {
+                petra.showMessageSuccess(`Adicionando: ${pessoa.nome}`)
+
+                var aguardando = {
+                    pessoa : { id : pessoa.id, nome: pessoa.nome},
+                    tipoHospede : null,
+                    acomodacao : null
+                }
+
+                state.aguardando.push(aguardando)
+            }
         },
 
         clearFlashMessage(state){
@@ -171,7 +182,6 @@ export default new Vuex.Store({
                 message : null,
                 type : 'info'
             }
-            console.log('cleaning flashMessage')
         }
     },
 })

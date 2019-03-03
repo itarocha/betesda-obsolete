@@ -232,6 +232,10 @@ export default {
       }
     },
 
+    setQuartoSelecionado(quarto){
+      this.quartoSelecionado = quarto
+    },
+
     loadLeitosOcupados() {
       var dataIni = petraDateTime.hoje()
 
@@ -258,10 +262,6 @@ export default {
 
     isLeitoOcupado(id){
       return (this.leitosOcupados.indexOf(id) >= 0);
-    },
-
-    setQuartoSelecionado(quarto){
-      this.quartoSelecionado = quarto
     },
 
     deleteItem(item) {

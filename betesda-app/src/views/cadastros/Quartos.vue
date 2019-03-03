@@ -156,7 +156,7 @@
                       :value="item.value">
                     </el-option>
                   </el-select>
-              </el-form-item>
+                </el-form-item>
             </el-col>
           </el-row>
 
