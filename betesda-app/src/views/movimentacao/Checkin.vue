@@ -1,14 +1,14 @@
 <template>
   <div>
-    <frame-selecao-leito ref="frameSelecaoLeito"></frame-selecao-leito>
+    <frame-selecao-leito ref="frameSelecaoLeito" @onSelecionar="onSelecionarLeito"></frame-selecao-leito>
 
     <el-container v-if="state == 'browse'">
       <el-header>
         <el-tooltip content="Limpar infomações" placement="bottom" :open-delay="toolTipDelay">
-          <el-button type="primary" @click="handleInsert">Limpar</el-button>
+          <el-button type="primary" @click="handleLimpar">Limpar</el-button>
         </el-tooltip>
         <el-tooltip content="Insere nova Hospedagem com as informações" placement="bottom" :open-delay="toolTipDelay">
-          <el-button type="primary" @click="handleInsert">Lançar Hospedagema</el-button>
+          <el-button type="primary" @click="handleLancarHospedagem">Lançar Hospedagema</el-button>
         </el-tooltip>
       </el-header>
 
@@ -47,13 +47,13 @@
 
                 <el-row :gutter="10">
                   <el-col :span="12">
-                    <el-form-item label="Dt.Entrada" prop="dataNascimento" :error="getErro('dataNascimento')">
-                      <el-date-picker type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" size="mini"></el-date-picker>
+                    <el-form-item label="Dt.Entrada" prop="dataEntrada" :error="getErro('dataEntrada')">
+                      <el-date-picker v-model="form.dataEntrada" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" size="mini"></el-date-picker>
                     </el-form-item>
                   </el-col>
                   <el-col :span="12">
-                    <el-form-item label="Prev. Saída" prop="dataNascimento" :error="getErro('dataNascimento')">
-                      <el-date-picker type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" size="mini"></el-date-picker>
+                    <el-form-item label="Prev. Saída" prop="dataPrevistaSaida" :error="getErro('dataPrevistaSaida')">
+                      <el-date-picker v-model="form.dataPrevistaSaida" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" size="mini"></el-date-picker>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -98,7 +98,6 @@
                   </el-col>
                 </el-row>
 
-
               </el-main>
             </el-container>
           </el-col>
@@ -125,7 +124,7 @@
                             <el-button @click="removerHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-trash"></i></el-button>
                         </el-tooltip>
 
-                        <el-tooltip v-if="form.tipoUtilizacao == 'T'" content="Selecionar Leito" placement="bottom" :open-delay="toolTipDelay">
+                        <el-tooltip v-if="(form.tipoUtilizacao == 'T') && (form.destinacaoHospedagemId != null)" content="Selecionar Leito" placement="bottom" :open-delay="toolTipDelay">
                             <el-button @click="selecionarLeito(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-bed"></i></el-button>
                         </el-tooltip>
 
@@ -133,7 +132,8 @@
                             <el-button @click="doSelecionarTipoHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-users"></i></el-button>
                         </el-tooltip>
 
-                        <el-tooltip content="Conferir/Editar dados do Hóspede" placement="bottom" :open-delay="toolTipDelay">
+                        <!-- desabilitado temporariamente -->
+                        <el-tooltip v-if="false" content="Conferir/Editar dados do Hóspede" placement="bottom" :open-delay="toolTipDelay">
                             <el-button @click="editarHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-pencil-alt"></i></el-button>
                         </el-tooltip>
                       </div> 
@@ -141,16 +141,14 @@
                       <div class="card-detail">
                         <div v-if="(item.tipoHospede == null)" class="red-lighten-4">Selecione o Tipo de Hóspede</div> 
                         <div v-if="(item.tipoHospede != null)">{{item.tipoHospede.descricao}}</div>
-
-                        <div v-if="(form.tipoUtilizacao == 'T') && (item.acomodacao == null)" class="red-lighten-4">Selecione o Leito</div> 
-                        <h4 v-if="item.acomodacao != null">Quarto: {{item.acomodacao.quarto.numero}} Leito: {{item.acomodacao.leito.numero}}</h4>
+                        <div v-if="(form.tipoUtilizacao == 'T') && (form.destinacaoHospedagemId == null)" class="red-lighten-4">Selecione a Destinação da Hospedagem</div> 
+                        <div v-if="(form.tipoUtilizacao == 'T') && (form.destinacaoHospedagemId != null) && (item.acomodacao == null)" class="red-lighten-4">Selecione o Leito</div> 
+                        <div v-if="item.acomodacao != null">Quarto: {{item.acomodacao.quarto.numero}} Leito: {{item.acomodacao.leito.numero}}</div>
                       </div>
 
                     </el-card>
                   </el-col>
                 </el-row>
-
-
               </el-main>
             </el-container>
 
@@ -161,8 +159,6 @@
     </el-container>
 
     <el-dialog title="Selecionar Tipo de Hóspede" :visible.sync="dialogSelecionarTipoHospede" width="500px">
-      
-
       <el-form :model="formTipoHospede" label-position="left" label-width="140px;">
         <el-row type="flex">
           <el-col>
@@ -172,7 +168,7 @@
         <el-row type="flex">
           <el-col>
             <el-form-item label="Tipo de Hóspede">
-              <el-select v-model="formTipoHospede.tipoHospedeId" placeholder="Selecione um Tipo">
+              <el-select v-model="formTipoHospede.tipoHospedeId" placeholder="Selecione um Tipo" style="width: 100%;"> 
                 <el-option
                   v-for="item in itensTipoHospede"
                   :key="item.value"
@@ -187,59 +183,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="handleSelecionarTipoHospede(false)">Cancelar</el-button>
-        <el-button type="primary" @click="handleSelecionarTipoHospede(true)">Confirmar</el-button>
-      </span>
-    </el-dialog>
-
-
-
-
-    <el-container v-if="state != 'browse'">
-      <el-header>
-        <el-row type="flex">  
-          <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button type="primary" @click="handleSave">Gravar</el-button></div>
-          </el-tooltip>
-          <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button @click="handleCancel">Cancelar</el-button></div>
-          </el-tooltip>
-          <div>{{state=='edit' ? 'Editando Tipo de Serviço' : 'Incluindo Tipo de Serviço'}}</div>
-        </el-row>
-      </el-header>
-      <el-main>
-        
-        <el-row class="container" type="flex" justify="center" align="middle">
-          <el-col :sm="24" :md="24" :lg="18">
-
-              <el-form :model="form" :rules="rules" ref="form"
-                label-position="top" size="small" label-width="140px">
-
-                <el-form-item label="Descrição" prop="descricao" :error="getErro('descricao')">
-                  <el-input v-model="form.descricao" ref="edtdescricao"></el-input>
-                </el-form-item>
-
-                <el-form-item label="Ativo?" prop="ativo" :error="getErro('ativo')">
-                  <el-select v-model="form.ativo">
-                    <el-option label="SIM" value="S"></el-option>
-                    <el-option label="NÃO" value="N"></el-option>
-                  </el-select>
-                </el-form-item>
-
-              </el-form>
-          </el-col>
-        </el-row>
-
-      </el-main>
-    </el-container>
-
-    <el-dialog
-      title="Confirmação"
-      :visible.sync="dialogExclusaoVisible"
-      width="600px">
-      <span>{{textToDelete}}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleConfirmDelete(false)">Cancelar</el-button>
-        <el-button type="primary" @click="handleConfirmDelete(true)">Sim</el-button>
+        <el-button type="primary" @click="handleSelecionarTipoHospede(true)" :disabled="formTipoHospede.tipoHospedeId == null">Confirmar</el-button>
       </span>
     </el-dialog>
 
@@ -265,6 +209,9 @@ export default {
   mounted(){
     this.$store.dispatch('setAcao','Checkin')
     this.resetData()
+
+    this.form = this.$store.getters.formHospedagem
+
     this.loadListas()
       this.$nextTick(() => {
         setTimeout(() => this.$refs.entidadeId.focus(), 500)
@@ -276,6 +223,8 @@ export default {
 
     erros: [],
 
+    state: "browse",
+
     hospedes: [],
 
     itensDestinacaoHospedagem : [],
@@ -284,15 +233,7 @@ export default {
     itensEncaminhadores : [],
     itensUtilizacao: [{ text: "Total", value: "T" }, { text: "Parcial", value: "P" }],
 
-
-    state : 'browse',
-
     dialogSelecionarTipoHospede : false,
-
-    dialogExclusaoVisible : false,
-
-    idToDelete : null,
-    textToDelete : null,
 
     form : {
       entidadeId: null,
@@ -352,6 +293,14 @@ export default {
 
 
   watch : {
+
+    form: {
+      deep:true,
+      handler(){
+        this.updateFormHospedagem()
+      }
+    },
+
     destinacaoHospedagem(){
       //this.loadQuartosPorTipoUtilizacao(this.formOpcoes.destinacaoHospedagem)
       this.clearLeitos()
@@ -359,12 +308,11 @@ export default {
 
     tipoUtilizacao(value){
       if (value == "P"){
-        //////////////////////////////////this.clearLeitos()
+        this.clearLeitos()
       }
     },
 
     entidadeId(newValue, oldValue){
-      //console.logconsole.log(`mudou de ${oldValue} para ${newValue}`)
       if (newValue == null){
         this.itensEncaminhadores = []
       } else {
@@ -372,24 +320,12 @@ export default {
       }
     },
 
-    /*
-    servicos(){
-    },
-
-
-    estado(value){
-      if (value == 'incluindo'){
-        this.focus()
-      }
-    }
-    */
   },
 
 
   methods: {
 
     resetData(){
-
       this.form = {
         entidadeId: null,
         encaminhadorId: null,
@@ -404,7 +340,12 @@ export default {
       this.errors = []
       this.hospedagemGravadaId = 0
       this.itensEncaminhadores = []
+      this.itensTipoServico = []
       this.itensEntidades = []
+    },
+
+    updateFormHospedagem(){
+      this.$store.dispatch('setFormHospedagem',this.form)
     },
 
     setDefaultData(){
@@ -446,108 +387,17 @@ export default {
     },
 
     clearLeitos(){
-      for (var i = 0; i < this.hospedes.length; i++) {
-        this.hospedes[i].acomodacao = null
+      for (var i = 0; i < this.aguardando.length; i++) {
+        this.aguardando[i].acomodacao = null
       }      
-      this.rerender()
     },
 
-    onSelecionarPessoa(_pessoa, _tipoHospede){
-      if (_pessoa != null) {
-        for (var i = 0; i < this.hospedes.length; ++i){
-          if (_pessoa.id == this.hospedes[i].pessoa.id){
-            return
-          }
-        }
-        var hospede = {
-          pessoa : _pessoa,
-          tipoHospede : _tipoHospede,
-          acomodacao : null // {quarto, leito}
-        }
-        //console.log("Selecionando pessoa: ", _pessoa)
-        this.hospedes.push(hospede)
-      }
+    handleLimpar(){
+
     },
 
-    handleEdit(row){
-      this.resetData()
-      this.doGetById(row.id)
-    },
+    handleLancarHospedagem(){
 
-    handleInsert(){
-      this.state = "insert"
-      this.resetData()
-      this.setDefaultData()
-      this.$nextTick(() => {
-        setTimeout(() => this.$refs.edtdescricao.focus(), 500)
-      })      
-    },
-    
-    handleSave(){
-      this.doSave()
-    },
-    
-    handleDelete(row){
-      this.textToDelete = `Deseja realmente excluir o Tipo de Serviço "${row.descricao}"?`
-      this.idToDelete = row.id
-      this.dialogExclusaoVisible = true
-    },
-
-    handleCancel(row){
-      this.state = "browse"
-      this.doGetAll()
-    },
-
-    handleConfirmDelete(confirm) {
-      this.dialogExclusaoVisible = false
-      if (confirm){
-        this.doDelete()
-      }
-    },
-
-    doGetAll(evt) {
-      petra.axiosGet("/app/tipo_servico").then(
-        response => {
-          this.dados = response.data
-        })
-    },
-
-    doGetById(id) {
-      petra.axiosGet(`/app/tipo_servico/${id}`).then(
-        response => {
-          this.form = response.data
-          this.state = "edit"
-          this.$nextTick(() => {
-            setTimeout(() => {
-              this.$refs.edtdescricao.focus()
-            }, 500)
-          })      
-        })
-    },
-
-    doDelete(evt) {
-      petra.axiosDelete("/app/tipo_servico/"+this.idToDelete)
-        .then(response => {
-          petra.showMessageSuccess('Tipo de Serviço excluído com sucesso')
-          this.doGetAll()
-        })
-        .catch(error => {
-          petra.tratarErros(error)
-        })
-    },
-
-    doSave(evt) {
-      this.errors = [];
-
-      petra.axiosPost("/app/tipo_servico/", this.form, false)
-        .then(response => {
-          petra.showMessageSuccess('Tipo de Serviço gravado com sucesso')
-          this.state="browse"
-          this.doGetAll()
-        })
-        .catch(error => {
-          this.erros = petra.tratarErros(error)
-        })
     },
 
     removerHospede(item){
@@ -560,13 +410,8 @@ export default {
     },
 
     selecionarLeito(hospede) {
+      this.hospedeSelecionado = hospede
       this.$refs.frameSelecaoLeito.openDialog(hospede, this.form.destinacaoHospedagemId, this.form.dataEntrada, this.form.dataPrevistaSaida)
-
-      //this.$refs.frameSelecaoLeito.teste()
-      /*
-      this.selecionarAcomodacao(hospede)
-      this.$refs.dlgSelecaoLeito.openDialog(hospede, this.formOpcoes.destinacaoHospedagem, this.dataEntrada, this.dataPrevistaSaida)
-      */
     },
 
     doSelecionarTipoHospede(hospede) {
@@ -601,77 +446,39 @@ export default {
       }
     },
 
-    onCloseSelecaoTipoHospede(tipoHospede){
-      /*
-      if (tipoHospede) {
-        if (this.hospedeSelecionado != null){
-          this.hospedeSelecionado.tipoHospede = tipoHospede
-          this.rerender()
-        }
+    onSelecionarLeito(acomodacao){
+
+      if (!acomodacao) {
+        return
       }
-      */
-    },
 
-    editarHospede(hospede) {
-      /*
-      this.$refs.dlgPessoaEdit.openDialog(hospede.pessoa)
-      */
-    },
+      if (this.hospedeSelecionado) {
+        var data = {
+          pessoaId : this.hospedeSelecionado.pessoa.id,
+          acomodacao : acomodacao
+        }
 
-    onSelecionarPessoa(_pessoa, _tipoHospede){
-      /*
-      if (_pessoa != null) {
-        for (var i = 0; i < this.hospedes.length; ++i){
-          if (_pessoa.id == this.hospedes[i].pessoa.id){
-            return
-          }
-        }
-        var hospede = {
-          pessoa : _pessoa,
-          tipoHospede : _tipoHospede,
-          acomodacao : null // {quarto, leito}
-        }
-        //console.log("Selecionando pessoa: ", _pessoa)
-        this.hospedes.push(hospede)
+        this.$store.dispatch("setAcomodacao", data)
       }
-      */
     },
-
-    onUpdatePessoa(_pessoa){
-      /*
-      if (_pessoa != null) {
-        for (var i = 0; i < this.hospedes.length; ++i){
-          if (_pessoa.id == this.hospedes[i].pessoa.id){
-            this.this.hospedes[i].pessoa = _pessoa
-            return
-          }
-        }
-      }
-      */
-    },
-
-    onCloseSelecionarPessoa(){
-      //this.focus()
-    },
-
 
     postarHospedagem() {
       this.errors = []
 
       var toSave = {
-        entidadeId : this.formOpcoes.entidadeId,
-        encaminhadorId : this.formOpcoes.encaminhadorId,
+        entidadeId : this.form.entidadeId,
+        encaminhadorId : this.form.encaminhadorId,
         dataEntrada : this.dataEntrada,
         dataPrevistaSaida : this.dataPrevistaSaida,
-        destinacaoHospedagemId : this.formOpcoes.destinacaoHospedagem,
-        tipoUtilizacao : this.formOpcoes.tipoUtilizacao,
-        observacoes : this.formOpcoes.observacoes,
+        destinacaoHospedagemId : this.form.destinacaoHospedagem,
+        tipoUtilizacao : this.form.tipoUtilizacao,
+        observacoes : this.form.observacoes,
         servicos : [],
         hospedes : []
 
       }
-      if (this.formOpcoes.tipoUtilizacao == "P") {
-        toSave.servicos = this.formOpcoes.servicos
+      if (this.form.tipoUtilizacao == "P") {
+        toSave.servicos = this.form.servicos
       }
       for (var i = 0; i < this.hospedes.length; ++i){
         var hospede = {

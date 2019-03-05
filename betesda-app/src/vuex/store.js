@@ -23,7 +23,17 @@ export default new Vuex.Store({
             name: '',
             email: ''
         },
-        aguardando: []
+        aguardando: [],
+        formHospedagem:{
+            entidadeId: null,
+            encaminhadorId: null,
+            dataEntrada: null,    
+            dataPrevistaSaida: null,
+            destinacaoHospedagem: null,
+            tipoUtilizacao: null,
+            servicos: [],
+            observacoes : null
+        },
     },
 
     getters:{ // computed properties
@@ -49,6 +59,7 @@ export default new Vuex.Store({
             return state.user
         },
         aguardando : state => state.aguardando,
+        formHospedagem : state => state.formHospedagem,
         qtdAguardando : state => {
             return state.aguardando.length
         },
@@ -105,6 +116,11 @@ export default new Vuex.Store({
         },
 
         //Entrada. chamar com store.dispatch('addAguardando',pessoa)
+
+        setFormHospedagem(context, form){
+            context.commit('setFormHospedagem', form)
+        },
+
         addAguardando(context, pessoa) {
             context.commit('addAguardando', pessoa) // 
         },
@@ -115,6 +131,9 @@ export default new Vuex.Store({
 
         setTipoHospede(state, data){        
             state.commit('setTipoHospede', data)
+        },
+        setAcomodacao(state, data){        
+            state.commit('setAcomodacao', data)
         }
     },
 
@@ -161,6 +180,10 @@ export default new Vuex.Store({
             delete axios.defaults.headers.common['Authorization'];
         },
 
+        setFormHospedagem(state, form){
+            state.formHospedagem = form
+        },
+
         //Onde as coisas acontecem
         addAguardando(state, pessoa){
             
@@ -184,6 +207,13 @@ export default new Vuex.Store({
             var hospede =  _.find(state.aguardando,{pessoa : {id : data.pessoaId}})
             if (hospede){
                 hospede.tipoHospede = data.tipoHospede
+            }
+        },
+
+        setAcomodacao(state, data){
+            var hospede =  _.find(state.aguardando,{pessoa : {id : data.pessoaId}})
+            if (hospede){
+                hospede.acomodacao = data.acomodacao
             }
         },
 

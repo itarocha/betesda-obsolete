@@ -2,69 +2,40 @@
   <div>
 
     <el-dialog title="Selecionar Leito" :visible.sync="dialogVisible" width="750px">
-        <el-row type="flex">
-          <el-col>
-            <h4>{{nomeHospede}}</h4>
-          </el-col>
-        </el-row>
-        <el-row type="flex">
-          <el-col :sm="24" :md="24" :lg="24">
-            <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick">
-              <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)">
+      <el-row type="flex">
+        <el-col :span="18">
+          <h4>{{nomeHospede}}</h4>
+        </el-col>
+        <el-col :span="6">
+          <h4 v-if="acomodacao != null">Seleção: Quarto {{acomodacao.quarto.numero}} Leito {{acomodacao.leito.numero}}</h4>
+        </el-col>
+      </el-row>
+      <el-row type="flex">
+        <el-col :sm="24" :md="24" :lg="24">
+          <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick">
+            <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)">
 
-                <div class="flex-container wrap">
-                  <!--
-                  <div class="flex-item" v-for="(leito, i)  in leitos" :key="i" style="width:200px;" @click.native="selecionarLeito(leito)">
-                    <div slot="header" class="clearfix" @click.native="selecionarLeito(leito)">
-                      <span class="numero_leito">{{leito.numero}}</span>
-                    </div> 
-                    <div style="font-size:0.8em">{{leito.tipoLeito.descricao}} - {{leito.tipoLeito.quantidadeCamas}} cama(s)</div>                      
-                  </div>
-                  -->
-                  <el-card class="flex-item" v-for="(leito, i)  in leitos" :key="i" shadow="never" style="width:200px;" @click.native="selecionarLeito(leito)" body-style="bodystyle">
-                    <div class="clearfix elcardheader">
-                      <span class="numero_leito">{{leito.numero}}</span>
-                    </div> 
-                    <div style="font-size:0.8em">{{leito.tipoLeito.descricao}} - {{leito.tipoLeito.quantidadeCamas}} cama(s)</div>                      
-                  </el-card>
-                </div>
+              <div class="flex-container wrap">
+                <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" 
+                    shadow="never" style="width:200px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
+                  <div class="clearfix elcardheader">
+                    <span class="numero_leito">{{leito.numero}}</span>
+                  </div> 
+                  <div style="font-size:0.8em">{{leito.tipoLeito.descricao}} - {{leito.tipoLeito.quantidadeCamas}} cama(s)</div>                      
+                </el-card>
+              </div>
 
-
-
-              </el-tab-pane>
-            </el-tabs>
-          </el-col>
-        </el-row>    
-
-
-
+            </el-tab-pane>
+          </el-tabs>
+        </el-col>
+      </el-row>    
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancelar</el-button>
-        <el-button type="primary" @click="dialogVisible = false">Confirmar</el-button>
+        <el-button type="primary" :disabled="acomodacao == null" @click="doSelecionarLeito">Confirmar</el-button>
       </span>
     </el-dialog>
 
-    <!--
-    <v-layout row wrap>
-      <v-flex xs12 sm12 md12>
-        <v-select v-model="quarto" :items="itensQuarto" item-text="displayText" item-value="id" label="Quarto" required></v-select>
-      </v-flex>
-      <v-flex xs12 sm12 md12 v-if="quarto != null">
-        <p style="color:'red'">Clique sobre a representação do leito para selecionar...{{dataIni}} - {{dataFim}}</p>
-      </v-flex>
-
-      <v-flex xs3 v-for="(leito, i) in leitos" :key="i">
-        <v-card :class="classeSituacaoLeito(leito)" @click.native="selecionarLeito(leito)">
-          <v-card-text class="text-sm">
-            <h3>{{leito.numero}}</h3>
-            <div class="caption">{{leito.tipoLeito.descricao}}</div>
-            <div class="caption">{{leito.tipoLeito.quantidadeCamas}} cama(s)</div>
-          </v-card-text>
-        </v-card>
-      </v-flex>
-    </v-layout>
-    -->
   </div>
 </template>
 
@@ -83,8 +54,10 @@ export default {
 
     nomeHospede : "",
     hospede : null,
-    quarto : null,
-    leito: null,
+
+    acomodacao : null,
+
+
     leitos : [],
     quartos : [],
     leitosOcupados : []
@@ -98,16 +71,6 @@ export default {
   },
 
   watch: {
-    quarto(value) {
-      this.$emit('selecionarQuarto',value)
-      this.leito = null
-
-      this.refreshLeitos(value)
-    },
-
-    activeTabName(value){
-      console.log("activeTabName ",value)
-    }
   },
 
   computed : {
@@ -121,10 +84,6 @@ export default {
   },
 
   methods: {
-
-    teste(){
-      this.dialogVisible = true
-    },
 
     openDialog(hospede, destinacaoHospedagemId, dataIni, dataFim){
       this.reset()
@@ -143,10 +102,8 @@ export default {
     },
 
     handleTabClick(tab){
-      //console.log("clicou em",tab.index)
       var quarto = this.quartos[tab.index]
       if (quarto){
-        //console.log("clicou em",tab.index, quarto)
         this.leitos = quarto.leitos
       }
     },
@@ -168,13 +125,6 @@ export default {
               this.leitos = q.leitos
               this.activeTabName = `quarto${q.numero}`
             }
-            /*
-            if (this.quartos.length > 0){
-              this.quarto = this.quartos[0].id
-              this.refreshLeitos(this.quarto.id)
-            }
-            */
-
           })
       }
     },
@@ -191,7 +141,7 @@ export default {
     },
 
     leitoSelecionado(id){
-      return this.leito && id == this.leito.id
+      return this.acomodacao && id == this.acomodacao.leito.id
     },
 
     classeSituacaoLeito(leito){
@@ -199,22 +149,25 @@ export default {
 
       var leitoSelecionado = this.leitoSelecionado(id)
       var leitoOcupado = this.isLeitoOcupado(id)
-      return leitoSelecionado ? "amber lighten-4 ma-1" : leitoOcupado ? "red lighten-2 ma-1" : "grey lighten-4 ma-1"
+      return leitoSelecionado ? "flex-item leito-selecionado" : leitoOcupado ? "flex-item leito-ocupado" : "flex-item  leito-livre"
     },
 
     isLeitoOcupado(id){
       return (this.leitosOcupados.indexOf(id) >= 0);
     },
 
-    selecionarLeito(leito){
-      console.log("selecionando leito ", leito)
+    selecionarLeito(quarto, leito){
       if (this.isLeitoOcupado(leito.id)){
         // mensagem
       } else {
-        this.leito = leito
-        this.$emit('selecionarLeito',leito)
+        this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
       }
 
+    },
+
+    doSelecionarLeito(){
+        this.$emit('onSelecionar', this.acomodacao)
+        this.dialogVisible = false
     },
 
     // publico
@@ -225,8 +178,7 @@ export default {
         if (this.quarto == this.quartos[i].id){
           item = {
             hospede : this.hospede,
-            quarto : this.quartos[i], 
-            leito : this.leito
+            acomodacao : this.acomodacao
           }
           return item
         }
@@ -251,8 +203,7 @@ export default {
 
     reset(){
       this.tipoHospede = null
-      this.quarto = null
-      this.leito = null
+      this.acomodacao = null
       this.leitos = []
     },
 
@@ -300,7 +251,7 @@ export default {
   border-radius: 4px;
   /*line-height: 1.5em;*/
   /*background: #FFF8E1;*/
-  background: #FFF9C4;
+  /*background: #FFF9C4;*/
   color: #455A64;
   padding: 10px;
 
@@ -315,6 +266,19 @@ export default {
   font-size: 2em;
   text-align: center;
   */
+}
+
+.leito-selecionado {
+  background: #FFE57F;
+}
+
+.leito-ocupado {
+  background: #D32F2F;
+  color: white;
+}
+
+.leito-livre {
+  background:whitesmoke;
 }
 
 
