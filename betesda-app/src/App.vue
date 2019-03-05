@@ -215,6 +215,14 @@ body{
     background: #f0f9eb;
   }
 
+  .el-dialog__body{
+    padding: 0px 10px;
+  }
+
+ .el-card__body {
+    padding: 8px;
+  }
+
 .el-aside {
   background: #F0F2F1;
   color:white;

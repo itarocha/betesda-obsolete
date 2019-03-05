@@ -1,5 +1,6 @@
 <template>
   <div>
+    <frame-selecao-leito ref="frameSelecaoLeito"></frame-selecao-leito>
 
     <el-container v-if="state == 'browse'">
       <el-header>
@@ -114,38 +115,39 @@
               </el-header>
               <el-main style="padding: 0px 5px;">
                 <el-row>
+                  <el-col>
+                    <el-card v-for="(item, i) in aguardando" :key="i" shadow="never" style="margin-bottom: 10px;">
 
-                  <el-card body-style="card-body-style" v-for="(item, i)  in aguardando" :key="i" shadow="never" >
+                      <div slot="header" class="clearfix" >
+                        <span class="card-header">{{item.pessoa.nome}}</span>
 
-                    <div slot="header" class="clearfix" >
-                      <span class="card-header">{{item.pessoa.nome}}</span>
+                        <el-tooltip content="Remover da Hospedagem" placement="bottom" :open-delay="toolTipDelay">
+                            <el-button @click="removerHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-trash"></i></el-button>
+                        </el-tooltip>
 
-                      <el-tooltip content="Remover da Hospedagem" placement="bottom" :open-delay="toolTipDelay">
-                          <el-button @click="removerHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-trash"></i></el-button>
-                      </el-tooltip>
+                        <el-tooltip v-if="form.tipoUtilizacao == 'T'" content="Selecionar Leito" placement="bottom" :open-delay="toolTipDelay">
+                            <el-button @click="selecionarLeito(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-bed"></i></el-button>
+                        </el-tooltip>
 
-                      <el-tooltip v-if="form.tipoUtilizacao == 'T'" content="Selecionar Leito" placement="bottom" :open-delay="toolTipDelay">
-                          <el-button @click="selecionarLeito(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-bed"></i></el-button>
-                      </el-tooltip>
+                        <el-tooltip content="Alterar Tipo de Hóspede" placement="bottom" :open-delay="toolTipDelay">
+                            <el-button @click="doSelecionarTipoHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-users"></i></el-button>
+                        </el-tooltip>
 
-                      <el-tooltip content="Alterar Tipo de Hóspede" placement="bottom" :open-delay="toolTipDelay">
-                          <el-button @click="selecionarTipoHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-users"></i></el-button>
-                      </el-tooltip>
+                        <el-tooltip content="Conferir/Editar dados do Hóspede" placement="bottom" :open-delay="toolTipDelay">
+                            <el-button @click="editarHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-pencil-alt"></i></el-button>
+                        </el-tooltip>
+                      </div> 
 
-                      <el-tooltip content="Conferir/Editar dados do Hóspede" placement="bottom" :open-delay="toolTipDelay">
-                          <el-button @click="editarHospede(item)" style="float: right; margin-left:10px" plain size="small" circle ><i class="fas fa-pencil-alt"></i></el-button>
-                      </el-tooltip>
-                    </div> 
+                      <div class="card-detail">
+                        <div v-if="(item.tipoHospede == null)" class="red-lighten-4">Selecione o Tipo de Hóspede</div> 
+                        <div v-if="(item.tipoHospede != null)">{{item.tipoHospede.descricao}}</div>
 
-                    <div class="card-detail">
-                      <div v-if="(item.tipoHospede == null)" class="red-lighten-4">Selecione o Tipo de Hóspede</div> 
-                      <div v-if="(item.tipoHospede != null)">{{item.tipoHospede.descricao}}</div>
+                        <div v-if="(form.tipoUtilizacao == 'T') && (item.acomodacao == null)" class="red-lighten-4">Selecione o Leito</div> 
+                        <h4 v-if="item.acomodacao != null">Quarto: {{item.acomodacao.quarto.numero}} Leito: {{item.acomodacao.leito.numero}}</h4>
+                      </div>
 
-                      <div v-if="(form.tipoUtilizacao == 'T') && (item.acomodacao == null)" class="red-lighten-4">Selecione o Leito</div> 
-                      <h4 v-if="item.acomodacao != null">Quarto: {{item.acomodacao.quarto.numero}} Leito: {{item.acomodacao.leito.numero}}</h4>
-                    </div>
-
-                  </el-card>
+                    </el-card>
+                  </el-col>
                 </el-row>
 
 
@@ -157,6 +159,39 @@
         </el-form>
       </el-main>
     </el-container>
+
+    <el-dialog title="Selecionar Tipo de Hóspede" :visible.sync="dialogSelecionarTipoHospede" width="500px">
+      
+
+      <el-form :model="formTipoHospede" label-position="left" label-width="140px;">
+        <el-row type="flex">
+          <el-col>
+            <h4>{{hospedeSelecionado == null ? "" : hospedeSelecionado.pessoa.nome}}</h4>
+          </el-col>
+        </el-row>
+        <el-row type="flex">
+          <el-col>
+            <el-form-item label="Tipo de Hóspede">
+              <el-select v-model="formTipoHospede.tipoHospedeId" placeholder="Selecione um Tipo">
+                <el-option
+                  v-for="item in itensTipoHospede"
+                  :key="item.value"
+                  :label="item.text"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleSelecionarTipoHospede(false)">Cancelar</el-button>
+        <el-button type="primary" @click="handleSelecionarTipoHospede(true)">Confirmar</el-button>
+      </span>
+    </el-dialog>
+
+
 
 
     <el-container v-if="state != 'browse'">
@@ -214,15 +249,22 @@
 
 <script>
 
+import FrameSelecaoLeito from "./FrameSelecaoLeito.vue"
+
 export default {
 
   name: 'Checkin',
+
+  components:{
+    FrameSelecaoLeito
+  },
 
   created(){
   },
 
   mounted(){
     this.$store.dispatch('setAcao','Checkin')
+    this.resetData()
     this.loadListas()
       this.$nextTick(() => {
         setTimeout(() => this.$refs.entidadeId.focus(), 500)
@@ -245,6 +287,8 @@ export default {
 
     state : 'browse',
 
+    dialogSelecionarTipoHospede : false,
+
     dialogExclusaoVisible : false,
 
     idToDelete : null,
@@ -260,6 +304,12 @@ export default {
       servicos: [],
       observacoes : null
     },
+
+    formTipoHospede: {
+      tipoHospedeId : null
+    },
+
+    hospedeSelecionado : null,
 
     rules: {
       descricao: [
@@ -346,7 +396,7 @@ export default {
         dataEntrada: null,    
         dataPrevistaSaida: null,
         destinacaoHospedagem: null,
-        tipoUtilizacao: null,
+        tipoUtilizacao: "T",
         servicos: [],
         observacoes : null
       },
@@ -510,17 +560,45 @@ export default {
     },
 
     selecionarLeito(hospede) {
+      this.$refs.frameSelecaoLeito.openDialog(hospede, this.form.destinacaoHospedagemId, this.form.dataEntrada, this.form.dataPrevistaSaida)
+
+      //this.$refs.frameSelecaoLeito.teste()
       /*
       this.selecionarAcomodacao(hospede)
       this.$refs.dlgSelecaoLeito.openDialog(hospede, this.formOpcoes.destinacaoHospedagem, this.dataEntrada, this.dataPrevistaSaida)
       */
     },
 
-    selecionarTipoHospede(hospede) {
-      /*
-      this.hospedeSelecionado = hospede
-      this.$refs.dlgSelTipoHospede.openDialog(hospede.pessoa.nome)
-      */
+    doSelecionarTipoHospede(hospede) {
+      this.hospedeSelecionado = hospede 
+      this.formTipoHospede.tipoHospedeId = null
+      if (hospede.tipoHospede){
+        this.formTipoHospede.tipoHospedeId = hospede.tipoHospede.id
+      }
+      this.dialogSelecionarTipoHospede = true
+    },
+
+    handleSelecionarTipoHospede(opcao){
+      this.dialogSelecionarTipoHospede = false
+      if (!opcao) {
+        return
+      }
+
+      if (this.formTipoHospede.tipoHospedeId && this.hospedeSelecionado){
+        var pessoaId = this.hospedeSelecionado.pessoa.id
+        var th =  _.find(this.itensTipoHospede, {value : this.formTipoHospede.tipoHospedeId})
+
+        if (th){
+          var data = {
+            pessoaId : pessoaId,
+            tipoHospede : {
+              id : th.value,
+              descricao : th.text
+            }
+          }
+          this.$store.dispatch("setTipoHospede", data)
+        }
+      }
     },
 
     onCloseSelecaoTipoHospede(tipoHospede){
@@ -653,11 +731,6 @@ export default {
 
   .bg-purple {
     background: #d3dce6;
-  }
-
-  .card-body-style {
-    padding : 10px;
-    color: red;
   }
 
   .card-header{

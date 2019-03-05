@@ -111,6 +111,10 @@ export default new Vuex.Store({
 
         clearFlashMessage(state){
             state.commit('clearFlashMessage')
+        },
+
+        setTipoHospede(state, data){        
+            state.commit('setTipoHospede', data)
         }
     },
 
@@ -173,6 +177,13 @@ export default new Vuex.Store({
                 }
 
                 state.aguardando.push(aguardando)
+            }
+        },
+
+        setTipoHospede(state, data){
+            var hospede =  _.find(state.aguardando,{pessoa : {id : data.pessoaId}})
+            if (hospede){
+                hospede.tipoHospede = data.tipoHospede
             }
         },
 
