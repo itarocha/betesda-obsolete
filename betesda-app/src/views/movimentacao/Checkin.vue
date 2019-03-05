@@ -240,7 +240,7 @@ export default {
       encaminhadorId: null,
       dataEntrada: null,    
       dataPrevistaSaida: null,
-      destinacaoHospedagem: null,
+      destinacaoHospedagemId: null,
       tipoUtilizacao: null,
       servicos: [],
       observacoes : null
@@ -265,8 +265,8 @@ export default {
 
   computed: {
 
-    destinacaoHospedagem(){
-      return this.form.destinacaoHospedagem
+    destinacaoHospedagemId(){
+      return this.form.destinacaoHospedagemId
     },
 
     tipoUtilizacao(){
@@ -301,7 +301,7 @@ export default {
       }
     },
 
-    destinacaoHospedagem(){
+    destinacaoHospedagemId(){
       //this.loadQuartosPorTipoUtilizacao(this.formOpcoes.destinacaoHospedagem)
       this.clearLeitos()
     },
@@ -331,7 +331,7 @@ export default {
         encaminhadorId: null,
         dataEntrada: null,    
         dataPrevistaSaida: null,
-        destinacaoHospedagem: null,
+        destinacaoHospedagemId: null,
         tipoUtilizacao: "T",
         servicos: [],
         observacoes : null
@@ -397,7 +397,7 @@ export default {
     },
 
     handleLancarHospedagem(){
-
+      this.postarHospedagem()
     },
 
     removerHospede(item){
@@ -468,9 +468,9 @@ export default {
       var toSave = {
         entidadeId : this.form.entidadeId,
         encaminhadorId : this.form.encaminhadorId,
-        dataEntrada : this.dataEntrada,
-        dataPrevistaSaida : this.dataPrevistaSaida,
-        destinacaoHospedagemId : this.form.destinacaoHospedagem,
+        dataEntrada : this.form.dataEntrada,
+        dataPrevistaSaida : this.form.dataPrevistaSaida,
+        destinacaoHospedagemId : this.form.destinacaoHospedagemId,
         tipoUtilizacao : this.form.tipoUtilizacao,
         observacoes : this.form.observacoes,
         servicos : [],
@@ -480,19 +480,19 @@ export default {
       if (this.form.tipoUtilizacao == "P") {
         toSave.servicos = this.form.servicos
       }
-      for (var i = 0; i < this.hospedes.length; ++i){
+      for (var i = 0; i < this.aguardando.length; ++i){
         var hospede = {
-          pessoaId : this.hospedes[i].pessoa.id,
-          pessoaNome : this.hospedes[i].pessoa.nome,
-          tipoHospedeId : this.hospedes[i].tipoHospede.id,
+          pessoaId : this.aguardando[i].pessoa.id,
+          pessoaNome : this.aguardando[i].pessoa.nome,
+          tipoHospedeId : this.aguardando[i].tipoHospede.id,
         }
 
-        if ((this.formOpcoes.tipoUtilizacao == "T") && (this.hospedes[i].acomodacao != null)){ 
+        if ((this.form.tipoUtilizacao == "T") && (this.aguardando[i].acomodacao != null)){ 
           hospede.acomodacao = {
-            quartoId : this.hospedes[i].acomodacao.quarto.id,
-            quartoNumero : this.hospedes[i].acomodacao.quarto.numero,
-            leitoId : this.hospedes[i].acomodacao.leito.id,
-            leitoNumero : this.hospedes[i].acomodacao.leito.numero,
+            quartoId : this.aguardando[i].acomodacao.quarto.id,
+            quartoNumero : this.aguardando[i].acomodacao.quarto.numero,
+            leitoId : this.aguardando[i].acomodacao.leito.id,
+            leitoNumero : this.aguardando[i].acomodacao.leito.numero,
           }
         }
         toSave.hospedes.push(hospede)
@@ -501,10 +501,11 @@ export default {
       petra.axiosPost("/app/hospedagem", toSave)
         .then(response => {
             this.errors = []
-            this.resetHospedagem()
-            this.showHospedagemGravada(response.data.id)
+            //////////this.resetHospedagem()
+            //this.showHospedagemGravada(response.data.id)
         })
         .catch(error => {
+          console.log(error)
           this.errors = petra.tratarErros(error)
         })
     },

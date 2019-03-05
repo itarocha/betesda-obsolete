@@ -29,7 +29,7 @@ export default new Vuex.Store({
             encaminhadorId: null,
             dataEntrada: null,    
             dataPrevistaSaida: null,
-            destinacaoHospedagem: null,
+            destinacaoHospedagemId: null,
             tipoUtilizacao: null,
             servicos: [],
             observacoes : null
