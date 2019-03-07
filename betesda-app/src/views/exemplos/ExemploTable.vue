@@ -24,10 +24,10 @@
               <el-table-column label="Ações">
                 <template slot-scope="scope">
                   <el-tooltip content="Editar" placement="bottom" :open-delay="300">
-                    <el-button type="primary" plain size="mini" circle @click="handleEdit(scope.row)"><i class="fas fa-pencil-alt"></i></el-button>  
+                    <el-button type="primary" plain size="mini" circle ><i class="fas fa-pencil-alt"></i></el-button>  
                   </el-tooltip>
                   <el-tooltip content="Excluir" placement="bottom" :open-delay="300">
-                    <el-button type="danger"  plain size="mini" circle @click="handleDelete(scope.row)"><i class="fas fa-trash"></i></el-button>  
+                    <el-button type="danger"  plain size="mini" circle><i class="fas fa-trash"></i></el-button>  
                   </el-tooltip>
                 </template>
               </el-table-column>
@@ -99,14 +99,6 @@ export default {
     formatMethod({ row, column, cellValue, index }) {
       //console.log(row, column, cellValue, index)
     },    
-
-    handleEdit(row){
-      //console.log("tentando editar", row)
-    },
-    
-    handleDelete(row){
-      //console.log("tentando excluir", row)
-    },
 
     tableRowClassName({row, rowIndex}) {
       if (rowIndex === 1) {

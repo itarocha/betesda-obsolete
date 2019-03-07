@@ -3,79 +3,134 @@
 
     <el-container v-if="state == 'browse'">
       <el-header>
-        <el-tooltip content="Incluir nova Destinação de Hospedagem" placement="bottom" :open-delay="toolTipDelay">
-          <el-button type="primary" @click="handleInsert">Incluir</el-button>
-        </el-tooltip>
+        <el-button type="primary" @click="getDadosSemanaAnterior(dados.dataIni)">Semana Anterior</el-button>
+        <el-button type="primary" @click="getDadosHoje()">Hoje</el-button>
+        <el-button type="primary" @click="getDadosProximaSemana(dados.dataFim)">Semana Seguinte</el-button>
       </el-header>
       <el-main>
-        <el-row type="flex" justify="center" align="middle">
-          <el-col :sm="24" :md="24" :lg="24">
-            <el-table
-              :data="dados"
-              stripe 
-              style="width: 100%"
-              border size="small"
-              :default-sort="{prop: 'descricao', order: 'ascending'}" 
-              height="400">
-              <el-table-column fixed header-align="left" align="right" prop="id" label="Código" width="150"></el-table-column>
-              <el-table-column prop="descricao" sortable label="Descrição" width="300"></el-table-column>
-              <el-table-column label="Ações">
-                <template slot-scope="scope">
-                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="primary" plain size="mini" circle @click="handleEdit(scope.row)"><i class="fas fa-pencil-alt"></i></el-button>  
-                  </el-tooltip>
-                  <el-tooltip content="Excluir" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="danger"  plain size="mini" circle @click="handleDelete(scope.row)"><i class="fas fa-trash"></i></el-button>  
-                  </el-tooltip>
-                </template>
-              </el-table-column>
-            </el-table>
+        <el-row type="flex" :gutter="10">
+          <el-col :sm="8" :md="8" :lg="8" style="height:400px;">
+            <calendar-view
+              :show-date="showDate"
+              :time-format-options="{hour: 'numeric', minute:'2-digit'}"
+              :enable-drag-drop="true"
+              :disable-past="disablePast"
+              :disable-future="disableFuture"
+              :show-event-times="showEventTimes"
+              :display-period-uom="displayPeriodUom"
+              :display-period-count="displayPeriodCount"
+              :starting-day-of-week="startingDayOfWeek"
+              :class="themeClasses"
+              :period-changed-callback="periodChanged"
+              :current-period-label="useTodayIcons ? 'icons' : ''"
+              @drop-on-date="onDrop"
+              @click-date="onClickDay"
+              @click-event="onClickEvent"
+            >
+              <calendar-view-header
+                slot="header"
+                slot-scope="{ headerProps }"
+                :header-props="headerProps"
+                @input="setShowDate"
+              />
+            </calendar-view>
+
           </el-col>
+
+          <el-col :sm="16" :md="16" :lg="16">
+
+            <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
+              <el-tab-pane label="Mapa de Hospedagem" name="mapa">
+
+                <el-container style="margin:2px;">
+                  <el-container :style="styleContainerMapa">
+                    <el-header style="line-height:20px; height:54px;">
+                      <el-row type="flex">
+                        <el-col>
+                          <div class="thebox p4 laranja h60">
+                            <span style="font-size: 12pt; align:center;">Quarto/</span>
+                            <span style="font-size: 12pt; align:center;">Leito</span>
+                          </div>
+                        </el-col>
+
+                        <el-col v-for="(dia, index) in dados.dias" :key="index" 
+                          :class="{'white-text': isDataAtual(dia), 'cyan-darken-4':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
+                          <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px" @click="selecionarDia(dia, index)">
+                            <p style="font-size: 9pt">{{diaSemana(dia)}}</p>
+                            <p style="font-size: 12pt">{{formatDate(dia,'DD/MMM')}}</p>
+                          </div>
+                        </el-col>
+                        <div class="w15"></div>
+                      </el-row>                      
+                    </el-header>
+                    
+                    <el-main style="padding-top:0px;">
+
+                      <div :style="styleGrid" class="scroll-y p0">
+                        <el-row type="flex" v-for="(celula, index) in dados.leitos" :key="index">
+                          <el-col>
+                            <div class="thebox p4 laranja hleito" :style="{height:calcularAlturaLeito(index)}">
+                              <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                              <center v-if="celula.quartoNumero == '9999'">Parcial</center>
+                            </div>
+                          </el-col>
+
+                          <el-col sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
+                            <div class="thebox hleito" v-if="celula.hospedagens.length == 0"></div>
+                            <div class="thebox hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
+                              <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe)" 
+                                    v-if="hospedagem.dias[indice].identificador != '0'"
+                                    :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
+                                    @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
+                                    <!-- deve entrar
+                                <v-chip color="grey lighten-1" 
+                                  :small="true" text-color="black" 
+                                  v-if="hospedagem.dias[indice].firstIndex" 
+                                  class="chip">{{getNome(hospedagem.dias[indice].identificador)}}</v-chip>
+                                  -->
+                              </div>                              
+                            </div>
+                          </el-col>
+                          <!--
+                          <v-flex sm12 v-for="(cell,indice) in celula.cells" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
+                            <div class="box hleito">
+                              <div :class="hospedagemClass(cell.andamento)" v-if="cell.hospedagemId != 0" :style="{backgroundColor: colorStatus(cell.status)}" 
+                              @click="showHospedagemInfo(cell.hospedagemId)">
+                                <v-chip color="grey lighten-1" :small="true" text-color="black" v-if="cell.firstIndex" class="chip">{{getNome(cell.id)}}</v-chip>
+                              </div>                              
+                            </div>
+                          </v-flex>
+                          -->
+                        </el-row>
+                      </div>
+
+                    </el-main>
+                  </el-container>
+                </el-container>
+
+
+
+
+
+
+
+
+              </el-tab-pane>
+              <el-tab-pane label="Hóspedes na Semana" name="hospedes">
+                
+              </el-tab-pane>
+              <el-tab-pane label="Resumo Diário" namd="resumo">
+                
+              </el-tab-pane>
+            </el-tabs>
+
+          </el-col>
+
+
+
         </el-row>
       </el-main>
     </el-container>
-
-    <el-container v-if="state != 'browse'">
-      <el-header>
-        <el-row type="flex">  
-          <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button type="primary" @click="handleSave">Gravar</el-button></div>
-          </el-tooltip>
-          <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button @click="handleCancel">Cancelar</el-button></div>
-          </el-tooltip>
-          <div>{{state=='edit' ? 'Editando Destinaçao de Hospedagem' : 'Incluindo Destinaçao de Hospedagem'}}</div>
-        </el-row>
-      </el-header>
-      <el-main>
-        
-        <el-row class="container" type="flex" justify="center" align="middle">
-          <el-col :sm="24" :md="24" :lg="18">
-
-              <el-form :model="form" :rules="rules" ref="form"
-                label-position="top" size="small" label-width="140px">
-
-                <el-form-item label="Descrição" prop="descricao" :error="getErro('descricao')">
-                  <el-input v-model="form.descricao" ref="edtdescricao"></el-input>
-                </el-form-item>
-
-              </el-form>
-          </el-col>
-        </el-row>
-
-      </el-main>
-    </el-container>
-
-    <el-dialog
-      title="Confirmação"
-      :visible.sync="dialogExclusaoVisible"
-      width="600px">
-      <span>{{textToDelete}}</span>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleConfirmDelete(false)">Cancelar</el-button>
-        <el-button type="primary" @click="handleConfirmDelete(true)">Sim</el-button>
-      </span>
-    </el-dialog>
 
   </div>
 
@@ -83,16 +138,39 @@
 
 <script>
 
+require("vue-simple-calendar/static/css/default.css")
+
+
+import {
+	CalendarView,
+	CalendarViewHeader,
+	CalendarMathMixin,
+} from "vue-simple-calendar"
+
 export default {
 
   name: 'Hospedagens',
+
+  components: {
+		CalendarView,
+		CalendarViewHeader,
+	},
+	mixins: [CalendarMathMixin],  
 
   created(){
   },
 
   mounted(){
     this.$store.dispatch('setAcao','Hospedagens')
-    this.doGetAll()
+
+    this.windowHeight = window.innerHeight
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', () => {
+        this.windowHeight = window.innerHeight
+      })
+    })
+
   },
 
   data: () =>({
@@ -102,130 +180,389 @@ export default {
 
     state : 'browse',
 
-    dialogExclusaoVisible : false,
+    activeTabName: 'mapa',
 
-    idToDelete : null,
-    textToDelete : null,
 
-    form : {
-      id : null,
-      descricao : null,
-      disponivel : null
-    },
+    windowHeight: 0,
+    styleGrid : 'max-height: 337px',
+    styleContainerMapa : 'height:300px',
+    txt : '???',
+    dataAtual: null,
+    dados: [],
+    pessoas:[],
 
-    rules: {
-      descricao: [
-        { required: true, message: "Preencha a descrição",trigger: "blur"},
-        { min: 3, max: 32, message: "Descrição deve ter de 3 a 32 caracteres",trigger: "blur"}
-      ],
-    },
+		qtdLeitosTotais : 0,
+		qtdLeitosOcupados : 0,
+    qtdLeitosLivres : 0,
 
-    toolTipDelay: 500
+		qtdTotais : 0,
+		qtdVencidos : 0,
+		qtdPendentes : 0,
+		qtdEncerrados : 0,
+
+		qtdParciaisTotais : 0,
+		qtdParciaisVencidos : 0,
+		qtdParciaisPendentes : 0,
+		qtdParciaisEncerrados : 0,
+
+    colorCache: {},
+
+    toolTipDelay: 500,
+
+			showDate: null, /*this.thisMonth(1),*/
+			message: "",
+			startingDayOfWeek: 0,
+			disablePast: false,
+			disableFuture: false,
+			displayPeriodUom: "month",
+			displayPeriodCount: 1,
+			showEventTimes: true,
+			newEventTitle: "",
+			newEventStartDate: "",
+			newEventEndDate: "",
+			useDefaultTheme: true,
+			useHolidayTheme: true,
+			useTodayIcons: false,    
 
   }),
 
+  watch: {
+    dataAtual(){
+
+      var d = moment(this.dataAtual).toDate()
+
+      //new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0)
+
+
+      this.setShowDate(d)
+      this.getDadosSemanaAtual()
+      this.showEstatisticas()
+    },
+
+    estatisticaLeitos(){
+      this.showEstatisticas()
+    },
+
+    windowHeight(newHeight, oldHeight) {
+      this.txt = `mudou de ${oldHeight} para ${newHeight}`
+      this.styleGrid = `max-height: ${newHeight - 272}px`
+      this.styleContainerMapa = `height: ${newHeight-270}px`
+    }    
+  },
+
+  created(){
+    this.dataAtual = petraDateTime.hoje()
+  },
+
+  computed: {
+
+    estatisticaLeitos(){
+      return this.dados.qtdLeitos
+    },
+
+    imageHeight () {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs': return '220px - xs'
+        case 'sm': return '400px - sm'
+        case 'md': return '500px - md'
+        case 'lg': return '600px - lg'
+        case 'xl': return '800px - xl'
+      }
+    },
+
+    alturaGrid () {
+      switch (this.$vuetify.breakpoint.name) {
+        case 'xs': return 'max-height: 337px'
+        case 'sm': return 'max-height: 337px'
+        case 'md': return 'max-height: 337px'
+        
+        case 'lg': return 'max-height: 337px'
+        case 'xl': return 'max-height: 673px' //613
+      }
+    },
+    
+		userLocale() {
+			return this.getDefaultBrowserLocale
+		},
+		dayNames() {
+			return this.getFormattedWeekdayNames(this.userLocale, "long", 0)
+		},
+		themeClasses() {
+			return {
+				"theme-default": this.useDefaultTheme,
+				"holiday-us-traditional": this.useHolidayTheme,
+				"holiday-us-official": this.useHolidayTheme,
+			}
+		},
+    
+
+  },
+
   methods: {
 
-    resetData(){
-      this.form = {
-        id : null,
-        descricao : null,
-        disponivel : null
-      }
-      this.erros = []
+    handleTabClick(tab, event) {
+      console.log(tab, event);
     },
 
-    setDefaultData(){
+    selecionarDia(dia, index){
+      this.dataAtual = dia;
     },
 
-    getErro(campo){
-      var retorno =  _.find(this.erros,{fieldName : campo})
-      if (retorno){
-        return retorno.errorMessage
-      }
-      return null
-    },
-
-    handleEdit(row){
-      this.resetData()
-      this.doGetById(row.id)
-    },
-
-    handleInsert(){
-      this.state = "insert"
-      this.resetData()
-      this.setDefaultData()
-      this.$nextTick(() => {
-        setTimeout(() => this.$refs.edtdescricao.focus(), 500)
-      })      
-    },
-    
-    handleSave(){
-      this.doSave()
-    },
-    
-    handleDelete(row){
-      this.textToDelete = `Deseja realmente excluir a Destinação de Hospedagem "${row.descricao}"?`
-      this.idToDelete = row.id
-      this.dialogExclusaoVisible = true
-    },
-
-    handleCancel(row){
-      this.state = "browse"
-      this.doGetAll()
-    },
-
-    handleConfirmDelete(confirm) {
-      this.dialogExclusaoVisible = false
-      if (confirm){
-        this.doDelete()
+    //TODO Somente se dataAtual não estiver na lista de datas da semana. A não ser que force
+    getDadosSemanaAtual(){
+      var existe = this.contemElemento(this.dataAtual, this.dados.dias)
+      if (!existe){
+        this.getData(this.dataAtual)
       }
     },
 
-    doGetAll(evt) {
-      petra.axiosGet("/app/destinacao_hospedagem").then(
-        response => {
-          this.dados = response.data
-        })
+    refreshMapa(){
+      this.getData(this.dataAtual)
     },
 
-    doGetById(id) {
-      petra.axiosGet(`/app/destinacao_hospedagem/${id}`).then(
-        response => {
-          this.form = response.data
-          this.state = "edit"
-          this.$nextTick(() => {
-            setTimeout(() => {
-              this.$refs.edtdescricao.focus()
-            }, 500)
-          })      
-        })
+    contemElemento(obj, list) {
+      for (var x in list) {
+          if (list[x] === obj) {
+              return true;
+          }
+      }
+      return false;
     },
 
-    doDelete(evt) {
-      petra.axiosDelete("/app/destinacao_hospedagem/"+this.idToDelete)
+    getDadosHoje(){
+      this.dataAtual = petraDateTime.hoje()
+    },
+
+    getDadosSemanaAnterior(data){
+      this.dataAtual = petraDateTime.semanaAnterior(data)
+    },
+
+    getDadosProximaSemana(data){
+      this.dataAtual = petraDateTime.semanaSeguinte(data)
+    },
+
+    isDataAtual(data){
+      return data == this.dataAtual ? true : false
+    },
+
+    isIndiceDataAtual(indice){
+      return indice == petraDateTime.getIndiceData(this.dataAtual)
+    },
+
+    getData(data) {
+      var dados = {
+        data : data
+      }
+      petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
-          petra.showMessageSuccess('Destinação de Hospedagem excluída com sucesso')
-          this.doGetAll()
+            this.dados = response.data
+            //console.log("getData() ",this.dados)
+            this.pessoas = response.data.hospedagens
+            //console.log(this.pessoas)
+            this.showEstatisticas()
         })
         .catch(error => {
-          petra.tratarErros(error)
+
         })
     },
 
-    doSave(evt) {
-      this.errors = [];
+    showEstatisticas(){
+      var index = petraDateTime.getIndiceData(this.dataAtual) || 0
 
-      petra.axiosPost("/app/destinacao_hospedagem/", this.form, false)
-        .then(response => {
-          petra.showMessageSuccess('Destinação de Hospedagem gravada com sucesso')
-          this.state="browse"
-          this.doGetAll()
-        })
-        .catch(error => {
-          this.erros = petra.tratarErros(error)
-        })
+      if (this.dados && this.dados.qtdLeitosTotais){
+        this.qtdLeitosTotais = this.dados.qtdLeitosTotais[index]
+        this.qtdLeitosOcupados = this.dados.qtdLeitosOcupados[index]
+        this.qtdLeitosLivres = this.dados.qtdLeitosLivres[index]
+
+        this.qtdTotais = this.dados.qtdTotais[index]
+        this.qtdVencidos = this.dados.qtdVencidos[index]
+        this.qtdPendentes = this.dados.qtdPendentes[index]
+        this.qtdEncerrados = this.dados.qtdEncerrados[index]
+
+        this.qtdParciaisTotais = this.dados.qtdParciaisTotais[index]
+        this.qtdParciaisVencidos = this.dados.qtdParciaisVencidos[index]
+        this.qtdParciaisPendentes = this.dados.qtdParciaisPendentes[index]
+        this.qtdParciaisEncerrados = this.dados.qtdParciaisEncerrados[index]
+      } else {
+        this.qtdLeitosTotais = 0
+        this.qtdLeitosOcupados = 0
+        this.qtdLeitosLivres = 0
+
+        this.qtdTotais = 0
+        this.qtdVencidos = 0
+        this.qtdPendentes = 0
+        this.qtdEncerrados = 0
+
+        this.qtdParciaisTotais = 0
+        this.qtdParciaisVencidos = 0
+        this.qtdParciaisPendentes = 0
+        this.qtdParciaisEncerrados = 0
+      }
     },
+
+    recarregar(){
+      this.getDadosSemanaAtual()
+    },
+
+    onEncerrada(hospedagemId){
+      this.refreshMapa()
+    },
+
+    onCloseHospedagemInfo(){
+      this.refreshMapa();
+    },
+
+    formatDate(data,formato){
+      return petraDateTime.formatDate(data,formato)
+    },
+
+    diaSemana(dia){
+      return petraDateTime.diaSemana(dia)
+    },
+
+    hospedagemClass(id, classe){
+      var hospedagem = this.getHospedagemById(id);
+      if (hospedagem){
+          if (classe == "INICIO") {
+            return 'grafico grafico_inicio'
+          } else 
+          if (classe == "DURANTE") {
+            return 'grafico grafico_durante'
+          } else 
+          if (classe == "FIM") {
+            return 'grafico grafico_fim'
+          } else
+          if (classe == "INDO") {
+            return 'grafico grafico_indo'
+          } else      
+          if (classe == "VINDO") {
+            return 'grafico grafico_vindo'
+          } else
+          if (classe == "INDO_VINDO") {
+            return 'grafico grafico_indo grafico_vindo'
+          } else
+          if (classe == "VINDO_FIM") {
+            return 'grafico grafico_vindo grafico_fim'
+          }
+      }
+      return ''
+    },  
+
+    colorStatus(id){
+      var hospedagem = this.getHospedagemById(id);
+      if (hospedagem){
+        if (hospedagem.baixado) {
+          return 'orange'
+        } else if (hospedagem.statusHospedagem == 'ABERTA'){
+          return '#0D47A1' // blue darken-4
+        } else if (hospedagem.statusHospedagem == 'ENCERRADA'){
+          return '#2E7D32' // green darken-4
+        } else if (hospedagem.statusHospedagem == 'VENCIDA'){
+          return '#D50000' // red accent-4
+        }
+      }
+      return 'blue'
+    },
+
+    calcularAlturaLeito(index){
+      var qtd = 0
+
+      if (this.dados && this.dados.leitos){
+        qtd = this.dados.leitos[index].hospedagens.length
+      }
+
+      if (qtd <= 1) {
+        return '28px'
+      } else {
+        return  (qtd*28)+'px'
+      }
+    },
+
+    getHospedagemById(id){
+      return _.find(this.dados.hospedagens,{identificador : id});
+    },
+
+    getNome(id){
+      var hospedagem = this.getHospedagemById(id);
+      if (hospedagem){
+        var nome = hospedagem.pessoaNome.split(" ")[0];
+        if (nome.length > 4){
+          nome = nome.substr(0,4) + "..."
+        }
+        return nome;
+      }
+      return '???';
+    },
+
+    showHospedagemInfoByIdentificador(id){
+      var hospedagem = this.getHospedagemById(id);
+      if (hospedagem){
+        this.showHospedagemInfo(hospedagem.hospedagemId)
+      }
+    },
+
+    showHospedagemInfo(id){
+      this.$refs.hospedagemInfo.openDialog(id);
+    },
+
+		periodChanged(range, eventSource) {
+			// Demo does nothing with this information, just including the method to demonstrate how
+			// you can listen for changes to the displayed range and react to them (by loading events, etc.)
+      //console.log(eventSource) //watch
+      
+      //var d = range.periodStart
+      //this.dataAtual = moment(d).format("YYYY-MM-DD")
+			//console.log(range.periodStart)
+		},
+		thisMonth(d, h, m) {
+			const t = new Date()
+			return new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0)
+		},
+		onClickDay(d) {
+
+      this.dataAtual = moment(d).format("YYYY-MM-DD")
+
+      console.log(`You clicked: ${this.dataAtual}`)
+
+		},
+		onClickEvent(e) {
+			this.message = `You clicked: ${e.title}`
+		},
+		setShowDate(d) {
+			this.message = `Changing calendar view to ${d.toLocaleDateString()}`
+      this.showDate = d
+      this.dataAtual = moment(d).format("YYYY-MM-DD")
+		},
+		onDrop(event, date) {
+			this.message = `You dropped ${event.id} on ${date.toLocaleDateString()}`
+			// Determine the delta between the old start date and the date chosen,
+			// and apply that delta to both the start and end date to move the event.
+			const eLength = this.dayDiff(event.startDate, date)
+			event.originalEvent.startDate = this.addDays(event.startDate, eLength)
+			event.originalEvent.endDate = this.addDays(event.endDate, eLength)
+		},
+
+
+    exemplosMoment(){
+      /* 
+
+      https://tableless.com.br/trabalhando-com-moment/
+
+      const dia = moment("2018-25-02")
+      moment("abcxyz").isValid() // false
+      moment("2018-02-24").add(2, "days") // 2018-02-26
+      moment("2018-02-24").add(1, "year").subtract("1", "days") // 2019-02-23
+
+      moment().format("dd/MM/yyyy HH-mm") // 25/02/2018 13-35
+      moment("abcxyz").format('YYYY MM DD') // "Invalid date"
+
+      moment('2017-10-20').isBefore('2017-10-21'); // true
+      moment('2017-10-20').isBefore('2010-12-31', 'year'); // false
+      moment('2017-10-20').isBefore('2018-01-01', 'year'); // true
+
+      moment('2010-10-20').isBetween('2010-10-19', '2010-10-25'); // true
+      */      
+    }    
 
   }
 }
@@ -248,4 +585,115 @@ export default {
     padding:10px;
   }
 
+:root {
+  --margin: 2px;
+}
+
+.w15{
+  min-width:15px;
+  color:red;
+}
+
+.fonte-azul{
+  color: blue;
+}
+
+.grade {
+  /*padding: 10px;*/
+  width: 100%;
+}
+
+.container-box {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.thebox {
+  box-sizing: border-box;
+  border-radius: 0px;
+  margin: 0px;
+  height: 30px;
+  border: 1px #bdbdbd solid;
+}
+
+.h60 {
+  height: 54px;
+}
+
+.hleito{
+  /*height:48px;*/
+  height:28px; /* era 36px */
+}
+
+.chip {
+  cursor:pointer;
+  margin:0px;
+  padding:1px;
+  font-size:8pt;
+  text-transform:uppercase;
+  margin-left:15px;
+}
+
+.p0{
+  padding:0px;
+}
+
+.p1{
+  padding: 1px;
+}
+
+.p4 {
+  padding:4px;
+}
+
+.laranja {
+  background-color: #FFECB3;
+}
+
+.grafico{
+  background-color: #E57373;
+  margin-left:-1px;
+  margin-right:-1px;
+  margin-top: 1px;
+  height: calc(100% - 2px);
+  cursor:pointer;
+  padding: 0px;
+}
+
+.grafico_inicio {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  width: calc(100% - 2px);
+  margin-left: 3px;
+}
+
+.grafico_fim {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  width: calc(100% - 3px);
+}
+
+/*  https://css-tricks.com/the-shapes-of-css/ */
+.grafico_indo {
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 0px;
+  /*width: calc(100% - 3px);*/
+}
+
+.grafico_vindo {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 30px;
+  /*width: calc(100% - 2px);*/
+  /*margin-left: 3px;*/
+}
+
+.cyan-darken-4{
+    background-color: #006064;
+}
+.white-text{
+    color:white;
+}
+.amber-lighten-4{
+    background-color:#FFECB3;
+}
 </style>
