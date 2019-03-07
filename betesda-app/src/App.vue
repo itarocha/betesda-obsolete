@@ -61,7 +61,9 @@
                 <i class="fas fa-forward pr"/>
                 <span>Movimentação</span>
               </template>
-                <el-menu-item index="2-1" route="tela"><i class="fas fa-university pr"></i>Entidades</el-menu-item>
+                <el-menu-item index="2-1" route="tela">
+                  <router-link to="/entidades" tag="div"><i class="fas fa-university pr"></i>Entidades</router-link>
+                </el-menu-item>
                 <el-menu-item index="2-2">
                     <router-link to="/pessoas" tag="div"><i class="fas fa-users pr"></i>Pessoas</router-link>
                 </el-menu-item>

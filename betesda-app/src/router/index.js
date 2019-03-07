@@ -11,6 +11,7 @@ import TiposServicos from '@/views/cadastros/TiposServicos'
 import DestinacoesHospedagens from '@/views/cadastros/DestinacoesHospedagens'
 import TiposLeitos from '@/views/cadastros/TiposLeitos'
 import Pessoas from '@/views/cadastros/Pessoas'
+import Entidades from '@/views/cadastros/Entidades'
 import Quartos from '@/views/cadastros/Quartos'
 import Checkin from '@/views/movimentacao/Checkin'
 import Hospedagens from '@/views/movimentacao/Hospedagens'
@@ -58,6 +59,11 @@ const router = new Router({
       path: '/pessoas',
       name: 'pessoas',
       component: Pessoas
+    },
+    {
+      path: '/entidades',
+      name: 'entidades',
+      component: Entidades
     },
     {
       path: '/hello',
