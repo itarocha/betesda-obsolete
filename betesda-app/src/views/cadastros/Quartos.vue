@@ -804,7 +804,7 @@ export default {
   box-orient: horizontal;
   /*-ms-box-orient: horizontal;*/
   display: flex;
-  justify-content: center;
+  justify-content: start; /*center*/
 }
 
 .wrap    { 

@@ -3,11 +3,13 @@ package br.com.itarocha.betesda.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -47,10 +49,17 @@ public class Entidade  extends UserDateAudit implements Serializable{
 	
 	@Size(max = 16, message="Telefone não pode ter mais que 16 caracteres")
 	private String telefone;
+
+	@Size(max = 16, message="Telefone2 não pode ter mais que 16 caracteres")
+	private String telefone2;
 	
 	@Email(message="Email inválido")
 	@Size(max = 64, message="Email deve ter no máximo 64 caracteres")
 	private String email;
+	
+	@Lob 
+	@Basic(fetch=FetchType.LAZY)
+	private String observacoes;
 
 	@OneToMany(mappedBy = "entidade",fetch=FetchType.LAZY)
 	private List<Encaminhador> encaminhadores;
@@ -105,6 +114,22 @@ public class Entidade  extends UserDateAudit implements Serializable{
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getTelefone2() {
+		return telefone2;
+	}
+
+	public void setTelefone2(String telefone2) {
+		this.telefone2 = telefone2;
+	}
+
+	public String getObservacoes() {
+		return observacoes;
+	}
+
+	public void setObservacoes(String observacoes) {
+		this.observacoes = observacoes;
 	}
 
 	public List<Encaminhador> getEncaminhadores() {

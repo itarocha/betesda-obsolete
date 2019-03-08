@@ -1,51 +1,33 @@
 <template>
   <div>
-    <el-container v-if="state == 'browse'">
+    <el-container v-if="state == 'browse' && mode == 'entidades'">
       <el-header>
-        <el-tooltip
-          content="Incluir nova Entidade"
-          placement="bottom"
-          :open-delay="toolTipDelay"
-        >
-          <el-button type="primary" @click="handleInsert">Incluir</el-button>
-        </el-tooltip>
+          <el-button type="primary" @click="handleInsertEntidade">Incluir Entidade</el-button>
       </el-header>
       <el-main>
-        <el-row>
-          <el-col :sm="24" :md="24" :lg="24">
-            <el-input placeholder="Entre com o texto para busca" v-model="searchValue" ref="edtLocalizar" :class="'input-with-select'">
-              <el-select v-model="searchField" slot="prepend" placeholder="Select">
-                <el-option v-for="item in itensBusca" :key="item.value" :label="item.text" :value="item.value"></el-option>
-              </el-select>
-              <el-button slot="append" @click="handleSearch" icon="el-icon-search"></el-button>
-            </el-input>
-          </el-col>
-        </el-row>
-
         <el-row type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="24">
             <el-table :data="dados" stripe style="width: 100%" border size="small" :default-sort="{prop: 'descricao', order: 'ascending'}" :height="tableHeight">
               <el-table-column fixed header-align="left" align="right" prop="id" label="Código" width="100"></el-table-column>
               <el-table-column fixed prop="nome" sortable label="Nome" width="250"></el-table-column>
-              <el-table-column prop="dataNascimento" :formatter="fmtDate" label="Nascimento" header-align="left" width="120" sortable></el-table-column>
+              <el-table-column prop="cnpj" label="CNPJ" header-align="left" width="120" sortable></el-table-column>
+              <el-table-column prop="telefone" label="Telefone" header-align="left" width="120"></el-table-column>
               <el-table-column prop="endereco.descricao" label="Endereço" class-name="wordwrap" width="350"></el-table-column>
-              <el-table-column prop="naturalidadeCidade" sortable label="Naturalidade" width="120"></el-table-column>
-              <el-table-column prop="naturalidadeUf" sortable label="UF"></el-table-column>
               <el-table-column label="Ações" fixed="right" align="center" width="140">
                 <template slot-scope="scope">
                   <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="primary" plain size="mini" circle @click="handleEdit(scope.row)">
+                    <el-button type="primary" plain size="mini" circle @click="handleEditEntidade(scope.row)">
                       <i class="fas fa-pencil-alt"></i>
                     </el-button>
                   </el-tooltip>
                   <el-tooltip content="Excluir" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="danger" plain size="mini" circle @click="handleDelete(scope.row)">
+                    <el-button type="danger" plain size="mini" circle @click="handleDeleteEntidade(scope.row)">
                       <i class="fas fa-trash"></i>
                     </el-button>
                   </el-tooltip>
-                  <el-tooltip content="Selecionar para Hospedagem" placement="bottom" :open-delay="toolTipDelay">
-                    <el-button type="warning" plain size="mini" circle @click="handleSelecionarParaHospedagem(scope.row)">
-                      <i class="fas fa-star"></i>
+                  <el-tooltip content="Gerenciar Encaminhadores" placement="bottom" :open-delay="toolTipDelay">
+                    <el-button type="warning" plain size="mini" circle @click="handleGerenciarEncaminhadores(scope.row)">
+                      <i class="fas fa-users"></i>
                     </el-button>
                   </el-tooltip>
                 </template>
@@ -56,12 +38,12 @@
       </el-main>
     </el-container>
 
-    <el-container v-if="state != 'browse'">
+    <el-container v-if="state != 'browse' && mode == 'entidades'" >
       <el-header>
         <el-row type="flex">
           <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
             <div style="margin-right:10px;">
-              <el-button type="primary" @click="handleSave">Gravar</el-button>
+              <el-button type="primary" @click="handleSaveEntidade">Gravar</el-button>
             </div>
           </el-tooltip>
           <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
@@ -69,7 +51,7 @@
               <el-button @click="state = 'browse'">Cancelar</el-button>
             </div>
           </el-tooltip>
-          <div>Incluindo/Alterando Pessoa</div>
+          <div>Incluindo/Alterando Entidade</div>
         </el-row>
       </el-header>
 
@@ -82,159 +64,176 @@
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item label="Nascimento" prop="dataNascimento" :error="getErro('dataNascimento')">
-                <el-date-picker type="date" v-model="form.dataNascimento" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+              <el-form-item label="CNPJ" prop="cnpj" :error="getErro('cnpj')">
+                <el-input v-model="form.cnpj" v-mask="'##.###.###/####-##'" masked="false"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
 
-          <el-row>
-            <el-col :span="24">
-              <el-tabs type="border-card">
-                <el-tab-pane label="Dados Pessoais">
-                  <el-row :gutter="10">
-                    <el-col :span="6">
-                      <el-form-item label="Sexo" prop="sexo" :error="getErro('sexo')">
-                        <el-select v-model="form.sexo" style="width:100%">
-                          <el-option v-for="item in itensSexo" :key="item.value" :label="item.text" :value="item.value"></el-option>
-                        </el-select>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="6">
-                      <el-form-item label="Estado Civil" prop="estadoCivil" :error="getErro('estadoCivil')">
-                        <el-select v-model="form.estadoCivil" style="width:100%">
-                          <el-option v-for="item in itensEstadoCivil" :key="item.value" :label="item.text" :value="item.value"></el-option>
-                        </el-select>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-form-item label="Profissão" prop="profissao" :error="getErro('profissao')">
-                        <el-input v-model="form.profissao" @input.native="fmtMaiusculas($event,'profissao')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-
-                  <el-row :gutter="10">
-                    <el-col :span="12">
-                      <el-form-item label="Naturalidade" prop="naturalidadeCidade" :error="getErro('naturalidadeCidade')">
-                        <el-input v-model="form.naturalidadeCidade" @input.native="fmtMaiusculas($event,'naturalidadeCidade')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-form-item label="Nat.UF" prop="naturalidadeUf" :error="getErro('naturalidadeUf')">
-                        <el-select v-model="form.naturalidadeUf" style="width:100%">
-                          <el-option v-for="item in itensUF" :key="item.value" :label="item.text" :value="item.value"></el-option>
-                        </el-select>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
-                      <el-form-item label="Nacionalidade" prop="nacionalidade" :error="getErro('nacionalidade')">
-                        <el-input v-model="form.nacionalidade" @input.native="fmtMaiusculas($event,'nacionalidade')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-
-                  <el-row :gutter="10">
-                    <el-col :span="8">
-                      <el-form-item label="CPF" prop="cpf" :error="getErro('cpf')">
-                        <el-input v-model="form.cpf" v-mask="'###.###.###-##'" masked="false"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
-                      <el-form-item label="RG" prop="fixme" :error="getErro('fixme')">
-                        <el-input v-model="form.rg" @input.native="fmtLetrasENumeros($event,'rg')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
-                      <el-form-item label="Cartão do SUS" prop="cartaoSus" :error="getErro('cartaoSus')">
-                        <el-input v-model="form.cartaoSus" v-mask="'###.####.####.####'" masked="false"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-                </el-tab-pane>
-                <el-tab-pane label="Endereço e Telefone">
-                  <el-row :gutter="10">
-                    <el-col :span="12">
-                      <el-form-item label="Endereço" prop="enderecoLogradouro" :error="getErro('endereco.logradouro')">
-                        <el-input v-model="form.endereco.logradouro" @input.native="fmtMaiusculas($event,'logradouro','endereco')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-form-item label="Número" prop="enderecoNumero" :error="getErro('endereco.numero')">
-                        <el-input v-model="form.endereco.numero"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
-                      <el-form-item label="Complemento" prop="enderecoComplemento" :error="getErro('endereco.complemento')">
-                        <el-input v-model="form.endereco.complemento" @input.native="fmtMaiusculas($event,'complemento','endereco')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-
-                  <el-row :gutter="10">
-                    <el-col :span="8">
-                      <el-form-item label="Bairro" prop="enderecoBairro" :error="getErro('endereco.bairro')">
-                        <el-input v-model="form.endereco.bairro" @input.native="fmtMaiusculas($event,'bairro','endereco')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-form-item label="CEP" prop="enderecoCep" :error="getErro('endereco.cep')">
-                        <el-input v-model="form.endereco.cep" v-mask="'#####-###'" masked="false"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
-                      <el-form-item label="Cidade" prop="enderecoCidade" :error="getErro('endereco.cidade')">
-                        <el-input v-model="form.endereco.cidade" @input.native="fmtMaiusculas($event,'cidade','endereco')"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="4">
-                      <el-form-item label="UF" prop="enderecoUf" :error="getErro('endereco.uf')">
-                        <el-select v-model="form.endereco.uf" style="width:100%">
-                          <el-option v-for="item in itensUF" :key="item.value" :label="item.text" :value="item.value"></el-option>
-                        </el-select>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-
-                  <el-row :gutter="10">
-                    <el-col :span="6">
-                      <el-form-item label="Telefone" prop="fixme" :error="getErro('telefone')">
-                        <el-input v-model="form.telefone"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="6">
-                      <el-form-item label="Telefone2" prop="fixme" :error="getErro('telefone2')">
-                        <el-input v-model="form.telefone2"></el-input>
-                      </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                      <el-form-item label="Email" prop="email" :error="getErro('email')">
-                         <el-input type="email" v-model="form.email"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-                </el-tab-pane>
-                <el-tab-pane label="Observações">
-                  <el-row :gutter="10">
-                    <el-col :span="24">
-                      <el-form-item label="Observacoes" prop="fixme" :error="getErro('observacoes')">
-                        <el-input type="textarea" rows="10" v-model="form.observacoes"></el-input>
-                      </el-form-item>
-                    </el-col>
-                  </el-row>
-                </el-tab-pane>
-              </el-tabs>
+          <el-row :gutter="10">
+            <el-col :span="6">
+              <el-form-item label="Telefone" prop="telefone" :error="getErro('telefone')">
+                <el-input v-model="form.telefone"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="Telefone2" prop="telefone2" :error="getErro('telefone2')">
+                <el-input v-model="form.telefone2"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Email" prop="email" :error="getErro('email')">
+                  <el-input type="email" v-model="form.email"></el-input>
+              </el-form-item>
             </el-col>
           </el-row>
+
+          <el-row :gutter="10">
+            <el-col :span="12">
+              <el-form-item label="Endereço" prop="enderecoLogradouro" :error="getErro('endereco.logradouro')">
+                <el-input v-model="form.endereco.logradouro" @input.native="fmtMaiusculas($event,'logradouro','endereco')"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="Número" prop="enderecoNumero" :error="getErro('endereco.numero')">
+                <el-input v-model="form.endereco.numero"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="Complemento" prop="enderecoComplemento" :error="getErro('endereco.complemento')">
+                <el-input v-model="form.endereco.complemento" @input.native="fmtMaiusculas($event,'complemento','endereco')"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="10">
+            <el-col :span="8">
+              <el-form-item label="Bairro" prop="enderecoBairro" :error="getErro('endereco.bairro')">
+                <el-input v-model="form.endereco.bairro" @input.native="fmtMaiusculas($event,'bairro','endereco')"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="CEP" prop="enderecoCep" :error="getErro('endereco.cep')">
+                <el-input v-model="form.endereco.cep" v-mask="'#####-###'" masked="false"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="Cidade" prop="enderecoCidade" :error="getErro('endereco.cidade')">
+                <el-input v-model="form.endereco.cidade" @input.native="fmtMaiusculas($event,'cidade','endereco')"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="4">
+              <el-form-item label="UF" prop="enderecoUf" :error="getErro('endereco.uf')">
+                <el-select v-model="form.endereco.uf" style="width:100%">
+                  <el-option v-for="item in itensUF" :key="item.value" :label="item.text" :value="item.value"></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
         </el-form>
       </el-main>
     </el-container>
 
-    <el-dialog title="Confirmação" :visible.sync="dialogExclusaoVisible" width="600px">
+    <el-container v-if="state == 'browse' && mode == 'encaminhadores'">
+      <el-row type="flex" justify="center" align="middle">
+          <el-col style="padding-left:20px; padding-bottom:0px;"><h4>{{formEntidade.nome}}</h4></el-col>
+      </el-row>
+      <el-header>
+          <el-button type="primary" @click="handleInsertEncaminhador">Incluir Encaminhador</el-button>
+          <el-button type="primary" @click="gerenciarEntidades">Voltar para Entidades</el-button>
+      </el-header>
+      <el-main>
+        <el-row type="flex" justify="center" align="middle">
+          <el-col :sm="24" :md="24" :lg="24">
+            <el-table :data="encaminhadores" stripe style="width: 100%" border size="small" :default-sort="{prop: 'descricao', order: 'ascending'}" :height="tableHeight">
+              <el-table-column fixed header-align="left" align="right" prop="id" label="Código" width="80"></el-table-column>
+              <el-table-column fixed prop="nome" sortable label="Nome" width="250"></el-table-column>
+              <el-table-column fixed prop="cargo" sortable label="Cargo" width="200"></el-table-column>
+              <el-table-column prop="telefone" label="Telefone" header-align="left" width="120"></el-table-column>
+              <el-table-column prop="email" label="Email" class-name="wordwrap" width="350"></el-table-column>
+              <el-table-column label="Ações" fixed="right" align="center" width="140">
+                <template slot-scope="scope">
+                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
+                    <el-button type="primary" plain size="mini" circle @click="handleEditEncaminhador(scope.row)">
+                      <i class="fas fa-pencil-alt"></i>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip content="Excluir" placement="bottom" :open-delay="toolTipDelay">
+                    <el-button type="danger" plain size="mini" circle @click="handleDeleteEncaminhador(scope.row)">
+                      <i class="fas fa-trash"></i>
+                    </el-button>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>
+
+    <el-container v-if="state != 'browse' && mode == 'encaminhadores'" >
+      <el-header>
+        <el-row type="flex">
+          <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;">
+              <el-button type="primary" @click="handleSaveEncaminhador">Gravar</el-button>
+            </div>
+          </el-tooltip>
+          <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;">
+              <el-button @click="state = 'browse'">Cancelar</el-button>
+            </div>
+          </el-tooltip>
+          <div>Incluindo/Alterando Encaminhador</div>
+        </el-row>
+      </el-header>
+
+      <el-main>
+        <el-form :model="formEncaminhador" :rules="rules" ref="form" label-position="top" size="small" label-width="140px">
+          <el-row :gutter="10">
+            <el-col :span="16">
+              <el-form-item label="Nome" prop="nome" :error="getErro('nome')">
+                <el-input v-model="formEncaminhador.nome" ref="edtNome" @input.native="fmtMaiusculas($event,'nome')"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item label="Cargo" prop="cargo" :error="getErro('cargo')">
+                <el-input v-model="formEncaminhador.cargo" ref="edtCargo" @input.native="fmtMaiusculas($event,'cargo')"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row :gutter="10">
+            <el-col :span="12">
+              <el-form-item label="Telefone" prop="telefone" :error="getErro('telefone')">
+                <el-input v-model="formEncaminhador.telefone"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="Email" prop="email" :error="getErro('email')">
+                  <el-input type="email" v-model="formEncaminhador.email"></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+        </el-form>
+      </el-main>
+    </el-container>
+
+    <el-dialog title="Confirmação" :visible.sync="dialogExclusaoEntidadeVisible" width="600px">
       <span>{{textToDelete}}</span>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="handleConfirmDelete(false)">Cancelar</el-button>
-        <el-button type="primary" @click="handleConfirmDelete(true)">Sim</el-button>
+        <el-button @click="handleConfirmDeleteEntidade(false)">Cancelar</el-button>
+        <el-button type="primary" @click="handleConfirmDeleteEntidade(true)">Sim</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="Confirmação" :visible.sync="dialogExclusaoEncaminhadorVisible" width="600px">
+      <span>{{textToDelete}}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleConfirmDeleteEncaminhador(false)">Cancelar</el-button>
+        <el-button type="primary" @click="handleConfirmDeleteEncaminhador(true)">Sim</el-button>
       </span>
     </el-dialog>
   </div>
@@ -254,30 +253,40 @@ export default {
 
   mounted() {
     this.$store.dispatch("setAcao", "Entidades");
-    
+    /*
     this.$nextTick(() => {
       window.addEventListener('resize', () => {
         this.tableHeight = window.innerHeight - 200
       })
       setTimeout(() => this.$refs.edtLocalizar.focus(), 500)
     })
-
-    this.doGetAll();
+    */
+    this.doGetAllEntidade();
   },
+
+  computed: {
+
+    tituloBotaoIncluir(){
+      return this.mode == 'entidades' ? 'Incluir Entidade' : 'Incluir Encaminhador'
+    }
+  },
+
 
   data: () => ({
     dados: [],
-
-    searchField : 'nome',
-    searchValue : '',
+    encaminhadores: [],
+    mode: 'entidades',
 
     form : {},
+    formEntidade : {},
+    formEncaminhador : {},
 
     erros: [],
 
     state: "browse",
 
-    dialogExclusaoVisible: false,
+    dialogExclusaoEntidadeVisible: false,
+    dialogExclusaoEncaminhadorVisible: false,
 
     idToDelete: null,
     textToDelete: null,
@@ -354,16 +363,7 @@ export default {
       this.form = {
         id : null,
         nome : null,
-        dataNascimento : null,
-        sexo : null,
-        estadoCivil : null,
-        cpf : null,
-        profissao : null,
-        rg : null,
-        naturalidadeCidade : null,
-        naturalidadeUf : null,
-        cartaoSus : null,
-
+        cnpj : null,
         endereco : {
           logradouro : null,
           numero : 0,
@@ -373,34 +373,45 @@ export default {
           cidade : null,
           uf : null,
         },
-
         telefone : null,
         telefone2 : null,
         email : null,
         observacoes : null
       },
 
+      this.formEncaminhador = {
+        entidade : {
+          id : null,
+          nome : null
+        },
+        id : null,
+        nome : null,
+        telefone : null,
+        cargo : null,
+        email : null
+      },
+
+
       this.erros = [];
     },
 
     setDefaultData() {
-      this.form.sexo = "F";
-      this.form.estadoCivil = "S";
-      this.form.naturalidadeUf = "MG"
-      this.form.nacionalidade = "BRASILEIRA"
       this.form.endereco.uf = "MG"
     },
 
     fmtMaiusculas(event, campo, group) {
+      var form = this.mode == 'entidades'  ? 'form' : 'formEncaminhador'
+
       if (group){
-        this.$data["form"][group][campo] = petra.removerAcentos(event.target.value).toUpperCase();
+        this.$data[form][group][campo] = petra.removerAcentos(event.target.value).toUpperCase();
       } else {
-        this.$data["form"][campo] = petra.removerAcentos(event.target.value).toUpperCase();
+        this.$data[form][campo] = petra.removerAcentos(event.target.value).toUpperCase();
       }
     },
 
     fmtLetrasENumeros(event, campo) {
-      this.$data["form"][campo] = petra.letrasENumeros(event.target.value).toUpperCase();
+      var form = this.mode == 'entidades'  ? 'form' : 'formEncaminhador'
+      this.$data[form][campo] = petra.letrasENumeros(event.target.value).toUpperCase();
     },
 
     fmtSimNao(row, col) {
@@ -423,16 +434,16 @@ export default {
       return null;
     },
 
-    handleSearch(){
-      this.doGetAll(true)
-    },
-
-    handleEdit(row) {
+    handleEditEntidade(row) {
+      this.state = "edit";
       this.resetData();
-      this.doGetById(row.id);
+      this.doGetEntidadeById(row.id);
+      this.$nextTick(() => {
+        setTimeout(() => this.$refs.edtNome.focus(), 500)
+      });
     },
 
-    handleInsert() {
+    handleInsertEntidade() {
       this.state = "insert";
       this.resetData();
       this.setDefaultData();
@@ -441,52 +452,44 @@ export default {
       });
     },
 
-    handleSelecionarParaHospedagem(row){
-      this.$store.dispatch('addAguardando', row)
+    handleSaveEntidade() {
+      this.doSaveEntidade(true);
     },
 
-    handleSave() {
-      this.doSave(true);
-    },
-
-    handleDelete(row) {
+    handleDeleteEntidade(row) {
       this.textToDelete = `Deseja realmente excluir "${row.nome}"?`;
       this.idToDelete = row.id;
-      this.dialogExclusaoVisible = true;
+      this.dialogExclusaoEntidadeVisible = true;
     },
 
-    handleCancel(row) {
+    handleCancelEntidade(row) {
       this.state = "browse";
-      this.doGetAll();
+      this.doGetAllEntidade();
     },
 
-    handleConfirmDelete(confirm) {
-      this.dialogExclusaoVisible = false;
+    handleConfirmDeleteEntidade(confirm) {
+      this.dialogExclusaoEntidadeVisible = false;
       if (confirm) {
-        this.doDelete();
+        this.doDeleteEntidade();
       }
     },
 
-    doGetAll(showMessage) {
-      if (this.searchValue.length < 3){
-        if (showMessage) {
-          petra.showMessageError("Texto de busca deve ter pelo menos 3 caracteres");
-        }
-        return
-      }
-
-      var searchRequest = {
-        fieldName : this.searchField,
-        value : this.searchValue
-      }
-
-      petra.axiosPost("/app/pessoas/filtrar", searchRequest).then(response => {
-        this.dados = response.data;
-      });
+    doGetAllEntidade() {
+      petra.axiosGet("/app/entidades", false).then(
+        response => this.dados = response.data
+      )
     },
 
-    doGetById(id) {
-      petra.axiosGet(`/app/pessoas/${id}`).then(response => {
+    doGetEncaminhadores(entidadeId) {
+      petra.axiosGet(`/app/encaminhadores/por_encaminhador/${entidadeId}`, false).then(
+        response => {
+          this.encaminhadores = response.data
+        } 
+      )
+    },
+
+    doGetEntidadeById(id) {
+      petra.axiosGet(`/app/entidades/${id}`).then(response => {
         this.form = response.data;
         this.state = "edit";
         this.$nextTick(() => {
@@ -497,32 +500,125 @@ export default {
       });
     },
 
-    doDelete(evt) {
+    doDeleteEntidade(evt) {
       petra
-        .axiosDelete("/app/pessoas/" + this.idToDelete)
+        .axiosDelete("/app/entidades/" + this.idToDelete)
         .then(response => {
-          petra.showMessageSuccess("Pessoa excluída com sucesso");
-          this.doGetAll();
+          petra.showMessageSuccess("Entidade excluída com sucesso");
+          this.doGetAllEntidade();
         })
         .catch(error => {
           petra.tratarErros(error);
         });
     },
 
-    doSave(evt) {
+    doSaveEntidade(evt) {
       this.errors = [];
 
       petra
-        .axiosPost("/app/pessoas/", this.form, true)
+        .axiosPost("/app/entidades/", this.form, true)
         .then(response => {
-          petra.showMessageSuccess("Pessoa gravada com sucesso");
+          petra.showMessageSuccess("Entidade gravada com sucesso");
           this.state = "browse";
-          this.doGetAll();
+          this.doGetAllEntidade();
         })
         .catch(error => {
           this.erros = petra.tratarErros(error);
         });
     },
+
+    handleInsertEncaminhador() {
+      this.state = "insert";
+      this.resetData();
+      this.setDefaultData();
+      this.$nextTick(() => {
+        setTimeout(() => this.$refs.edtNome.focus(), 500)
+      });
+    },
+
+    handleSaveEncaminhador() {
+      this.doSaveEncaminhador(true);
+    },
+
+    handleDeleteEncaminhador(row) {
+      this.textToDelete = `Deseja realmente excluir "${row.nome}"?`;
+      this.idToDelete = row.id;
+      this.dialogExclusaoEncaminhadorVisible = true;
+    },
+
+    handleCancelEncaminhador(row) {
+      this.state = "browse"
+      this.doGetEncaminhadores(this.formEntidade.id)
+    },
+
+    handleConfirmDeleteEncaminhador(confirm) {
+      this.dialogExclusaoEncaminhadorVisible = false;
+      if (confirm) {
+        this.doDeleteEncaminhador();
+      }
+    },
+
+    handleGerenciarEncaminhadores(item){
+      this.formEntidade = item
+      this.doGetEncaminhadores(this.formEntidade.id)
+      this.mode='encaminhadores'
+    },
+
+    gerenciarEntidades() {
+      this.form = null
+      this.mode='entidades'
+    },
+
+    handleEditEncaminhador(row) {
+      this.state = "edit";
+      this.resetData();
+      this.doGetEncaminhadorById(row.id);
+      this.$nextTick(() => {
+        setTimeout(() => this.$refs.edtNome.focus(), 500)
+      });
+    },
+
+    doGetEncaminhadorById(id) {
+      petra.axiosGet(`/app/encaminhadores/${id}`).then(response => {
+        this.formEncaminhador = response.data;
+        this.state = "edit";
+        this.$nextTick(() => {
+          setTimeout(() => {
+            //this.$refs.edtdescricao.focus()
+          }, 500);
+        });
+      });
+    },
+
+    doDeleteEncaminhador(evt) {
+      petra
+        .axiosDelete("/app/encaminhadores/" + this.idToDelete)
+        .then(response => {
+          petra.showMessageSuccess("Encaminhador excluído com sucesso");
+          this.doGetEncaminhadores(this.formEntidade.id)
+        })
+        .catch(error => {
+          petra.tratarErros(error);
+        });
+    },
+
+    doSaveEncaminhador(evt) {
+      this.errors = [];
+
+      this.formEncaminhador.entidade = this.formEntidade
+
+      petra
+        .axiosPost("/app/encaminhadores/", this.formEncaminhador, true)
+        .then(response => {
+          petra.showMessageSuccess("Encaminhador gravado com sucesso");
+          this.state = "browse";
+          this.doGetEncaminhadores(this.formEntidade.id)
+        })
+        .catch(error => {
+          this.erros = petra.tratarErros(error);
+        });
+    },
+
 
     tableCellClassName({ row, column, rowIndex, columnIndex }) {
       // row = mostra o registro do momento.

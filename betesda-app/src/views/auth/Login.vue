@@ -83,7 +83,7 @@ export default {
         //petra.showMessageSuccess('Usuário logado com sucesso')
         petra.showMessageInfo('Usuário logado com sucesso')
 
-        this.$router.push({name: 'teste'}) // hospedagens
+        this.$router.push({name: 'home'}) // hospedagens
       }).catch(error =>{
         console.log(error)
         petra.showMessageError('Usuário ou senha inválidos')

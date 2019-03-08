@@ -19,63 +19,73 @@
                 <router-link to="/" tag="div"><i class="fas fa-home pr"></i>Home</router-link>
             </el-menu-item>
 
+            <el-menu-item index="1-2">
+                <router-link to="/situacoes_leitos" tag="div"><i class="fas fa-check-circle pr"></i>Situações de Leitos</router-link>
+            </el-menu-item>
+
+            <el-menu-item index="1-3">
+                <router-link to="/tipos_hospedes" tag="div"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</router-link>
+            </el-menu-item>
+
+            <el-menu-item index="1-4">
+                <router-link to="/tipos_leitos" tag="div"><i class="fas fa-bed pr"></i>Tipos de Leitos</router-link>
+            </el-menu-item>
+
+            <el-menu-item index="1-5">
+                <router-link to="/tipos_servicos" tag="div"><i class="fas fa-coffee pr"></i>Tipos de Serviços</router-link>
+            </el-menu-item>
+
+            <el-menu-item index="1-6">
+                <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</router-link>
+            </el-menu-item>
+
+            <el-menu-item index="1-7">
+                <router-link to="/quartos" tag="div"><i class="fas fa-hospital pr"></i>Quartos</router-link>
+            </el-menu-item>
+
+            <el-menu-item index="2-1" route="tela">
+              <router-link to="/entidades" tag="div"><i class="fas fa-university pr"></i>Entidades</router-link>
+            </el-menu-item>
+            <el-menu-item index="2-2">
+                <router-link to="/pessoas" tag="div"><i class="fas fa-users pr"></i>Pessoas</router-link>
+            </el-menu-item>
+            <el-menu-item index="2-3">
+                <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
+            </el-menu-item>
+            <el-menu-item index="2-4">
+                <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
+            </el-menu-item>
+
+            <!--''
             <el-submenu index="1">
               <template slot="title">
                 <i class="fas fa-folder-open pr"/>
                 <span>Cadastros</span>
               </template>
-
-                <el-menu-item index="1-2">
-                    <router-link to="/situacoes_leitos" tag="div"><i class="fas fa-check-circle pr"></i>Situações de Leitos</router-link>
-                </el-menu-item>
-
-                <el-menu-item index="1-3">
-                    <router-link to="/tipos_hospedes" tag="div"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</router-link>
-                </el-menu-item>
-
-                <el-menu-item index="1-4">
-                    <router-link to="/tipos_leitos" tag="div"><i class="fas fa-bed pr"></i>Tipos de Leitos</router-link>
-                </el-menu-item>
-
-                <el-menu-item index="1-5">
-                    <router-link to="/tipos_servicos" tag="div"><i class="fas fa-coffee pr"></i>Tipos de Serviços</router-link>
-                </el-menu-item>
-
-                <el-menu-item index="1-6">
-                    <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</router-link>
-                </el-menu-item>
-
-                <el-menu-item index="1-7">
-                    <router-link to="/quartos" tag="div"><i class="fas fa-hospital pr"></i>Quartos</router-link>
-                </el-menu-item>
-
+              -->
+                <!-- menus aqui -->
+                <!--
                 <el-menu-item index="1-0-0">
                   <router-link to="/login" tag="div"><i class="fas fa-eye pr"></i>Login</router-link>
                 </el-menu-item>
                 <el-menu-item index="1-0-1">
                     <router-link to="/teste" tag="div"><i class="fas fa-file pr"></i>Teste</router-link>
                 </el-menu-item>
+                -->
+            <!--    
             </el-submenu>
             <el-submenu index="2">
               <template slot="title">
                 <i class="fas fa-forward pr"/>
                 <span>Movimentação</span>
               </template>
-                <el-menu-item index="2-1" route="tela">
-                  <router-link to="/entidades" tag="div"><i class="fas fa-university pr"></i>Entidades</router-link>
-                </el-menu-item>
-                <el-menu-item index="2-2">
-                    <router-link to="/pessoas" tag="div"><i class="fas fa-users pr"></i>Pessoas</router-link>
-                </el-menu-item>
-                <el-menu-item index="2-3">
-                    <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
-                </el-menu-item>
-                <el-menu-item index="2-4">
-                    <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
-                </el-menu-item>
+              -->
+                <!-- menus aqui -->
+                <!--
                 <el-menu-item index="2-5" route="tela"><i class="fas fa-utensils pr"></i>Serviços</el-menu-item>
                 <el-menu-item index="2-6" route="tela"><i class="fas fa-id-card pr"></i>Histórico de Hospedagens</el-menu-item>
-            </el-submenu>
+                -->
+            <!--</el-submenu>-->
           </el-menu>
         </el-aside>
       <el-container>
@@ -185,6 +195,10 @@ body{
   margin:auto;
 }
 
+.el-menu-item{
+  height: 38px;
+  line-height: 40px;
+}
 
   .el-table .vermelho {
     background: red !important;

@@ -14,7 +14,7 @@
         <el-row>
           <el-col :sm="24" :md="24" :lg="24">
             <el-input placeholder="Entre com o texto para busca" v-model="searchValue" ref="edtLocalizar" :class="'input-with-select'">
-              <el-select v-model="searchField" slot="prepend" placeholder="Select">
+              <el-select v-model="searchField" slot="prepend" style="width:200px;">
                 <el-option v-for="item in itensBusca" :key="item.value" :label="item.text" :value="item.value"></el-option>
               </el-select>
               <el-button slot="append" @click="handleSearch" icon="el-icon-search"></el-button>
