@@ -43,7 +43,10 @@ module.exports = {
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '/',
+    assetsPublicPath: 'http://petrasistemas.com.br/betesda/',
+
+    // Various Dev Server settings
+    host: 'petrasistemas.com.br', // can be overwritten by process.prod.HOST
 
     /**
      * Source Maps

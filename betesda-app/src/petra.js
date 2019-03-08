@@ -1,8 +1,8 @@
 var moment = require('moment')
 moment.locale('pt-br');
 
-var base_uri =  'http://localhost:8088/api'
-//var base_uri = 'http://petrasistemas.com.br:8080/betesda/api'
+//var base_uri =  'http://localhost:8088/api'
+var base_uri = 'http://petrasistemas.com.br:8080/betesda/api'
 
 export default {
 

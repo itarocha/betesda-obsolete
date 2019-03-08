@@ -52,7 +52,7 @@
             <el-menu-item index="2-3">
                 <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
             </el-menu-item>
-            <el-menu-item index="2-4">
+            <el-menu-item index="2-4" v-if="false">
                 <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
             </el-menu-item>
 

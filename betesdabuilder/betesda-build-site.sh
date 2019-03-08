@@ -12,11 +12,11 @@ echo "Realizando backup do banco de dados"
 sudo mysqldump --add-drop-table --databases betesda -e -C > /home/itamar/projetos_spring/betesda/betesdabuilder/output/betesda.sql
 
 echo "Construindo front-end"
-cd /home/itamar/projetos_spring/betesda/betesdaclient
+cd /home/itamar/projetos_spring/betesda/betesda-app
 
 npm run build
 
-cd /home/itamar/projetos_spring/betesda/betesdaclient/dist/
+cd /home/itamar/projetos_spring/betesda/betesda-app/dist/
 
 echo "Compactando arquivo..."
 tar -zcvf /home/itamar/projetos_spring/betesda/betesdabuilder/output/betesdaclient.tar.gz *
