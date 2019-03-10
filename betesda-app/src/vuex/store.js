@@ -134,7 +134,13 @@ export default new Vuex.Store({
         },
         setAcomodacao(state, data){        
             state.commit('setAcomodacao', data)
-        }
+        },
+        limparHospedagem(state){        
+            state.commit('limparHospedagem')
+        },
+        removerHospede(state, data){        
+            state.commit('removerHospede', data)
+        },
     },
 
     mutations:{ //changing the state - call mutations
@@ -214,6 +220,33 @@ export default new Vuex.Store({
             var hospede =  _.find(state.aguardando,{pessoa : {id : data.pessoaId}})
             if (hospede){
                 hospede.acomodacao = data.acomodacao
+            }
+        },
+
+        limparHospedagem(state){     
+            console.log("limpando hospedagem")   
+            state.aguardando = [],
+        
+            state.formHospedagem = {
+                entidadeId: null,
+                encaminhadorId: null,
+                dataEntrada: null,    
+                dataPrevistaSaida: null,
+                destinacaoHospedagemId: null,
+                tipoUtilizacao: null,
+                servicos: [],
+                observacoes : null
+            }
+        },
+
+        removerHospede(state, data){        
+            var hospede =  _.find(state.aguardando,{pessoa : {id : data.pessoa.id}})
+            if (hospede){
+                var index = state.aguardando.indexOf(hospede)
+                if (index > -1){
+                    state.aguardando.splice(index,1)
+                }
+                state.aguardando.indexOf(hospede)
             }
         },
 

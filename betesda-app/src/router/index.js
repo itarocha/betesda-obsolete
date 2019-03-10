@@ -28,42 +28,66 @@ const router = new Router({
     {
       path: '/situacoes_leitos',
       name: 'situacoes_leitos',
-      component: SituacoesLeitos
+      component: SituacoesLeitos,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/tipos_hospedes',
       name: 'tipos_hospedes',
-      component: TiposHospedes
+      component: TiposHospedes,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/tipos_servicos',
       name: 'tipos_servicos',
-      component: TiposServicos
+      component: TiposServicos,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/destinacoes_hospedagens',
       name: 'destinacoes_hospedagens',
-      component: DestinacoesHospedagens
+      component: DestinacoesHospedagens,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/tipos_leitos',
       name: 'tipos_leitos',
-      component: TiposLeitos
+      component: TiposLeitos,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/quartos',
       name: 'quartos',
-      component: Quartos
+      component: Quartos,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/pessoas',
       name: 'pessoas',
-      component: Pessoas
+      component: Pessoas,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/entidades',
       name: 'entidades',
-      component: Entidades
+      component: Entidades,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/hello',
@@ -73,12 +97,18 @@ const router = new Router({
     {
       path: '/checkin',
       name: 'checkin',
-      component: Checkin
+      component: Checkin,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/hospedagens',
       name: 'hospedagens',
-      component: Hospedagens
+      component: Hospedagens,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: '/teste',

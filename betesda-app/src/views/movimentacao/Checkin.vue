@@ -8,7 +8,7 @@
           <el-button type="primary" @click="handleLimpar">Limpar</el-button>
         </el-tooltip>
         <el-tooltip content="Insere nova Hospedagem com as informações" placement="bottom" :open-delay="toolTipDelay">
-          <el-button type="primary" @click="handleLancarHospedagem">Lançar Hospedagema</el-button>
+          <el-button type="primary" @click="handleLancarHospedagem">Lançar Hospedagem</el-button>
         </el-tooltip>
       </el-header>
 
@@ -393,20 +393,23 @@ export default {
     },
 
     handleLimpar(){
-
+      this.resetData()
+      this.$store.dispatch("limparHospedagem")
     },
 
-    handleLancarHospedagem(){
-      this.postarHospedagem()
-    },
 
     removerHospede(item){
+      this.$store.dispatch("removerHospede", item)
       /*
       var indice = this.hospedes.indexOf(item);
       if (indice > -1){
         this.hospedes.splice(indice,1)
       }
       */
+     },
+
+    handleLancarHospedagem(){
+      this.postarHospedagem()
     },
 
     selecionarLeito(hospede) {

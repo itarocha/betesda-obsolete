@@ -1,5 +1,6 @@
 <template>
   <div>
+    <hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada" @close="onCloseHospedagemInfo"></hospedagem-info>
 
     <el-container v-if="state == 'browse'">
       <el-header>
@@ -137,23 +138,25 @@
 </template>
 
 <script>
-
-require("vue-simple-calendar/static/css/default.css")
+  import HospedagemInfo from "./HospedagemInfo.vue"  
 
 
 import {
-	CalendarView,
+  CalendarView,
 	CalendarViewHeader,
 	CalendarMathMixin,
 } from "vue-simple-calendar"
 
-export default {
 
+require("vue-simple-calendar/static/css/default.css")
+
+export default {
   name: 'Hospedagens',
 
   components: {
 		CalendarView,
-		CalendarViewHeader,
+    CalendarViewHeader,
+    HospedagemInfo,
 	},
 	mixins: [CalendarMathMixin],  
 
@@ -266,7 +269,7 @@ export default {
         case 'sm': return '400px - sm'
         case 'md': return '500px - md'
         case 'lg': return '600px - lg'
-        case 'xl': return '800px - xl'
+        case 'xl': return '800px - xl' 
       }
     },
 
@@ -301,7 +304,7 @@ export default {
   methods: {
 
     handleTabClick(tab, event) {
-      console.log(tab, event);
+      //console.log(tab, event);
     },
 
     selecionarDia(dia, index){
@@ -502,6 +505,7 @@ export default {
     },
 
     showHospedagemInfo(id){
+      //console.log("this.$refs.hospedagemInfo ",this.$refs.hospedagemInfo)
       this.$refs.hospedagemInfo.openDialog(id);
     },
 

@@ -52,7 +52,7 @@
             <el-menu-item index="2-3">
                 <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
             </el-menu-item>
-            <el-menu-item index="2-4" v-if="false">
+            <el-menu-item index="2-4">
                 <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
             </el-menu-item>
 
@@ -91,16 +91,19 @@
       <el-container>
         <el-header class="back-title">
           <el-row class="title-container" type="flex" justify="center" align="middle">
-            <el-col :span="18" class="header-title">{{titulo}}{{numero}}</el-col>
+            <el-col :span="15" class="header-title">{{titulo}}{{numero}}</el-col>
 
             <el-col :span="3" class="header-menu">
               <el-badge :value="aguardando.length" class="item" v-if="aguardando.length > 0">
                 <el-button size="small" @click="handleOpenCheckin">Checkin</el-button>
               </el-badge>
             </el-col>
-            <el-col :span="3" class="header-menu">
-              <router-link to="/login" tag="div">Login</router-link>
+            <el-col :span="6" class="header-menu">
+              <span v-if="loggedIn">{{user.name}}</span>
+              <el-button type="primary" size="medium" @click.native="handleLogin" v-if="!loggedIn" >LOGIN</el-button>
+              <el-button type="primary" size="medium" @click.native="handleLogout" v-if="loggedIn" >LOGOUT</el-button>
             </el-col>
+
           </el-row>
         </el-header>
 
@@ -122,13 +125,22 @@ export default {
   }),
 
   watch:{
-    aguardando(){
-      deep: true
+
+    aguardando: {
+      deep: true,
+      handler() {
+        var itens = this.$store.getters.aguardando
+        console.log("alterando checkin: ",itens.length)
+      }
     }
+
   },
 
   computed: {
-    
+    loggedIn(){
+      return this.$store.getters.loggedIn
+    },
+
     titulo(){
       return this.$store.getters.titulo
     },
@@ -164,7 +176,20 @@ export default {
 
     handleCloseNotify(){
       this.$store.dispatch('clearFlashMessage')
-    }
+    },
+
+    handleLogin(){
+      this.$router.push({name: 'login'})
+    },
+    
+    handleLogout(){
+      this.$store.dispatch("limparHospedagem")
+      this.$store.dispatch('destroyToken')
+      // promise
+      // .then(response => {this.$router.push({name:'home'})})
+      this.$router.push({name:'home'})
+    },
+
   },
 
 }
@@ -317,6 +342,14 @@ body{
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 */
+
+.el-collapse-item .grey-lighten-4{
+  background-color: brown;
+}
+
+.el-collapse-item .amber-lighten-4{
+    background-color:#FFECB3;
+}
 
 </style>
 
