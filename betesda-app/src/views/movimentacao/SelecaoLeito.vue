@@ -1,11 +1,12 @@
 <template>
   <div>
 
-    <el-dialog title="Selecionar Leito" :visible.sync="dialogVisible" width="750px">
       <el-row type="flex">
+        <!--
         <el-col :span="18">
           <h4>{{nomeHospede}}</h4>
         </el-col>
+        -->
         <el-col :span="6">
           <h4 v-if="acomodacao != null">Seleção: Quarto {{acomodacao.quarto.numero}} Leito {{acomodacao.leito.numero}}</h4>
         </el-col>
@@ -17,7 +18,7 @@
 
               <div class="flex-container wrap">
                 <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" 
-                    shadow="never" style="width:200px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
+                    shadow="never" style="width:100px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
                   <div class="clearfix elcardheader">
                     <span class="numero_leito">{{leito.numero}}</span>
                   </div> 
@@ -29,20 +30,19 @@
           </el-tabs>
         </el-col>
       </el-row>    
-
+      <!--
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancelar</el-button>
         <el-button type="primary" :disabled="acomodacao == null" @click="doSelecionarLeito">Confirmar</el-button>
       </span>
-    </el-dialog>
-
+      -->
   </div>
 </template>
 
 <script>
 
 export default {
-  name: "FrameSelecaoLeito",
+  name: "SelecaoLeito",
   
   props : ['config'],
 
@@ -261,6 +261,8 @@ export default {
 
 .flex-item {
   border-radius: 4px;
+  line-height:1em;
+  padding:5px;
   /*line-height: 1.5em;*/
   /*background: #FFF8E1;*/
   /*background: #FFF9C4;*/

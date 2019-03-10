@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="Informações de Hospedagem" :visible.sync="dialogVisible" width="750px">
+    <el-dialog title="Informações de Hospedagem" :visible.sync="dialogVisible" width="850px">
       <listagem-erros :errors="errors"></listagem-erros>
       <!--
       <el-row type="flex">

@@ -18,39 +18,6 @@
     </v-layout>
     -->
 
-    <el-container v-if="hospedagem != null && state == 'edit'">
-      <el-main style="padding:5px; line-height:2.2em; height:370px;" >
-        <listagem-erros :errors="errors"></listagem-erros>        
-        <el-row>
-          <el-col style="text-align:center">
-            <h4>Informe a data de Baixa</h4>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10">
-          <el-col :span="8">Hóspede a ser baixado</el-col>
-          <el-col :span="16" class="font-weight-bold">{{hospedeSelecionado.pessoa.nome}}</el-col>
-        </el-row>
-
-        <el-row>
-          <el-form :model="formBaixa" label-position="left" label-width="140px;">
-            <el-row type="flex">
-              <el-col>
-                <el-form-item label="Data de Baixa">
-                  <el-date-picker type="date" v-model="formBaixa.dataBaixa" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>    
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-        </el-row>
-
-        <el-row>
-          <el-col>
-            <el-button type="danger" size="mini" @click.native="handleBaixarHospede" :disabled="formBaixa.dataBaixa == null">Confirmar</el-button>
-            <el-button type="primary" size="mini" @click.native="state = 'browse'">Cancelar</el-button>
-          </el-col>
-        </el-row>
-      </el-main>
-    </el-container>    
 
     <!-- begin frame-hospedagem -->
     <el-container v-if="hospedagem != null && state == 'browse'">
@@ -118,7 +85,7 @@
                               @click.native="handleSelecionarDataBaixa(hpd)">Baixar
                             </el-button>
                             <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
-                              @click.native="showTransferencia(hpd, hospedagem.destinacaoHospedagem.id)">Transferir
+                              @click.native="handleSelecionarTransferencia(hpd)">Transferir
                             </el-button>
                           </el-col>
                         </el-row>
@@ -284,12 +251,88 @@
         </el-row>
       </el-main>
     </el-container>
+
+    <el-container v-if="hospedagem != null && state == 'baixar'">
+      <el-main style="padding:5px; line-height:2.2em; height:370px;" >
+        <listagem-erros :errors="errors"></listagem-erros>        
+        <el-row>
+          <el-col style="text-align:center">
+            <h4>Informe a data de Baixa</h4>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">Hóspede a ser baixado</el-col>
+          <el-col :span="16" class="font-weight-bold">{{hospedeSelecionado.pessoa.nome}}</el-col>
+        </el-row>
+
+        <el-row>
+          <el-form :model="formBaixa" label-position="left" label-width="140px;">
+            <el-row type="flex">
+              <el-col>
+                <el-form-item label="Data de Baixa">
+                  <el-date-picker type="date" v-model="formBaixa.dataBaixa" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>    
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-row>
+
+        <el-row>
+          <el-col>
+            <el-button type="danger" size="mini" @click.native="handleBaixarHospede" :disabled="formBaixa.dataBaixa == null">Confirmar</el-button>
+            <el-button type="primary" size="mini" @click.native="state = 'browse'">Cancelar</el-button>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>    
+
+    <el-container v-if="hospedagem != null && state == 'transferir'">
+      <el-main style="padding:5px; line-height:1em; height:370px;" >
+        <listagem-erros :errors="errors"></listagem-erros>        
+        <el-row>
+          <el-col style="text-align:center">
+            <h4>Informe a data de Transferência e o Leito de Destino</h4>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">Hóspede a ser transferido</el-col>
+          <el-col :span="16" class="font-weight-bold">{{hospedeSelecionado.pessoa.nome}}</el-col>
+        </el-row>
+
+        <el-row>
+          <el-form :model="formTransferencia" label-position="left" label-width="140px;">
+            <el-row type="flex">
+              <el-col>
+                <el-form-item label="Data de Transferência">
+                  <el-date-picker type="date" v-model="formTransferencia.dataTransferencia" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>    
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-row>
+
+        <el-row>
+          <selecao-leito ref="frameSelecaoLeito" :config="configTransferencia" @onSelecionar="onSelecionarLeito"></selecao-leito>
+        </el-row>
+
+
+        <el-row>
+          <el-col>
+            <el-button type="danger" size="mini" @click.native="handleTransferirHospede" :disabled="formTransferencia.dataTransferencia == null">Confirmar</el-button>
+            <el-button type="primary" size="mini" @click.native="state = 'browse'">Cancelar</el-button>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>    
+
   </div>
 </template>
 
 <script>
 
 import ListagemErros from "../../components/ListagemErros"
+import SelecaoLeito from "./SelecaoLeito.vue"
+
 /*
 import DialogoSelecaoDataRenovacao from "./DialogoSelecaoDataRenovacao.vue"
 import DialogoSelecaoDataBaixa from "./DialogoSelecaoDataBaixa.vue"
@@ -301,6 +344,7 @@ export default {
   
   components: {
     ListagemErros,
+    SelecaoLeito,
     /*
     DialogoSelecaoDataBaixa,
     DialogoSelecaoDataRenovacao,
@@ -349,6 +393,17 @@ export default {
       dataBaixa : null
     },
 
+    formTransferencia : {
+      dataTransferencia : null
+    },
+
+    configTransferencia : {
+      hospede : null,
+      destinacaoHospedagemId : null,
+      dataEntrada : null,
+      dataPrevistaSaida : null
+    },
+
     errors: [],
   }),
 
@@ -378,7 +433,7 @@ export default {
     handleSelecionarDataBaixa(hpd){
       this.hospedeSelecionado = hpd
       this.formBaixa.dataBaixa = null
-      this.state = 'edit'
+      this.state = 'baixar'
     },
 
     handleBaixarHospede(){
@@ -405,6 +460,49 @@ export default {
         })
     },
 
+    handleSelecionarTransferencia(hpd){
+      this.hospedeSelecionado = hpd
+      this.formTransferencia.dataTransferencia = null
+      this.state = 'transferir'
+      this.configTransferencia = {
+        hospede : hpd,
+        destinacaoHospedagemId : this.destinacaoHospedagem.id,
+        dataEntrada : this.hospedagem.dataEntrada,
+        dataPrevistaSaida : this.hospedagem.dataPrevistaSaida
+      }
+      //this.$refs.frameSelecaoLeito.openDialog(hpd, this.destinacaoHospedagem.id, this.hospedagem.dataEntrada, this.hospedagem.dataPrevistaSaida)
+    },
+
+
+    onSelecionarLeito(){
+
+    },
+
+    handleTransferirHospede(){
+      if (this.hospedeSelecionado != null && this.formTransferencia.dataTransferencia != null){
+        this.transferirHospede(this.hospedeSelecionado.id, this.formTransferencia.dataTransferencia)
+      }
+    },
+
+    transferirHospede(hospedeId, data) {
+      /*
+      var dados = {
+        hospedeId : hospedeId,
+        data : data
+      }
+      
+      petra.axiosPost("/app/hospedagem/mapa/baixar", dados, false)
+        .then(response => {
+          this.getInfo(this.hospedagemId)
+          petra.showMessageSuccess('Hóspede baixado com sucesso')
+          this.state = 'browse'
+        }).catch(error => {
+          this.errors = petra.tratarErros(error);
+          console.log(this.errors)
+          petra.showMessageError(this.errors)
+        })
+      */
+    },
 
 
     formatDate(data, formato){
@@ -438,18 +536,6 @@ export default {
             this.errors = petra.tratarErros(error);
           })
     },
-
-    // interno
-    showTransferencia(hospede, destinacaoHospedagemId){
-      //this.$refs.dlgSelecaoLeitoTransferencia.openDialog(hospede, destinacaoHospedagemId);
-    },
-
-    onCloseTransferencia(sucesso){
-      if (sucesso) {
-        this.getInfo(this.hospedagemId)
-      }
-    },  
-
 
     reset(){
       this.form = {
