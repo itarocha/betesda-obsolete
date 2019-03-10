@@ -1,6 +1,9 @@
 export default {
 
   getHospedagemInfo(hospedagemId, response, error) {
+    if (hospedagemId <= 0){
+      return
+    }
     var dados = {
       hospedagemId : hospedagemId
     }

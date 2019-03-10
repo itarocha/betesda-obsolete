@@ -2,7 +2,7 @@
   <div>
     <frame-selecao-leito ref="frameSelecaoLeito" @onSelecionar="onSelecionarLeito"></frame-selecao-leito>
 
-    <el-container v-if="state == 'browse'">
+    <el-container v-if="state == 'insert'">
       <el-header>
         <el-tooltip content="Limpar infomações" placement="bottom" :open-delay="toolTipDelay">
           <el-button type="primary" @click="handleLimpar">Limpar</el-button>
@@ -13,6 +13,7 @@
       </el-header>
 
       <el-main style="padding-top:0px; padding-left:5px; padding-right:5px; padding-bottom:5px;">
+        <listagem-erros :errors="errors"></listagem-erros>
         <el-form :model="form" :rules="rules" ref="form" label-position="left" size="small" label-width="100px">
         <el-row type="flex" justify="center">
           <el-col :xs="24" :sm="24" :md="12" :lg="12">
@@ -158,6 +159,19 @@
       </el-main>
     </el-container>
 
+    <el-container v-if="state == 'browse'">
+      <el-header>
+        <el-tooltip content="Preparar para incluir nova Hospedagem" placement="bottom" :open-delay="toolTipDelay">
+          <el-button type="primary" @click="handleIncluirHospedagem">Incluir</el-button>
+        </el-tooltip>
+      </el-header>
+
+      <el-main style="padding-top:0px; padding-left:5px; padding-right:5px; padding-bottom:5px;">
+        <frame-hospedagem :config="configHospedagem"></frame-hospedagem>
+      </el-main>
+    </el-container>
+
+
     <el-dialog title="Selecionar Tipo de Hóspede" :visible.sync="dialogSelecionarTipoHospede" width="500px">
       <el-form :model="formTipoHospede" label-position="left" label-width="140px;">
         <el-row type="flex">
@@ -194,13 +208,17 @@
 <script>
 
 import FrameSelecaoLeito from "./FrameSelecaoLeito.vue"
+import FrameHospedagem from "./FrameHospedagem.vue"
+import ListagemErros from "../../components/ListagemErros.vue"
 
 export default {
 
   name: 'Checkin',
 
   components:{
-    FrameSelecaoLeito
+    FrameSelecaoLeito,
+    FrameHospedagem,
+    ListagemErros
   },
 
   created(){
@@ -221,9 +239,9 @@ export default {
   data: () =>({
     dados: [],
 
-    erros: [],
+    errors: [],
 
-    state: "browse",
+    state: "insert",
 
     hospedes: [],
 
@@ -251,6 +269,11 @@ export default {
     },
 
     hospedeSelecionado : null,
+
+    configHospedagem :{
+      hospedagemId : 0,
+      permitirEditar : false
+    },
 
     rules: {
       descricao: [
@@ -339,9 +362,9 @@ export default {
       this.hospedes = []
       this.errors = []
       this.hospedagemGravadaId = 0
-      this.itensEncaminhadores = []
-      this.itensTipoServico = []
-      this.itensEntidades = []
+      //this.itensEncaminhadores = []
+      //this.itensTipoServico = []
+      //this.itensEntidades = []
     },
 
     updateFormHospedagem(){
@@ -397,6 +420,10 @@ export default {
       this.$store.dispatch("limparHospedagem")
     },
 
+    handleIncluirHospedagem() {
+      this.configHospedagem.hospedagemId = 0
+      this.estado = 'browse'
+    },
 
     removerHospede(item){
       this.$store.dispatch("removerHospede", item)
@@ -484,10 +511,12 @@ export default {
         toSave.servicos = this.form.servicos
       }
       for (var i = 0; i < this.aguardando.length; ++i){
+        var hospede = this.aguardando[i]
+
         var hospede = {
-          pessoaId : this.aguardando[i].pessoa.id,
-          pessoaNome : this.aguardando[i].pessoa.nome,
-          tipoHospedeId : this.aguardando[i].tipoHospede.id,
+          pessoaId : hospede.pessoa.id,
+          pessoaNome : hospede.pessoa.nome,
+          tipoHospedeId : hospede.tipoHospede == null ? null : hospede.tipoHospede.id,
         }
 
         if ((this.form.tipoUtilizacao == "T") && (this.aguardando[i].acomodacao != null)){ 
@@ -503,14 +532,17 @@ export default {
 
       petra.axiosPost("/app/hospedagem", toSave)
         .then(response => {
-            this.errors = []
-            //////////this.resetHospedagem()
-            //this.showHospedagemGravada(response.data.id)
+          this.handleLimpar()
+          this.doShowHospedagemGravada(response.data.id)
         })
         .catch(error => {
-          console.log(error)
           this.errors = petra.tratarErros(error)
         })
+    },
+
+    doShowHospedagemGravada(id){
+      this.configHospedagem.hospedagemId = id
+      this.state = 'browse'
     },
 
   }

@@ -224,7 +224,6 @@ export default new Vuex.Store({
         },
 
         limparHospedagem(state){     
-            console.log("limpando hospedagem")   
             state.aguardando = [],
         
             state.formHospedagem = {

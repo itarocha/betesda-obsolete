@@ -2,9 +2,7 @@
   <div>
 
     <!--
-    <dialogo-selecao-data-encerramento ref="dlgSelecaoDataEncerramento" @close="onSelecionarDataEncerramento"></dialogo-selecao-data-encerramento>
     <dialogo-selecao-data-renovacao ref="dlgSelecaoDataRenovacao" @close="onSelecionarDataRenovacao"></dialogo-selecao-data-renovacao>
-    <dialogo-confirmacao ref="dlgExclusao" titulo="Confirmação" @ok="onDeleteConfirmed"></dialogo-confirmacao>
 
     <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onCloseTransferencia"></dialogo-selecao-leito-transferencia>
     <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
@@ -20,263 +18,297 @@
     </v-layout>
     -->
 
+    <el-container v-if="hospedagem != null && state == 'edit'">
+      <el-main style="padding:5px; line-height:2.2em; height:370px;" >
+        <listagem-erros :errors="errors"></listagem-erros>        
+        <el-row>
+          <el-col style="text-align:center">
+            <h4>Informe a data de Baixa</h4>
+          </el-col>
+        </el-row>
+        <el-row :gutter="10">
+          <el-col :span="8">Hóspede a ser baixado</el-col>
+          <el-col :span="16" class="font-weight-bold">{{hospedeSelecionado.pessoa.nome}}</el-col>
+        </el-row>
+
+        <el-row>
+          <el-form :model="formBaixa" label-position="left" label-width="140px;">
+            <el-row type="flex">
+              <el-col>
+                <el-form-item label="Data de Baixa">
+                  <el-date-picker type="date" v-model="formBaixa.dataBaixa" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>    
+                </el-form-item>
+              </el-col>
+            </el-row>
+          </el-form>
+        </el-row>
+
+        <el-row>
+          <el-col>
+            <el-button type="danger" size="mini" @click.native="handleBaixarHospede" :disabled="formBaixa.dataBaixa == null">Confirmar</el-button>
+            <el-button type="primary" size="mini" @click.native="state = 'browse'">Cancelar</el-button>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>    
+
     <!-- begin frame-hospedagem -->
-          <el-row>
-            <el-col :span="24">
-              <el-tabs type="border-card" v-if="hospedagem != null">
-                <el-tab-pane label="Hospedagem">
-                  <el-row :gutter="10">
-                    <el-col :span="8">Código</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{config.hospedagemId}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Data de Entrada</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{formatDate(hospedagem.dataEntrada)}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Data Prevista de Saída</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{formatDate(hospedagem.dataPrevistaSaida)}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Data Efetiva de Saída</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{formatDate(hospedagem.dataEfetivaSaida)}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Destinação de Hospedagem</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{destinacaoHospedagem.descricao}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Tipo de Utilização</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{tipoUtilizacao(hospedagem.tipoUtilizacao)}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Situação</el-col>
-                    <el-col :span="6" class="font-weight-bold">{{hospedagem.status}}</el-col>
-                  </el-row>
-                  <el-row :gutter="10" v-if="servicos.length > 0">
-                    <el-col :span="8">Serviços</el-col>
-                    <el-col :span="16" class="font-weight-bold">
-                      <el-tag v-for="(servico, idx) in servicos" :key="idx" type="success" size="medium" class="tags">{{servico.descricao}}</el-tag>
-                    </el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="8">Observações</el-col>
-                  </el-row>
-                  <el-row :gutter="10">
-                    <el-col :span="24">
-                      <el-input type="textarea" class="font-size-10" rows="5" v-model="hospedagem.observacoes" readonly></el-input>                      
-                    </el-col>
-                  </el-row>
+    <el-container v-if="hospedagem != null && state == 'browse'">
+      <el-main style="padding:5px; line-height:1.5em; height:370px;">
+        <el-row>
+          <el-col :span="24">
+            <el-tabs type="border-card" >
+              <el-tab-pane label="Hospedagem" style="height:280px;">
+                <el-row :gutter="10">
+                  <el-col :span="8">Código</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{config.hospedagemId}}</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Data de Entrada</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{formatDate(hospedagem.dataEntrada)}}</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Data Prevista de Saída</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{formatDate(hospedagem.dataPrevistaSaida)}}</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Data Efetiva de Saída</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{formatDate(hospedagem.dataEfetivaSaida)}}</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Destinação de Hospedagem</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{destinacaoHospedagem.descricao}}</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Tipo de Utilização</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{tipoUtilizacao(hospedagem.tipoUtilizacao)}}</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Situação</el-col>
+                  <el-col :span="6" class="font-weight-bold">{{hospedagem.status}}</el-col>
+                </el-row>
+                <el-row :gutter="10" v-if="servicos.length > 0">
+                  <el-col :span="8">Serviços</el-col>
+                  <el-col :span="16" class="font-weight-bold">
+                    <el-tag v-for="(servico, idx) in servicos" :key="idx" type="success" size="medium" class="tags">{{servico.descricao}}</el-tag>
+                  </el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="8">Observações</el-col>
+                </el-row>
+                <el-row :gutter="10">
+                  <el-col :span="24">
+                    <el-input type="textarea" class="font-size-10" rows="5" v-model="hospedagem.observacoes" readonly></el-input>                      
+                  </el-col>
+                </el-row>
+              </el-tab-pane>
+              <el-tab-pane label="Hóspede(s)" style="height:280px;">
+                <el-row :gutter="10">
+                  <el-col :span="24">
+                    <el-collapse v-for="(hpd, i) in hospedagem.hospedes" :key="i" v-model="activeName" accordion>
+                      <el-collapse-item  :title="hpd.pessoa.nome + ' - ' + hpd.tipoHospede.descricao" :name="i" 
+                        :class="{'grey-lighten-4' : !isBaixado(hpd), 'amber-lighten-4' : isBaixado(hpd)}">   
+                        <el-row v-if="hpd.baixado == 'S'" class="font-weight-bold">
+                          BAIXADO
+                        </el-row>
+                        <el-row v-if="permitirEditar" :gutter="10">
+                          <el-col>
+                            <!-- showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida) -->
+                            <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
+                              @click.native="handleSelecionarDataBaixa(hpd)">Baixar
+                            </el-button>
+                            <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
+                              @click.native="showTransferencia(hpd, hospedagem.destinacaoHospedagem.id)">Transferir
+                            </el-button>
+                          </el-col>
+                        </el-row>
+
+                        <el-row :gutter="10">
+                          <el-col :span="4">Nascimento</el-col>
+                          <el-col :span="20" class="font-weight-bold">{{formatDate(hpd.pessoa.dataNascimento)}}</el-col>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="4">Endereço</el-col>
+                          <el-col :span="20" class="font-weight-bold">{{hpd.pessoa.endereco != null ? hpd.pessoa.endereco.descricao : ''}}</el-col>
+                        </el-row>
+
+                        <div xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
+                          <el-row>
+                            <el-col>Histórico de Leitos</el-col>
+                          </el-row>
+
+                          <el-row v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex" class="body-1 pa-1 pl-3">
+                              <el-col>
+                              #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                              <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
+                              </el-col>
+                          </el-row>
+                        </div> 
+                      </el-collapse-item>
+                    </el-collapse> 
+                  </el-col>
+                </el-row>
                 </el-tab-pane>
-                <el-tab-pane label="Hóspede(s)">
-                  <el-row :gutter="10">
-                    <el-col :span="24">
-                      <el-collapse v-for="(hpd, i) in hospedagem.hospedes" :key="i" v-model="activeName" accordion>
-                        <el-collapse-item  :title="hpd.pessoa.nome + ' - ' + hpd.tipoHospede.descricao" :name="i" 
-                          :class="{'grey-lighten-4' : !isBaixado(hpd), 'amber-lighten-4' : isBaixado(hpd)}">   
-                          <el-row v-if="hpd.baixado == 'S'" class="font-weight-bold">
-                            BAIXADO
-                          </el-row>
-                          <el-row v-if="permitirEditar" :gutter="10">
-                            <el-col>
-                              <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
-                                @click.native="showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida)">Baixar
-                              </el-button>
-                              <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
-                                @click.native="showTransferencia(hpd, hospedagem.destinacaoHospedagem.id)">Transferir
-                              </el-button>
-                            </el-col>
-                          </el-row>
 
-                          <el-row :gutter="10">
-                            <el-col :span="4">Nascimento</el-col>
-                            <el-col :span="20" class="font-weight-bold">{{formatDate(hpd.pessoa.dataNascimento)}}</el-col>
-                          </el-row>
-                          <el-row :gutter="10">
-                            <el-col :span="4">Endereço</el-col>
-                            <el-col :span="20" class="font-weight-bold">{{hpd.pessoa.endereco != null ? hpd.pessoa.endereco.descricao : ''}}</el-col>
-                          </el-row>
-
-                          <div xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
-                            <el-row>
-                              <el-col>Histórico de Leitos</el-col>
-                            </el-row>
-
-                            <el-row v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex" class="body-1 pa-1 pl-3">
-                                <el-col>
-                                #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
-                                <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
-                                </el-col>
-                            </el-row>
-                          </div> 
-                        </el-collapse-item>
-                      </el-collapse> 
+              <el-tab-pane label="Encaminhador" style="height:280px;">
+                <div v-if="entidade != null">
+                  <el-row :gutter="5" class="font-size-10">
+                    <el-col :span="16">
+                      Encaminhador
+                    </el-col>
+                    <el-col :span="8">
+                      Cargo
                     </el-col>
                   </el-row>
-                  </el-tab-pane>
 
-                <el-tab-pane label="Encaminhador">
-                  <div if="entidade != null">
-                    <el-row :gutter="5" class="font-size-10">
-                      <el-col :span="16">
-                        Encaminhador
-                      </el-col>
-                      <el-col :span="8">
-                        Cargo
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="16">
+                      <el-input size="mini" readonly v-model="encaminhador.nome"></el-input>
+                    </el-col>
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="encaminhador.cargo"></el-input>
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5">
-                      <el-col :span="16">
-                        <el-input size="mini" readonly v-model="encaminhador.nome"></el-input>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="encaminhador.cargo"></el-input>
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5" class="font-size-10">
+                    <el-col :span="8">
+                      Telefone
+                    </el-col>
+                    <el-col :span="16">
+                      Email
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5" class="font-size-10">
-                      <el-col :span="8">
-                        Telefone
-                      </el-col>
-                      <el-col :span="16">
-                        Email
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="encaminhador.telefone"></el-input>
+                    </el-col>
+                    <el-col :span="16">
+                      <el-input size="mini" readonly v-model="encaminhador.email"></el-input>
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5">
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="encaminhador.telefone"></el-input>
-                      </el-col>
-                      <el-col :span="16">
-                        <el-input size="mini" readonly v-model="encaminhador.email"></el-input>
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5" class="font-size-10">
+                    <el-col :span="16">
+                      Entidade
+                    </el-col>
+                    <el-col :span="8">
+                      CNPJ
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5" class="font-size-10">
-                      <el-col :span="16">
-                        Entidade
-                      </el-col>
-                      <el-col :span="8">
-                        CNPJ
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="16">
+                      <el-input size="mini" readonly v-model="entidade.nome"></el-input>
+                    </el-col>
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="entidade.cnpj"></el-input>
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5">
-                      <el-col :span="16">
-                        <el-input size="mini" readonly v-model="entidade.nome"></el-input>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="entidade.cnpj"></el-input>
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5" class="font-size-10">
+                    <el-col :span="8">
+                      Telefone
+                    </el-col>
+                    <el-col :span="16">
+                      Email
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5" class="font-size-10">
-                      <el-col :span="8">
-                        Telefone
-                      </el-col>
-                      <el-col :span="16">
-                        Email
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5">
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="entidade.telefone"></el-input>
+                    </el-col>
+                    <el-col :span="16">
+                      <el-input size="mini" readonly v-model="entidade.email"></el-input>
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5">
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="entidade.telefone"></el-input>
-                      </el-col>
-                      <el-col :span="16">
-                        <el-input size="mini" readonly v-model="entidade.email"></el-input>
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5" class="font-size-10">
+                    <el-col :span="12">
+                      Endereço
+                    </el-col>
+                    <el-col :span="4">
+                      Número
+                    </el-col>
+                    <el-col :span="8">
+                      Complemento
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5" class="font-size-10">
-                      <el-col :span="12">
-                        Endereço
-                      </el-col>
-                      <el-col :span="4">
-                        Número
-                      </el-col>
-                      <el-col :span="8">
-                        Complemento
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5"  v-if="entidade != null && entidade.endereco != null">
+                    <el-col :span="12">
+                      <el-input size="mini" readonly v-model="entidade.endereco.logradouro"></el-input>
+                    </el-col>
+                    <el-col :span="4">
+                      <el-input size="mini" readonly v-model="entidade.endereco.numero"></el-input>
+                    </el-col>
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="entidade.endereco.complemento"></el-input>
+                    </el-col>
+                  </el-row>
 
-                    <el-row :gutter="5">
-                      <el-col :span="12">
-                        <el-input size="mini" readonly v-model="entidade.endereco.logradouro"></el-input>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-input size="mini" readonly v-model="entidade.endereco.numero"></el-input>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="entidade.endereco.complemento"></el-input>
-                      </el-col>
-                    </el-row>
+                  <el-row :gutter="5" class="font-size-10">
+                    <el-col :span="8">
+                      Bairro
+                    </el-col>
+                    <el-col :span="4">
+                      CEP
+                    </el-col>
+                    <el-col :span="8">
+                      Cidade
+                    </el-col>
+                    <el-col :span="4">
+                      UF
+                    </el-col>
+                  </el-row>
+                  <el-row :gutter="5" v-if="entidade != null && entidade.endereco != null">
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="entidade.endereco.bairro"></el-input>
+                    </el-col>
+                    <el-col :span="4">
+                      <el-input size="mini" readonly v-model="entidade.endereco.cep"></el-input>
+                    </el-col>
+                    <el-col :span="8">
+                      <el-input size="mini" readonly v-model="entidade.endereco.cidade"></el-input>
+                    </el-col>
+                    <el-col :span="4">
+                      <el-input size="mini" readonly v-model="entidade.endereco.uf"></el-input>
+                    </el-col>
+                  </el-row>
+                </div>    
 
-                    <el-row :gutter="5" class="font-size-10">
-                      <el-col :span="8">
-                        Bairro
-                      </el-col>
-                      <el-col :span="4">
-                        CEP
-                      </el-col>
-                      <el-col :span="8">
-                        Cidade
-                      </el-col>
-                      <el-col :span="4">
-                        UF
-                      </el-col>
-                    </el-row>
-
-                    <el-row :gutter="5">
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="entidade.endereco.bairro"></el-input>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-input size="mini" readonly v-model="entidade.endereco.cep"></el-input>
-                      </el-col>
-                      <el-col :span="8">
-                        <el-input size="mini" readonly v-model="entidade.endereco.cidade"></el-input>
-                      </el-col>
-                      <el-col :span="4">
-                        <el-input size="mini" readonly v-model="entidade.endereco.uf"></el-input>
-                      </el-col>
-                    </el-row>
-                  </div>    
-
-                </el-tab-pane>
-              </el-tabs>
-            </el-col>
-          </el-row>
-
+              </el-tab-pane>
+            </el-tabs>
+          </el-col>
+        </el-row>
+      </el-main>
+    </el-container>
   </div>
 </template>
 
 <script>
 
+import ListagemErros from "../../components/ListagemErros"
 /*
-import DialogoSelecaoDataEncerramento from "./DialogoSelecaoDataEncerramento.vue"
 import DialogoSelecaoDataRenovacao from "./DialogoSelecaoDataRenovacao.vue"
 import DialogoSelecaoDataBaixa from "./DialogoSelecaoDataBaixa.vue"
 import DialogoSelecaoLeitoTransferencia from "./DialogoSelecaoLeitoTransferencia.vue"
-import DialogoConfirmacao from '../config/DialogoConfirmacao.vue'
 */
 
 export default {
   name: 'FrameHospedagem',
   
   components: {
+    ListagemErros,
     /*
-    DialogoSelecaoDataEncerramento,
     DialogoSelecaoDataBaixa,
     DialogoSelecaoDataRenovacao,
     DialogoSelecaoLeitoTransferencia,
-    DialogoConfirmacao
     */
   },
 
   computed: {
-    // config é composto de hospedagemId, permitirEditar
   },
 
   watch: {
@@ -288,12 +320,14 @@ export default {
     }
   },
 
-  props:['codigo', 'config'],
+  props:['config'],
 
   data: () =>({
+    state : 'browse',
 
     hospedagemId: 0,
     hospedagem:{},
+    hospedeSelecionado:null,
 
     tipoHospede:{},
     destinacaoHospedagem:{},
@@ -306,11 +340,16 @@ export default {
     activeName:null,
 
     dados: [],
-    errors:[],
-    dialogVisible : false,
-
+    erros:[],
+    
     permitirEditar : false,
     tabActive : 0,
+
+    formBaixa : {
+      dataBaixa : null
+    },
+
+    errors: [],
   }),
 
   created(){
@@ -332,29 +371,41 @@ export default {
     },
 
     // public
-    showSelecionarDataEncerramento(){
-      //this.$refs.dlgSelecaoDataEncerramento.openDialog(this.hospedagem.id, this.hospedagem.dataPrevistaSaida);
-    },
-
-    // public
-    showSelecionarDataRenovacao(){
-      //this.$refs.dlgSelecaoDataRenovacao.openDialog(this.hospedagem.id, this.hospedagem.dataPrevistaSaida);
-    },
-
-    // public
     getHospedagem(){
       return this.hospedagem
     },
 
-    // interno
-    showSelecionarDataBaixa(hospedeId, dataPrevistaSaida){
-      //this.$refs.dlgSelecaoDataBaixa.openDialog(hospedeId, dataPrevistaSaida);
+    handleSelecionarDataBaixa(hpd){
+      this.hospedeSelecionado = hpd
+      this.formBaixa.dataBaixa = null
+      this.state = 'edit'
     },
 
-    // public
-    deleteConfirm() {
-      //this.$refs.dlgExclusao.openDialog("Deseja realmente excluir esta Hospedagem?")
+    handleBaixarHospede(){
+      if (this.hospedeSelecionado != null && this.formBaixa.dataBaixa != null){
+        this.baixarHospede(this.hospedeSelecionado.id, this.formBaixa.dataBaixa)
+      }
     },
+
+    baixarHospede(hospedeId, data) {
+      var dados = {
+        hospedeId : hospedeId,
+        data : data
+      }
+      
+      petra.axiosPost("/app/hospedagem/mapa/baixar", dados, false)
+        .then(response => {
+          this.getInfo(this.hospedagemId)
+          petra.showMessageSuccess('Hóspede baixado com sucesso')
+          this.state = 'browse'
+        }).catch(error => {
+          this.errors = petra.tratarErros(error);
+          console.log(this.errors)
+          petra.showMessageError(this.errors)
+        })
+    },
+
+
 
     formatDate(data, formato){
       return petraDateTime.formatDate(data) || '---'
@@ -388,68 +439,6 @@ export default {
           })
     },
 
-    onSelecionarDataEncerramento(hospedagemId, dataEncerramento){
-      if (dataEncerramento != null){
-        this.encerrarHospedagem(hospedagemId, dataEncerramento)
-      }
-    },
-
-    encerrarHospedagem(hospedagemId, data) {
-      var dados = {
-        hospedagemId : hospedagemId,
-        data : data
-      }
-
-      petra.axiosPost("/app/hospedagem/mapa/encerramento", dados, false)
-        .then(response => {
-          this.$emit('encerrada',hospedagemId)
-        }).catch(error => {
-          this.errors = petra.tratarErros(error);
-        })
-    },
-
-    onSelecionarDataBaixa(hospedeId, dataBaixa){
-      if (dataBaixa != null){
-        this.baixarHospedagem(hospedeId, dataBaixa)
-      }
-    },
-
-    baixarHospedagem(hospedeId, data) {
-      var dados = {
-        hospedeId : hospedeId,
-        data : data
-      }
-      
-      petra.axiosPost("/app/hospedagem/mapa/baixar", dados, false)
-        .then(response => {
-          this.getInfo(this.hospedagemId)
-          petra.showMessageSuccess('Hospedagem encerrada com sucesso')
-          this.$emit('close',true)
-        }).catch(error => {
-          this.errors = petra.tratarErros(error);
-        })
-    },
-
-    onSelecionarDataRenovacao(hospedagemId, dataRenovacao){
-      if (dataRenovacao != null){
-        this.renovarHospedagem(hospedagemId, dataRenovacao)
-      }
-    },
-
-    renovarHospedagem(hospedagemId, data) {
-      var dados = {
-        hospedagemId : hospedagemId,
-        data : data
-      }
-      
-      petra.axiosPost("/app/hospedagem/mapa/renovacao", dados, false)
-        .then(response => {
-          this.$emit('renovada',hospedagemId)
-        }).catch(error => {
-          this.errors = petra.tratarErros(error);
-        })
-    },
-
     // interno
     showTransferencia(hospede, destinacaoHospedagemId){
       //this.$refs.dlgSelecaoLeitoTransferencia.openDialog(hospede, destinacaoHospedagemId);
@@ -461,17 +450,8 @@ export default {
       }
     },  
 
-    onDeleteConfirmed(evt) {
-      petra.axiosDelete("/app/hospedagem/"+this.hospedagemId, false)
-        .then(response => {
-          this.$emit('excluida',this.hospedagemId)
-        })
-        .catch(error => {
-          this.errors = petra.tratarErros(error);
-        })
-    },
 
-    reset(evt){
+    reset(){
       this.form = {
         id : null,
         descricao : null

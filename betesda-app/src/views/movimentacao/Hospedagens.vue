@@ -83,12 +83,9 @@
                                     v-if="hospedagem.dias[indice].identificador != '0'"
                                     :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
                                     @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
-                                    <!-- deve entrar
-                                <v-chip color="grey lighten-1" 
-                                  :small="true" text-color="black" 
-                                  v-if="hospedagem.dias[indice].firstIndex" 
-                                  class="chip">{{getNome(hospedagem.dias[indice].identificador)}}</v-chip>
-                                  -->
+                                    <!--<el-tag type="info" size="mini">Mini</el-tag>-->
+                                    
+                                <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
                               </div>                              
                             </div>
                           </el-col>
@@ -184,7 +181,6 @@ export default {
     state : 'browse',
 
     activeTabName: 'mapa',
-
 
     windowHeight: 0,
     styleGrid : 'max-height: 337px',
@@ -699,5 +695,14 @@ export default {
 }
 .amber-lighten-4{
     background-color:#FFECB3;
+}
+.chip{
+  background-color:whitesmoke;
+  width:50px;
+  text-align:center;
+  padding-top:5px;
+  padding-bottom: 4px;
+  border: 1px solid #bdbdbd;
+   border-radius: 16px;
 }
 </style>

@@ -498,6 +498,10 @@ public class HospedagemService {
 		Hospedagem h = hospedagemRepo.findHospedagemByHospedagemId(hospedagemId);
 		HospedagemFullVO retorno = new HospedagemFullVO();
 		
+		if (h == null) {
+			return retorno;
+		}
+		
 		for (HospedagemTipoServico hts: h.getServicos()) {
 			TipoServico servico = hts.getTipoServico();
 			retorno.getServicos().add(servico);

@@ -129,8 +129,7 @@ export default {
     aguardando: {
       deep: true,
       handler() {
-        var itens = this.$store.getters.aguardando
-        console.log("alterando checkin: ",itens.length)
+        //var itens = this.$store.getters.aguardando
       }
     }
 
