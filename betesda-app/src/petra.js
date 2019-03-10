@@ -251,6 +251,10 @@ export default {
         return s.replace(/[^a-zA-Z0-9]/g,"")
       },
 
+      letrasNumerosEspacos(s) {
+        return s.replace(/[^a-zA-Z0-9\s]/g,"")
+      },
+
 
       randomColor(id) {
         //const r = () => Math.floor(256 * Math.random());

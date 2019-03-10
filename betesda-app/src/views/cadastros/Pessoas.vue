@@ -141,7 +141,7 @@
                       </el-form-item>
                     </el-col>
                     <el-col :span="8">
-                      <el-form-item label="RG" prop="fixme" :error="getErro('fixme')">
+                      <el-form-item label="RG" prop="fixme" :error="getErro('rg')">
                         <el-input v-model="form.rg" @input.native="fmtLetrasENumeros($event,'rg')"></el-input>
                       </el-form-item>
                     </el-col>
@@ -166,7 +166,7 @@
                     </el-col>
                     <el-col :span="8">
                       <el-form-item label="Complemento" prop="enderecoComplemento" :error="getErro('endereco.complemento')">
-                        <el-input v-model="form.endereco.complemento" @input.native="fmtMaiusculas($event,'complemento','endereco')"></el-input>
+                        <el-input v-model="form.endereco.complemento" @input.native="fmtLetrasNumerosEspacos($event,'complemento','endereco')"></el-input>
                       </el-form-item>
                     </el-col>
                   </el-row>
@@ -401,6 +401,17 @@ export default {
 
     fmtLetrasENumeros(event, campo) {
       this.$data["form"][campo] = petra.letrasENumeros(event.target.value).toUpperCase();
+    },
+
+    fmtLetrasNumerosEspacos(event, campo, group) {
+      var s = petra.letrasNumerosEspacos(event.target.value).toUpperCase()
+      //console.log(s)
+      //this.$data["form"][campo] = s;
+      if (group){
+        this.$data["form"][group][campo] = s;
+      } else {
+        this.$data["form"][campo] = s;
+      }
     },
 
     fmtSimNao(row, col) {
