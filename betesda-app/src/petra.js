@@ -1,8 +1,8 @@
 var moment = require('moment')
 moment.locale('pt-br');
 
-var base_uri =  'http://localhost:8088/api'
-//var base_uri = 'http://petrasistemas.com.br:8080/betesda/api'
+//var base_uri =  'http://localhost:8088/api'
+var base_uri = 'http://petrasistemas.com.br:8080/betesda/api'
 
 export default {
 
@@ -99,9 +99,7 @@ export default {
           .then(response => {
             resolve(response)
           }).catch(error => {
-
             this.tratarRequestError(error, reject, showPostErrors)
-
           })
       })
     },
@@ -109,10 +107,14 @@ export default {
     tratarRequestError(error, reject, showPostErrors){
       if ((error.response) && (error.response.status)) {
         if ((error.response.status >= 400) && (error.response.status < 500) && showPostErrors){
-          if (error.response.data.errors){
-            this.showMessageError(error.response.data.errors[0].errorMessage)  
+          if (error.response.status == 403){
+            this.showMessageError("Você não tem permissão para acessar esse recurso")  
           } else {
-            this.showMessageError(error.response.data)
+            if (error.response.data.errors){
+                this.showMessageError(error.response.data.errors[0].errorMessage)  
+            } else {
+              this.showMessageError(error.response.data)
+            }
           }
         } else if ((error.response.status == 500)){
           if (error.response.data.errors){

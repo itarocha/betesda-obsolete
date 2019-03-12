@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import Home from '@/views/Home'
 import Teste from '@/components/Teste'
 import Login from '@/views/auth/Login'
+import CreateNewUser from '@/views/auth/CreateNewUser'
 
 import SituacoesLeitos from '@/views/cadastros/SituacoesLeitos'
 import TiposHospedes from '@/views/cadastros/TiposHospedes'
@@ -122,6 +123,11 @@ const router = new Router({
       meta: {
         requiresVisitor: true
       }
+    },
+    {
+      path: '/create_new_user',
+      name: 'create_new_user',
+      component: CreateNewUser,
     },
   ]
 })

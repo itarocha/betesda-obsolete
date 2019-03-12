@@ -19,41 +19,44 @@
                 <router-link to="/" tag="div"><i class="fas fa-home pr"></i>Home</router-link>
             </el-menu-item>
 
-            <el-menu-item index="1-2">
+            <el-menu-item index="1-2" v-if="isRoot || isAdmin">
                 <router-link to="/situacoes_leitos" tag="div"><i class="fas fa-check-circle pr"></i>Situações de Leitos</router-link>
             </el-menu-item>
 
-            <el-menu-item index="1-3">
+            <el-menu-item index="1-3" v-if="isRoot || isAdmin">
                 <router-link to="/tipos_hospedes" tag="div"><i class="fas fa-tag pr"></i>Tipos de Hóspedes</router-link>
             </el-menu-item>
 
-            <el-menu-item index="1-4">
+            <el-menu-item index="1-4" v-if="isRoot || isAdmin">
                 <router-link to="/tipos_leitos" tag="div"><i class="fas fa-bed pr"></i>Tipos de Leitos</router-link>
             </el-menu-item>
 
-            <el-menu-item index="1-5">
+            <el-menu-item index="1-5" v-if="isRoot || isAdmin">
                 <router-link to="/tipos_servicos" tag="div"><i class="fas fa-coffee pr"></i>Tipos de Serviços</router-link>
             </el-menu-item>
 
-            <el-menu-item index="1-6">
+            <el-menu-item index="1-6" v-if="isRoot || isAdmin">
                 <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</router-link>
             </el-menu-item>
 
-            <el-menu-item index="1-7">
+            <el-menu-item index="1-7" v-if="isRoot || isAdmin || isUser">
                 <router-link to="/quartos" tag="div"><i class="fas fa-hospital pr"></i>Quartos</router-link>
             </el-menu-item>
 
-            <el-menu-item index="2-1" route="tela">
+            <el-menu-item index="2-1" route="tela" v-if="isRoot || isAdmin || isUser">
               <router-link to="/entidades" tag="div"><i class="fas fa-university pr"></i>Entidades</router-link>
             </el-menu-item>
-            <el-menu-item index="2-2">
+            <el-menu-item index="2-2" v-if="isRoot || isAdmin || isUser">
                 <router-link to="/pessoas" tag="div"><i class="fas fa-users pr"></i>Pessoas</router-link>
             </el-menu-item>
-            <el-menu-item index="2-3">
+            <el-menu-item index="2-3" v-if="isRoot || isAdmin || isUser">
                 <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
             </el-menu-item>
-            <el-menu-item index="2-4">
+            <el-menu-item index="2-4" v-if="isRoot || isAdmin || isUser">
                 <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
+            </el-menu-item>
+            <el-menu-item index="2-5" v-if="isRoot">
+                <router-link to="/create_new_user" tag="div"><i class="fas fa-eye pr"></i>Administrador</router-link>
             </el-menu-item>
 
             <!--''
@@ -108,6 +111,7 @@
         </el-header>
 
         <el-main>
+          <!--user = {{user}} - isAdmin = {{isAdmin}} - isRoot = {{isRoot}}-->
           <router-view/>
         </el-main>
       </el-container>
@@ -146,6 +150,18 @@ export default {
 
     user(){
       return this.$store.getters.user
+    },
+
+    isUser(){
+      return this.$store.getters.isUser
+    },
+
+    isAdmin(){
+      return this.$store.getters.isAdmin
+    },
+
+    isRoot(){
+      return this.$store.getters.isRoot
     },
 
     numero(){

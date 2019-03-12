@@ -461,6 +461,7 @@ export default {
     },
 
     handleSelecionarTransferencia(hpd){
+      /*
       this.hospedeSelecionado = hpd
       this.formTransferencia.dataTransferencia = null
       this.state = 'transferir'
@@ -471,6 +472,7 @@ export default {
         dataPrevistaSaida : this.hospedagem.dataPrevistaSaida
       }
       //this.$refs.frameSelecaoLeito.openDialog(hpd, this.destinacaoHospedagem.id, this.hospedagem.dataEntrada, this.hospedagem.dataPrevistaSaida)
+      */
     },
 
 

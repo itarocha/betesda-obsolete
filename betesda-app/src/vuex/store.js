@@ -55,9 +55,36 @@ export default new Vuex.Store({
             return state.flashMessage
         },
         user(state){
-            // nem tudo...
-            return state.user
+            return state.token ?  petra.parseJwt(state.token) : null
         },
+        
+        isUser(state){
+            var user =  state.token ?  petra.parseJwt(state.token) : null
+            if (user && user.authorities){
+                var tipo =  _.find(user.authorities,{authority : "ROLE_USER"})
+                return tipo ? true : false;
+            }
+            return false
+        },
+        
+        isAdmin(state){
+            var user =  state.token ?  petra.parseJwt(state.token) : null
+            if (user && user.authorities){
+                var tipo =  _.find(user.authorities,{authority : "ROLE_ADMIN"})
+                return tipo ? true : false;
+            }
+            return false
+        },
+        
+        isRoot(state){
+            var user =  state.token ?  petra.parseJwt(state.token) : null
+            if (user && user.authorities){
+                var tipo =  _.find(user.authorities,{authority : "ROLE_ROOT"})
+                return tipo ? true : false;
+            }
+            return false
+        },
+        
         aguardando : state => state.aguardando,
         formHospedagem : state => state.formHospedagem,
         qtdAguardando : state => {
