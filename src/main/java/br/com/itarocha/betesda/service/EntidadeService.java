@@ -5,14 +5,17 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.SelectValueVO;
 import br.com.itarocha.betesda.repository.EnderecoRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
+import br.com.itarocha.betesda.util.validation.ResultError;
 
 @Service
 public class EntidadeService {
@@ -29,10 +32,19 @@ public class EntidadeService {
 	public EntidadeService() {
 	}
 
-	public Entidade create(Entidade model) {
+	public Entidade create(Entidade model) throws ValidationException {
 		try{
+			
+			Long id = model.getId() == null ? 0L : model.getId();
+			
+			if (this.entidadeCadastradaPorCampo(id, "cnpj", model.getCnpj())) {
+				throw new ValidationException(new ResultError().addError("cnpj", "CNPJ já casdastrado para outra Entidade"));
+			}
+			
 			enderecoRepo.save(model.getEndereco());
 			repositorio.save(model);
+		} catch (ValidationException e) {
+			throw e;
 		}catch(Exception e){
 			throw new IllegalArgumentException(e.getMessage());
 		}
@@ -76,4 +88,27 @@ public class EntidadeService {
 		return retorno;
 	}
 	
+	public boolean entidadeCadastradaPorCampo(Long entidadeId, String campo, String valor) {
+		
+		if ("".equals(valor) || valor == null) {
+			return false;
+		}
+		Long qtd = 0L;
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append("SELECT COUNT(*) "); 
+			sb.append("FROM entidade "); 
+			sb.append(String.format("WHERE %s = :%s ",campo,campo)); 
+			sb.append("AND id <> :entidadeId ");
+			
+			Query query = em.createNativeQuery(sb.toString());
+			qtd = ((Number)query.setParameter("entidadeId", entidadeId)
+									.setParameter(campo, valor)
+									.getSingleResult()).longValue();
+		} catch (Exception e) {
+			return false;
+		}
+		
+		return qtd > 0; 
+	}
 }

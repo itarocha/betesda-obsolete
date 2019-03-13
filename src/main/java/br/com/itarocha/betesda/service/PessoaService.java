@@ -4,22 +4,19 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
+import javax.persistence.Query;
 import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.Endereco;
 import br.com.itarocha.betesda.model.Pessoa;
-import br.com.itarocha.betesda.model.UnidadeFederacao;
 import br.com.itarocha.betesda.repository.EnderecoRepository;
 import br.com.itarocha.betesda.repository.PessoaRepository;
+import br.com.itarocha.betesda.util.validation.ResultError;
 
 //import static org.springframework.data.jpa.domain.Specifications.where;
 
@@ -38,10 +35,27 @@ public class PessoaService {
 	public PessoaService() {
 	}
 
-	public Pessoa create(Pessoa model) {
+	public Pessoa create(Pessoa model) throws ValidationException {
 		try{
 			enderecoRepo.save(model.getEndereco());
+			
+			Long id = model.getId() == null ? 0L : model.getId();
+			
+			if (this.pessoaCadastradaPorCampo(id, "cpf", model.getCpf())) {
+				throw new ValidationException(new ResultError().addError("cpf", "CPF já casdastrado para outra pessoa"));
+			}
+			
+			if (this.pessoaCadastradaPorCampo(id, "rg", model.getRg())) {
+				throw new ValidationException(new ResultError().addError("rg", "RG já casdastrado para outra pessoa"));
+			}
+			
+			if (this.pessoaCadastradaPorCampo(id, "cartao_sus", model.getCartaoSus())) {
+				throw new ValidationException(new ResultError().addError("cartaoSus", "Cartão do SUS já casdastrado para outra pessoa"));
+			}
+			
 			repositorio.save(model);
+		} catch (ValidationException e) {
+			throw e;
 		}catch(Exception e){
 			throw new IllegalArgumentException(e.getMessage());
 		}
@@ -68,8 +82,6 @@ public class PessoaService {
 	}
 
 	public List<Pessoa> findByFieldNameAndValue(String campo, String valor){
-		// bookRepository.findAll(where(hasAuthor(author)).and(titleContains(title)));
-		//return repositorio.findAll(campoContem(campo, valor));
 		return repositorio.findAll(campoQueContenha(campo, valor));
 	}
 	
@@ -96,7 +108,6 @@ public class PessoaService {
 	}
 
 	static Specification<Pessoa> campoContem(String campo, String valor) {
-	    //return (pessoa, cq, cb) -> cb.like(pessoa.get(campo), "%" + valor + "%");
 	    return (pessoa, cq, cb) -> cb.like(cb.lower(pessoa.get(campo)), "%" + valor.toLowerCase() + "%");
 	}
 	
@@ -136,5 +147,30 @@ public class PessoaService {
             }
         };
         */
-    }	
+    }
+	
+	public boolean pessoaCadastradaPorCampo(Long pessoaId, String campo, String valor) {
+		
+		if ("".equals(valor) || valor == null) {
+			return false;
+		}
+		Long qtd = 0L;
+		try {
+			StringBuilder sb = new StringBuilder();
+			sb.append("SELECT COUNT(*) "); 
+			sb.append("FROM pessoa "); 
+			sb.append(String.format("WHERE %s = :%s ",campo,campo)); 
+			sb.append("AND id <> :pessoaId ");
+			
+			Query query = em.createNativeQuery(sb.toString());
+			qtd = ((Number)query.setParameter("pessoaId", pessoaId)
+									.setParameter(campo, valor)
+									.getSingleResult()).longValue();
+		} catch (Exception e) {
+			return false;
+		}
+		
+		return qtd > 0; 
+	}
+	
 }

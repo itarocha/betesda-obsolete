@@ -65,7 +65,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="CNPJ" prop="cnpj" :error="getErro('cnpj')">
-                <el-input v-model="form.cnpj" v-mask="'##.###.###/####-##'" masked="false"></el-input>
+                <el-input v-model="form.cnpj" v-mask="'##.###.###/####-##'" masked="true"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -91,7 +91,7 @@
           <el-row :gutter="10">
             <el-col :span="12">
               <el-form-item label="Endereço" prop="enderecoLogradouro" :error="getErro('endereco.logradouro')">
-                <el-input v-model="form.endereco.logradouro" @input.native="fmtMaiusculas($event,'logradouro','endereco')"></el-input>
+                <el-input v-model="form.endereco.logradouro" @input.native="fmtLetrasNumerosEspacos($event,'logradouro','endereco')"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="4">
@@ -101,7 +101,7 @@
             </el-col>
             <el-col :span="8">
               <el-form-item label="Complemento" prop="enderecoComplemento" :error="getErro('endereco.complemento')">
-                <el-input v-model="form.endereco.complemento" @input.native="fmtMaiusculas($event,'complemento','endereco')"></el-input>
+                <el-input v-model="form.endereco.complemento" @input.native="fmtLetrasNumerosEspacos($event,'complemento','endereco')"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
@@ -109,12 +109,12 @@
           <el-row :gutter="10">
             <el-col :span="8">
               <el-form-item label="Bairro" prop="enderecoBairro" :error="getErro('endereco.bairro')">
-                <el-input v-model="form.endereco.bairro" @input.native="fmtMaiusculas($event,'bairro','endereco')"></el-input>
+                <el-input v-model="form.endereco.bairro" @input.native="fmtLetrasNumerosEspacos($event,'bairro','endereco')"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="4">
               <el-form-item label="CEP" prop="enderecoCep" :error="getErro('endereco.cep')">
-                <el-input v-model="form.endereco.cep" v-mask="'#####-###'" masked="false"></el-input>
+                <el-input v-model="form.endereco.cep" v-mask="'#####-###'" masked="true"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="8">
@@ -412,6 +412,16 @@ export default {
     fmtLetrasENumeros(event, campo) {
       var form = this.mode == 'entidades'  ? 'form' : 'formEncaminhador'
       this.$data[form][campo] = petra.letrasENumeros(event.target.value).toUpperCase();
+    },
+
+    fmtLetrasNumerosEspacos(event, campo, group) {
+      var form = this.mode == 'entidades'  ? 'form' : 'formEncaminhador'
+      var s = petra.letrasNumerosEspacos(event.target.value).toUpperCase()
+      if (group){
+        this.$data[form][group][campo] = s;
+      } else {
+        this.$data[form][campo] = s;
+      }
     },
 
     fmtSimNao(row, col) {

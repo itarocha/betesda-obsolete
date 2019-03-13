@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.service.EntidadeService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
+import br.com.itarocha.betesda.utils.Validadores;
 
 @RestController
 @RequestMapping("/api/app/entidades")
@@ -56,8 +58,23 @@ public class EntidadesController {
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody Entidade model) {
+		
+		if (model.getCnpj() != null) {
+			model.setCnpj(model.getCnpj().replaceAll("\\.", "").replaceAll("\\-", "").replaceAll("\\/", ""));
+		}
+		if (model.getEndereco() != null && model.getEndereco().getCep() != null) {
+			model.getEndereco().setCep((model.getEndereco().getCep().replaceAll("\\-", "")));
+		}
+		
 		ItaValidator<Entidade> v = new ItaValidator<Entidade>(model);
 		v.validate();
+		
+		if (model.getCnpj() != null && model.getCnpj() != "") {
+			if (!Validadores.isValidCNPJ(model.getCnpj())) {
+				v.addError("cnpj", "CNPJ inválido");
+			}
+		}
+		
 		if (!v.hasErrors() ) {
 			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
@@ -66,6 +83,9 @@ public class EntidadesController {
 			Entidade saved = null;
 			saved = service.create(model);
 		    return new ResponseEntity<Entidade>(saved, HttpStatus.OK);
+		} catch (ValidationException e) {
+			ResponseEntity<?> re = new ResponseEntity<>(e.getRe(), HttpStatus.BAD_REQUEST); 
+			return re;
 		} catch (Exception e) {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

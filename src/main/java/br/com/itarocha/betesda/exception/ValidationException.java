@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import br.com.itarocha.betesda.util.validation.ResultError;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class ValidationException extends RuntimeException{
+public class ValidationException extends Exception{
 
 	private static final long serialVersionUID = -1173120804319840769L;
 

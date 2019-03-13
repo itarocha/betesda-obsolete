@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.TipoHospede;
 import br.com.itarocha.betesda.service.TipoHospedeService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;

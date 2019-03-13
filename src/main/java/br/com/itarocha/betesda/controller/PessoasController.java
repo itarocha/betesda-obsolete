@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.Pessoa;
 import br.com.itarocha.betesda.model.SearchRequest;
 import br.com.itarocha.betesda.service.PessoaService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
+import br.com.itarocha.betesda.utils.Validadores;
 
 @RestController
 @RequestMapping("/api/app/pessoas")
@@ -87,6 +89,13 @@ public class PessoasController {
 		
 		ItaValidator<Pessoa> v = new ItaValidator<Pessoa>(model);
 		v.validate();
+		
+		if (model.getCpf() != null && model.getCpf() != "") {
+			if (!Validadores.isValidCPF(model.getCpf())) {
+				v.addError("cpf", "CPF inválido");
+			}
+		}
+		
 		if (!v.hasErrors() ) {
 			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
@@ -95,6 +104,9 @@ public class PessoasController {
 			Pessoa saved = null;
 			saved = service.create(model);
 		    return new ResponseEntity<Pessoa>(saved, HttpStatus.OK);
+		} catch (ValidationException e) {
+			ResponseEntity<?> re = new ResponseEntity<>(e.getRe(), HttpStatus.BAD_REQUEST); 
+			return re;
 		} catch (Exception e) {
 			return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
 		}

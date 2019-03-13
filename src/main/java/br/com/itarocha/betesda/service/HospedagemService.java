@@ -728,7 +728,7 @@ public class HospedagemService {
 	} 
 	
 	//TODO Implementar renovarHospedagem
-	public void renovarHospedagem(Long hospedagemId, LocalDate dataRenovacao) {
+	public void renovarHospedagem(Long hospedagemId, LocalDate dataRenovacao) throws ValidationException{
 		/*
 		* Somente se hospedagem.status == aberta
 		* hospedagem = getHospedagem(hospedagemId)

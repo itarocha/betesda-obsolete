@@ -156,7 +156,7 @@
                   <el-row :gutter="10">
                     <el-col :span="12">
                       <el-form-item label="Endereço" prop="enderecoLogradouro" :error="getErro('endereco.logradouro')">
-                        <el-input v-model="form.endereco.logradouro" @input.native="fmtMaiusculas($event,'logradouro','endereco')"></el-input>
+                        <el-input v-model="form.endereco.logradouro" @input.native="fmtLetrasNumerosEspacos($event,'logradouro','endereco')"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="4">
@@ -174,7 +174,7 @@
                   <el-row :gutter="10">
                     <el-col :span="8">
                       <el-form-item label="Bairro" prop="enderecoBairro" :error="getErro('endereco.bairro')">
-                        <el-input v-model="form.endereco.bairro" @input.native="fmtMaiusculas($event,'bairro','endereco')"></el-input>
+                        <el-input v-model="form.endereco.bairro" @input.native="fmtLetrasNumerosEspacos($event,'bairro','endereco')"></el-input>
                       </el-form-item>
                     </el-col>
                     <el-col :span="4">
@@ -306,6 +306,9 @@ export default {
       {text: "Nome", value: "nome", type: "text"},
       {text: "CPF", value: "cpf", type: "text"},
       {text: "RG", value: "rg", type: "text"},
+      {text: "Cartão do SUS", value: "cartaoSus", type: "text"},
+      {text: "Telefone", value: "telefone", type: "text"},
+      {text: "Telefone2", value: "telefone2", type: "text"},
     ],
 
     itensSexo: [
@@ -405,8 +408,6 @@ export default {
 
     fmtLetrasNumerosEspacos(event, campo, group) {
       var s = petra.letrasNumerosEspacos(event.target.value).toUpperCase()
-      //console.log(s)
-      //this.$data["form"][campo] = s;
       if (group){
         this.$data["form"][group][campo] = s;
       } else {
