@@ -55,7 +55,7 @@
                         </el-col>
 
                         <el-col v-for="(dia, index) in dados.dias" :key="index" 
-                          :class="{'white-text': isDataAtual(dia), 'cyan-darken-4':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
+                          :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
                           <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px" @click="selecionarDia(dia, index)">
                             <p style="font-size: 9pt">{{diaSemana(dia)}}</p>
                             <p style="font-size: 12pt">{{formatDate(dia,'DD/MMM')}}</p>
@@ -76,10 +76,10 @@
                             </div>
                           </el-col>
 
-                          <el-col sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
+                          <el-col sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey-lighten-2':isIndiceDataAtual(indice)}">
                             <div class="thebox hleito" v-if="celula.hospedagens.length == 0"></div>
                             <div class="thebox hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
-                              <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe)" 
+                              <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe, hospedagem.dias[indice])" 
                                     v-if="hospedagem.dias[indice].identificador != '0'"
                                     :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
                                     @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
@@ -419,9 +419,17 @@ export default {
       return petraDateTime.diaSemana(dia)
     },
 
-    hospedagemClass(id, classe){
+    hospedagemClass(id, classe, dias){
       var hospedagem = this.getHospedagemById(id);
+
+      hospedagem.baixado
+
+      //console.log('hpd:',hospedagem)
+      //console.log('dias:',dias)
       if (hospedagem){
+          if (hospedagem.baixado && classe == "INDO"){
+            return 'grafico grafico_fim_baixado'
+          } else
           if (classe == "INICIO") {
             return 'grafico grafico_inicio'
           } else 
@@ -450,14 +458,14 @@ export default {
     colorStatus(id){
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
-        if (hospedagem.baixado) {
-          return 'orange'
-        } else if (hospedagem.statusHospedagem == 'ABERTA'){
-          return '#0D47A1' // blue darken-4
+        if (hospedagem.statusHospedagem == 'ABERTA'){
+          return '#00796B' // teal darken-2
         } else if (hospedagem.statusHospedagem == 'ENCERRADA'){
-          return '#2E7D32' // green darken-4
+          return '#78909C' // blue-grey lighten-1
         } else if (hospedagem.statusHospedagem == 'VENCIDA'){
           return '#D50000' // red accent-4
+        } else if (hospedagem.baixado) {
+          return '#4DB6AC'
         }
       }
       return 'blue'
@@ -522,7 +530,7 @@ export default {
 
       this.dataAtual = moment(d).format("YYYY-MM-DD")
 
-      console.log(`You clicked: ${this.dataAtual}`)
+      //console.log(`You clicked: ${this.dataAtual}`)
 
 		},
 		onClickEvent(e) {
@@ -621,17 +629,7 @@ export default {
 }
 
 .hleito{
-  /*height:48px;*/
-  height:28px; /* era 36px */
-}
-
-.chip {
-  cursor:pointer;
-  margin:0px;
-  padding:1px;
-  font-size:8pt;
-  text-transform:uppercase;
-  margin-left:15px;
+  height:28px;
 }
 
 .p0{
@@ -675,34 +673,51 @@ export default {
 
 /*  https://css-tricks.com/the-shapes-of-css/ */
 .grafico_indo {
-  border-top-right-radius: 30px;
-  border-bottom-right-radius: 0px;
-  /*width: calc(100% - 3px);*/
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 0px;
+}
+
+.grafico_fim_baixado {
+  border-color:#000;
+  border-style: solid;
+  border-width: 0px 4px 0px 0px;
 }
 
 .grafico_vindo {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 30px;
-  /*width: calc(100% - 2px);*/
-  /*margin-left: 3px;*/
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 0px 0px 4px;
 }
 
-.cyan-darken-4{
-    background-color: #006064;
+.teal-darken-2 {
+  background-color: #00796B;
 }
+
 .white-text{
     color:white;
 }
 .amber-lighten-4{
     background-color:#FFECB3;
 }
+/*
+.chip {
+  cursor:pointer;
+  margin:0px;
+  padding:1px;
+}
+*/
 .chip{
+  font-size:8pt;
+  margin-left:4px;
   background-color:whitesmoke;
-  width:50px;
+  width:48px;
   text-align:center;
+  text-transform:uppercase;
   padding-top:5px;
   padding-bottom: 4px;
   border: 1px solid #bdbdbd;
-   border-radius: 16px;
+  border-radius: 16px;
 }
+
 </style>

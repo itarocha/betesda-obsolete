@@ -61,7 +61,12 @@
         <el-row type="flex">
           <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
             <div style="margin-right:10px;">
-              <el-button type="primary" @click="handleSave">Gravar</el-button>
+              <el-button type="primary" @click="handleSave(false)">Gravar</el-button>
+            </div>
+          </el-tooltip>
+          <el-tooltip content="Gravar alterações e adicionar para hospedagem" placement="bottom" :open-delay="toolTipDelay">
+            <div style="margin-right:10px;">
+              <el-button type="warning" @click="handleSave(true)">Gravar e Selecionar</el-button>
             </div>
           </el-tooltip>
           <el-tooltip content="Cancelar alterações" placement="bottom" :open-delay="toolTipDelay">
@@ -457,8 +462,8 @@ export default {
       this.$store.dispatch('addAguardando', row)
     },
 
-    handleSave() {
-      this.doSave(true);
+    handleSave(doCheckin) {
+      this.doSave(doCheckin);
     },
 
     handleDelete(row) {
@@ -521,7 +526,7 @@ export default {
         });
     },
 
-    doSave(evt) {
+    doSave(doCheckin) {
       this.errors = [];
 
       petra
@@ -529,6 +534,10 @@ export default {
         .then(response => {
           petra.showMessageSuccess("Pessoa gravada com sucesso");
           this.state = "browse";
+          if (doCheckin){
+            //console.log("Adicionar para checkin ",response.data.id)
+            this.handleSelecionarParaHospedagem(response.data)
+          }
           this.doGetAll();
         })
         .catch(error => {

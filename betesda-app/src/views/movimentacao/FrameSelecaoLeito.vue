@@ -72,14 +72,18 @@ export default {
   },
 
   mounted(){
-    this.openDialog(this.config.hospede, this.config.destinacaoHospedagemId, this.config.dataEntrada,this.config.dataPrevistaSaida)
+    var hospede = this.config ? this.config.hospede : null
+    var dataEntrada = this.config ? this.config.dataEntrada : null
+    var dataPrevistaSaida = this.config ? this.config.dataPrevistaSaida : null
+    var destinacaoHospedagemId = this.config ? this.config.destinacaoHospedagemId : null
+    this.openDialog(hospede, destinacaoHospedagemId, dataEntrada, dataPrevistaSaida)
   },
 
   watch: {
     config:{
       deep: true,
       handler(){
-        console.log('frameSelecaoLeito. mudou o config ', this.config)
+        //console.log('frameSelecaoLeito. mudou o config ', this.config)
 
       }
     }
@@ -109,8 +113,8 @@ export default {
       })
 
       this.hospede = hospede
-      this.nomeHospede = hospede.pessoa.nome
-      this.dialogVisible = true
+      this.nomeHospede = hospede == null ? null : hospede.pessoa.nome
+      this.dialogVisible = hospede != null
     },
 
     handleTabClick(tab){

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div >
 
       <el-row type="flex">
         <!--
@@ -7,18 +7,21 @@
           <h4>{{nomeHospede}}</h4>
         </el-col>
         -->
-        <el-col :span="6">
-          <h4 v-if="acomodacao != null">Seleção: Quarto {{acomodacao.quarto.numero}} Leito {{acomodacao.leito.numero}}</h4>
+        <el-col v-if="acomodacao == null" style="font-weight:bold; padding-bottom:5px;">
+          Clique sobre um leito para selecioná-lo
+        </el-col>
+        <el-col v-if="acomodacao != null" style="font-weight:bold; padding-bottom:5px;">
+          Seleção: Quarto {{acomodacao.quarto.numero}} Leito {{acomodacao.leito.numero}}
         </el-col>
       </el-row>
       <el-row type="flex">
         <el-col :sm="24" :md="24" :lg="24">
-          <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick">
-            <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)">
+          <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick" >
+            <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)" style="height:140px; max-height:130px; overflow: auto;">
 
               <div class="flex-container wrap">
                 <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" 
-                    shadow="never" style="width:100px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
+                    shadow="never" style="width:120px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
                   <div class="clearfix elcardheader">
                     <span class="numero_leito">{{leito.numero}}</span>
                   </div> 
@@ -30,12 +33,6 @@
           </el-tabs>
         </el-col>
       </el-row>    
-      <!--
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancelar</el-button>
-        <el-button type="primary" :disabled="acomodacao == null" @click="doSelecionarLeito">Confirmar</el-button>
-      </span>
-      -->
   </div>
 </template>
 
@@ -80,7 +77,6 @@ export default {
       deep: true,
       handler(){
         console.log('frameSelecaoLeito. mudou o config ', this.config)
-
       }
     }
   },
@@ -173,13 +169,9 @@ export default {
         // mensagem
       } else {
         this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
+        this.$emit('onSelecionar', this.acomodacao)
       }
 
-    },
-
-    doSelecionarLeito(){
-        this.$emit('onSelecionar', this.acomodacao)
-        this.dialogVisible = false
     },
 
     // publico
@@ -216,6 +208,7 @@ export default {
     reset(){
       this.tipoHospede = null
       this.acomodacao = null
+      this.$emit('onSelecionar', this.acomodacao)
       this.leitos = []
     },
 

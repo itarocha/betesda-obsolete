@@ -21,11 +21,6 @@ import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-/*
-
-
-
-*/
 
 @Entity(name="planilha_paciente")
 public class PlanilhaPaciente {

@@ -6,10 +6,6 @@ echo "Preparando-se para gerar front-end"
 echo "Excluindo arquivos antigos"
 rm /home/itamar/projetos_spring/betesda/betesdabuilder/output/betesdaclient.tar.gz
 rm /home/itamar/projetos_spring/betesda/betesdabuilder/output/betesda.war
-rm /home/itamar/projetos_spring/betesda/betesdabuilder/output/betesda.sql
-
-echo "Realizando backup do banco de dados"
-sudo mysqldump --add-drop-table --databases betesda -e -C > /home/itamar/projetos_spring/betesda/betesdabuilder/output/betesda.sql
 
 echo "Construindo front-end"
 cd /home/itamar/projetos_spring/betesda/betesda-app
