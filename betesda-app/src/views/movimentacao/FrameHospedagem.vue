@@ -1,24 +1,6 @@
 <template>
   <div>
 
-    <!--
-    <dialogo-selecao-data-renovacao ref="dlgSelecaoDataRenovacao" @close="onSelecionarDataRenovacao"></dialogo-selecao-data-renovacao>
-
-    <dialogo-selecao-leito-transferencia ref="dlgSelecaoLeitoTransferencia" @close="onCloseTransferencia"></dialogo-selecao-leito-transferencia>
-    <dialogo-selecao-data-baixa ref="dlgSelecaoDataBaixa" @close="onSelecionarDataBaixa"></dialogo-selecao-data-baixa>
-    -->
-
-    <!--
-    <v-layout justify-space-between row wrap fill-height>
-      <v-flex xs12 sm12 md12 v-if="errors">
-        <v-alert :value="true" type="error" v-for="(item, i)  in errors" :key="i">
-          {{item.errorMessage}}
-        </v-alert>
-      </v-flex>
-    </v-layout>
-    -->
-
-
     <!-- begin frame-hospedagem -->
     <el-container v-if="hospedagem != null && state == 'browse'">
       <el-main style="padding:5px; line-height:1.5em; height:370px;">
@@ -26,6 +8,7 @@
           <el-col :span="24">
             <el-tabs type="border-card" >
               <el-tab-pane label="Hospedagem" style="height:280px;">
+                <!-- TODO: Componentizar esse resumo de hospedagem. Isso é utilizado em FrameAcrescentarHospede -->
                 <el-row :gutter="10">
                   <el-col :span="8">Código</el-col>
                   <el-col :span="6" class="font-weight-bold">{{config.hospedagemId}}</el-col>
@@ -307,7 +290,7 @@
         </el-row>
 
         <el-row style="margin-bottom:10px; height:225px;">
-          <selecao-leito ref="frameSelecaoLeito" :config="configTransferencia" @onSelecionar="onSelecionarLeito"></selecao-leito>
+          <selecao-leito ref="frameSelecaoLeito" :config="configTransferencia" :height="140" @onSelecionar="onSelecionarLeito"></selecao-leito>
         </el-row>
 
         <el-row>
@@ -328,23 +311,12 @@
 import ListagemErros from "../../components/ListagemErros"
 import SelecaoLeito from "./SelecaoLeito.vue"
 
-/*
-import DialogoSelecaoDataRenovacao from "./DialogoSelecaoDataRenovacao.vue"
-import DialogoSelecaoDataBaixa from "./DialogoSelecaoDataBaixa.vue"
-import DialogoSelecaoLeitoTransferencia from "./DialogoSelecaoLeitoTransferencia.vue"
-*/
-
 export default {
   name: 'FrameHospedagem',
   
   components: {
     ListagemErros,
     SelecaoLeito,
-    /*
-    DialogoSelecaoDataBaixa,
-    DialogoSelecaoDataRenovacao,
-    DialogoSelecaoLeitoTransferencia,
-    */
   },
 
   computed: {
@@ -525,8 +497,6 @@ export default {
           //petra.showMessageError(this.errors)
         })
     },
-
-
 
     formatDate(data, formato){
       return petraDateTime.formatDate(data) || '---'

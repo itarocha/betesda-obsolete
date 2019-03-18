@@ -21,6 +21,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button type="danger" size="small" @click="deleteConfirm">Excluir</el-button>
+        <el-button type="primary" size="small" @click="showAcrescentarHospede">Acrescentar Hóspede</el-button>
         <el-button type="primary" size="small" @click="showSelecionarDataRenovacao" v-if="permitirRenovar">Renovar</el-button>
         <el-button type="primary" size="small" @click="showSelecionarDataEncerramento" v-if="permitirEncerrar">Encerrar</el-button>
         <el-button type="primary" size="small" @click="close(false)">Fechar</el-button>
@@ -71,12 +72,36 @@
       </span>
     </el-dialog>
 
+    <!-- Dialogo acrescentar novo hóspede -->
+    <el-dialog title="Acrescentar novo Hóspede" :visible.sync="dialogAcrescentarHospede" width="850px">
+
+      <frame-acrescentar-hospede :config="configAcrescentarHospede"></frame-acrescentar-hospede>
+
+      <!--
+      <el-form :model="formRenovacao" label-position="left" label-width="140px;">
+        <el-row type="flex">
+          <el-col>
+            <el-form-item label="Data de Renovação">
+              <el-date-picker type="date" v-model="formRenovacao.dataRenovacao" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>    
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="handleAcrescentarHospede(false)">Cancelar</el-button>
+        <el-button type="primary" @click="handleSelecionarDataRenovacao(true)" :disabled="formRenovacao.dataRenovacao == null">Confirmar</el-button>
+      </span>
+    </el-dialog>
+
+
   </div>
 </template>
 
 <script>
 
 import FrameHospedagem from './FrameHospedagem.vue'
+import FrameAcrescentarHospede from "./FrameAcrescentarHospede.vue"
 import ListagemErros from "../../components/ListagemErros.vue"
 
 export default {
@@ -84,7 +109,8 @@ export default {
   
   components: {
     FrameHospedagem,
-    ListagemErros
+    ListagemErros,
+    FrameAcrescentarHospede,
   },
 
   computed: {
@@ -103,6 +129,8 @@ export default {
     descricaoItemExclusao : "???",
 
     hospedagemId: 0,
+
+    /*
     tipoHospede:{},
     destinacaoHospedagem:{},
     hospede: {},
@@ -111,6 +139,9 @@ export default {
     hospedagem:{},
     entidade:{},
     encaminhador:{},
+    */
+
+
     dados: [],
     errors:[{field:'nome', errorMessage:'Nome deve ser preenchido'}, {field:'idade', errorMessage:'Idade deve ser superior a 18'}, ],
     dialogVisible : false,
@@ -126,9 +157,12 @@ export default {
       dataRenovacao : null
     },
 
+    configAcrescentarHospede : null,
+
     dialogDeleteHospedagemVisible : false,
     dialogSelecionarDataEncerramento : false,
     dialogSelecionarDataRenovacao : false,
+    dialogAcrescentarHospede : false,
 
   }),
 
@@ -180,6 +214,17 @@ export default {
         }).catch(error => {
           this.errors = petra.tratarErros(error);
         })
+    },
+
+    showAcrescentarHospede(){
+      this.configAcrescentarHospede = {hospedagemId : this.hospedagemId}
+      console.log("showAcrescentarHospede", this.configAcrescentarHospede)
+      this.dialogAcrescentarHospede = true
+    },
+
+    handleAcrescentarHospede(situacao){
+      this.configAcrescentarHospede = null
+      this.dialogAcrescentarHospede = false
     },
 
     close(value){

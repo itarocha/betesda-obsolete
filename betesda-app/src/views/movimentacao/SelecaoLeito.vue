@@ -2,11 +2,6 @@
   <div >
 
       <el-row type="flex">
-        <!--
-        <el-col :span="18">
-          <h4>{{nomeHospede}}</h4>
-        </el-col>
-        -->
         <el-col v-if="acomodacao == null" style="font-weight:bold; padding-bottom:5px;">
           Clique sobre um leito para selecioná-lo
         </el-col>
@@ -17,7 +12,7 @@
       <el-row type="flex">
         <el-col :sm="24" :md="24" :lg="24">
           <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick" >
-            <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)" style="height:140px; max-height:130px; overflow: auto;">
+            <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)" :style="estilo">
 
               <div class="flex-container wrap">
                 <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" 
@@ -41,7 +36,7 @@
 export default {
   name: "SelecaoLeito",
   
-  props : ['config'],
+  props : ['config', 'height'],
 
   dataIni : null,
   dataFim : null,
@@ -76,7 +71,7 @@ export default {
     config:{
       deep: true,
       handler(){
-        console.log('frameSelecaoLeito. mudou o config ', this.config)
+        //console.log('frameSelecaoLeito. mudou o config ', this.config)
       }
     }
   },
@@ -88,6 +83,12 @@ export default {
       } else {
         return []
       }
+    },
+
+    estilo() {
+      var height = this.height;
+      var maxHeight = this.height - 10
+      return `height:${height}px; max-height:${maxHeight}; overflow: auto;`
     }
   },
 
