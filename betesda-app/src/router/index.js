@@ -17,6 +17,8 @@ import Quartos from '@/views/cadastros/Quartos'
 import Checkin from '@/views/movimentacao/Checkin'
 import Hospedagens from '@/views/movimentacao/Hospedagens'
 
+import TelaHospedagem from '@/views/hpd/TelaHospedagem'
+
 Vue.use(Router)
 
 const router = new Router({
@@ -107,6 +109,14 @@ const router = new Router({
       path: '/hospedagens',
       name: 'hospedagens',
       component: Hospedagens,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/tela_hospedagem',
+      name: 'tela_hospedagem',
+      component: TelaHospedagem,
       meta: {
         requiresAuth: true
       }

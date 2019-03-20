@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <el-container>
-        <el-aside width="280px">
+        <el-aside width="250px">
           <el-row class="logo-container" type="flex" justify="center" align="middle">
             <el-col class="logo-texto">
               Betesda
@@ -57,6 +57,9 @@
             </el-menu-item>
             <el-menu-item index="2-5" v-if="isRoot">
                 <router-link to="/create_new_user" tag="div"><i class="fas fa-eye pr"></i>Administrador</router-link>
+            </el-menu-item>
+            <el-menu-item index="2-6" v-if="isRoot">
+                <router-link to="/tela_hospedagem" tag="div"><i class="fas fa-car pr"></i>Detalhes Hospedagem</router-link>
             </el-menu-item>
 
             <!--''
@@ -222,6 +225,7 @@ body{
   font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --webkit-font-smoothing: antialiased;
   --moz-osx-font-smoothing: grayscale;
+  line-height: 1.2em;
   /*color:#2c3e50;*/
 }
 
@@ -364,6 +368,31 @@ body{
 
 .el-collapse-item .amber-lighten-4{
     background-color:#FFECB3;
+}
+
+.el-collapse-item__header{
+  font-weight: bold;
+}
+
+.subtitulo {
+  text-align: center;
+  border-radius: 4px;
+}
+
+.bg-purple {
+  background: #d3dce6;
+}
+
+.font-weight-bold{
+  font-weight: bold;
+}
+
+.font-size-10{
+  font-size: 10pt;
+}
+
+.font-size-8{
+  font-size: 8pt;
 }
 
 </style>
