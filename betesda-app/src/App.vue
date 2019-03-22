@@ -4,7 +4,7 @@
         <el-aside width="250px">
           <el-row class="logo-container" type="flex" justify="center" align="middle">
             <el-col class="logo-texto">
-              Betesda
+              Betesda{{env}}
             </el-col>
           </el-row>  
 
@@ -143,6 +143,11 @@ export default {
   },
 
   computed: {
+
+    env(){
+      return petra.env()
+    },
+
     loggedIn(){
       return this.$store.getters.loggedIn
     },

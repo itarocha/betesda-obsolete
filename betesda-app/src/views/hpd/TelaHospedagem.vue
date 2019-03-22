@@ -17,17 +17,17 @@
             </el-row>
             <el-row :gutter="10">
               <el-col :span="4">Data de Entrada</el-col>
-              <el-col :span="4" class="font-weight-bold">{{formatDate(hospedagem.dataEntrada)}}</el-col>
+              <el-col :span="4" class="font-weight-bold">{{hospedagem.dataEntrada | fmtData}}</el-col>
               <el-col :span="4">Data Prevista de Saída</el-col>
-              <el-col :span="4" class="font-weight-bold">{{formatDate(hospedagem.dataPrevistaSaida)}}</el-col>
+              <el-col :span="4" class="font-weight-bold">{{hospedagem.dataPrevistaSaida | fmtData}}</el-col>
               <el-col :span="4">Data Efetiva de Saída</el-col>
-              <el-col :span="4" class="font-weight-bold">{{formatDate(hospedagem.dataEfetivaSaida)}}</el-col>
+              <el-col :span="4" class="font-weight-bold">{{hospedagem.dataEfetivaSaida | fmtData}}</el-col>
             </el-row>
             <el-row :gutter="10">
               <el-col :span="4">Destinação</el-col>
               <el-col :span="4" class="font-weight-bold">{{hospedagem.destinacaoHospedagem != null ? hospedagem.destinacaoHospedagem.descricao : null}}</el-col>
               <el-col :span="4">Tipo de Utilização</el-col>
-              <el-col :span="4" class="font-weight-bold">{{tipoUtilizacao(hospedagem.tipoUtilizacao)}}</el-col>
+              <el-col :span="4" class="font-weight-bold">{{hospedagem.tipoUtilizacao | fmtTipoUtilizacao}}</el-col>
               <el-col :span="4">Situação</el-col>
               <el-col :span="4" class="font-weight-bold">{{hospedagem.status}}</el-col>
             </el-row>
@@ -64,7 +64,7 @@
                 <el-col :span="24">
                   <el-collapse v-for="(hpd, i) in hospedagem.hospedes" :key="i" v-model="activeName" accordion>
                     <el-collapse-item :title="hpd.pessoa.nome + ' - ' + hpd.tipoHospede.descricao" :name="i" 
-                      :class="{'grey-lighten-4' : !isBaixado(hpd), 'amber-lighten-4' : isBaixado(hpd)}">   
+                      :class="{'grey-lighten-4' : !hpd.baixado != 'S', 'amber-lighten-4' : hpd.baixado == 'S'}">   
                       <el-row v-if="hpd.baixado == 'S'" class="font-weight-bold">
                         BAIXADO
                       </el-row>
@@ -82,7 +82,7 @@
 
                       <el-row :gutter="10">
                         <el-col :span="4">Nascimento</el-col>
-                        <el-col :span="20" class="font-weight-bold">{{formatDate(hpd.pessoa.dataNascimento)}}</el-col>
+                        <el-col :span="20" class="font-weight-bold">{{hpd.pessoa.dataNascimento | fmtData}}</el-col>
                       </el-row>
                       <el-row :gutter="10">
                         <el-col :span="4">Endereço</el-col>
@@ -94,10 +94,10 @@
                           <el-col>Histórico de Leitos</el-col>
                         </el-row>
 
-                        <el-row v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex" class="body-1 pa-1 pl-3">
+                        <el-row v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex">
                             <el-col>
-                            #{{leito.id}} - {{formatDate(leito.dataEntrada)}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
-                            <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{formatDate(leito.dataSaida)}}</span>
+                            #{{leito.id}} - <span></span>{{leito.dataEntrada | fmtData}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                            <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{leito.dataSaida | fmtData}}</span>
                             </el-col>
                         </el-row>
                       </div> 
@@ -110,11 +110,11 @@
 
           <!-- componente encaminhador -->
           <el-col :span="12">
-              <el-row>
-                <el-col>
-                  <div class="subtitulo bg-purple">ENCAMINHADOR</div>
-                </el-col>
-              </el-row>
+            <el-row>
+              <el-col>
+                <div class="subtitulo bg-purple">ENCAMINHADOR</div>
+              </el-col>
+            </el-row>
 
             <div v-if="encaminhador != null && entidade != null">
               <el-row :gutter="5" class="font-size-10">
@@ -144,7 +144,7 @@
 
               <el-row :gutter="5" class="font-weight-bold">
                 <el-col :span="16">{{entidade.nome}}</el-col>
-                <el-col :span="8">{{entidade.cnpj}}</el-col>
+                <el-col :span="8">{{entidade.cnpj | fmtCNPJ}}</el-col>
               </el-row>
 
               <el-row :gutter="5" class="font-size-10">
@@ -177,7 +177,7 @@
               </el-row>
               <el-row :gutter="5" v-if="entidade != null && entidade.endereco != null" class="font-weight-bold">
                 <el-col :span="8">{{entidade.endereco.bairro}}</el-col>
-                <el-col :span="4">{{entidade.endereco.cep}}</el-col>
+                <el-col :span="4">{{entidade.endereco.cep | fmtCep}}</el-col>
                 <el-col :span="8">{{entidade.endereco.cidade}}</el-col>
                 <el-col :span="4">{{entidade.endereco.uf}}</el-col>
               </el-row>
@@ -193,14 +193,12 @@
 </template>
 
 <script>
-//  import HospedagemInfo from "./HospedagemInfo.vue"  
-
-
 
 export default {
   name: 'TelaHospedagem',
 
-  components: {},
+  components: {
+  },
 
   created(){},
 
@@ -253,19 +251,6 @@ export default {
             this.errors = petra.tratarErros(error);
           })
     },
-
-    formatDate(data, formato){
-      return petraDateTime.formatDate(data) || '---'
-    },
-   
-    tipoUtilizacao(tipo){
-      return tipo == "T" ? "Total" : "Parcial"
-    },
-
-    isBaixado(hospede){
-      return hospede.baixado == 'S'
-    },
-
 
   }
 }

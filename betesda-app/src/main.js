@@ -59,6 +59,14 @@ Vue.config.productionTip = false
 
 Vue.use(ElementUI);
 
+//import './filters/ItaDateFilter.js'
+
+import * as filters from './filters/filtros'
+
+Object.keys(filters).forEach(key => {
+  Vue.filter(key, filters[key])
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
