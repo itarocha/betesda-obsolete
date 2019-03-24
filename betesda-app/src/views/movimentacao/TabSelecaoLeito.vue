@@ -1,40 +1,22 @@
 <template>
   <div>
 
-    <el-dialog title="Selecionar Leito" :visible.sync="dialogVisible" width="750px">
-      <el-row type="flex">
-        <el-col :span="18">
-          <h4>{{nomeHospede}}</h4>
-        </el-col>
-        <el-col :span="6">
-          <h4 v-if="acomodacao != null">Seleção: Quarto {{acomodacao.quarto.numero}} Leito {{acomodacao.leito.numero}}</h4>
-        </el-col>
-      </el-row>
-      <el-row type="flex">
-        <el-col :sm="24" :md="24" :lg="24">
-          <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick">
-            <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)">
+    <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick">
+      <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)" style="height:200px;">
 
-              <div class="flex-container wrap">
-                <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" 
-                    shadow="never" style="width:200px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
-                  <div class="clearfix elcardheader">
-                    <span class="numero_leito">{{leito.numero}}</span>
-                  </div> 
-                  <div style="font-size:0.8em">{{leito.tipoLeito.descricao}} - {{leito.tipoLeito.quantidadeCamas}} cama(s)</div>                      
-                </el-card>
-              </div>
+        <div class="flex-container wrap">
+          <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" 
+              shadow="never" style="width:120px;" @click.native="selecionarLeito(quarto, leito)" body-style="bodystyle">
+            <div class="clearfix elcardheader">
+              <span class="numero_leito">{{leito.numero}}</span>
+            </div> 
+            <div style="font-size:0.8em">{{leito.tipoLeito.descricao}}</div>                      
+            <div style="font-size:0.8em">{{leito.tipoLeito.quantidadeCamas}} cama(s)</div>                      
+          </el-card>
+        </div>
 
-            </el-tab-pane>
-          </el-tabs>
-        </el-col>
-      </el-row>    
-
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">Cancelar</el-button>
-        <el-button type="primary" :disabled="acomodacao == null" @click="doSelecionarLeito">Confirmar</el-button>
-      </span>
-    </el-dialog>
+      </el-tab-pane>
+    </el-tabs>
 
   </div>
 </template>
@@ -42,25 +24,17 @@
 <script>
 
 export default {
-  name: "FrameSelecaoLeito",
+  name: "TabSelecaoLeito",
   
   props : ['config'],
 
   dataIni : null,
   dataFim : null,
 
-
-
   data: () =>({
-    dialogVisible : false,
-
     activeTabName: null,
 
-    nomeHospede : "",
-    hospede : null,
-
     acomodacao : null,
-
 
     leitos : [],
     quartos : [],
@@ -68,23 +42,18 @@ export default {
   }),
 
   created(){
-    this.reset()
+    this.openDialog()
   },
 
   mounted(){
-    var hospede = this.config ? this.config.hospede : null
-    var dataEntrada = this.config ? this.config.dataEntrada : null
-    var dataPrevistaSaida = this.config ? this.config.dataPrevistaSaida : null
-    var destinacaoHospedagemId = this.config ? this.config.destinacaoHospedagemId : null
-    this.openDialog(hospede, destinacaoHospedagemId, dataEntrada, dataPrevistaSaida)
+    this.openDialog()
   },
 
   watch: {
     config:{
       deep: true,
       handler(){
-        //console.log('frameSelecaoLeito. mudou o config ', this.config)
-
+        this.openDialog()
       }
     }
   },
@@ -96,13 +65,19 @@ export default {
       } else {
         return []
       }
-    }
+    },
+
   },
 
   methods: {
 
-    openDialog(hospede, destinacaoHospedagemId, dataIni, dataFim){
+    openDialog(){
       this.reset()
+
+      var dataIni = this.config ? this.config.dataIni : null
+      var dataFim = this.config ? this.config.dataFim : null
+      var destinacaoHospedagemId = this.config ? this.config.destinacaoHospedagemId : null
+
 
       var hoje = petraDateTime.hoje()
       this.dataIni = dataIni || hoje
@@ -112,9 +87,6 @@ export default {
         this.loadQuartosPorTipoUtilizacao(destinacaoHospedagemId)
       })
 
-      this.hospede = hospede
-      this.nomeHospede = hospede == null ? null : hospede.pessoa.nome
-      this.dialogVisible = hospede != null
     },
 
     handleTabClick(tab){
@@ -177,13 +149,13 @@ export default {
         // mensagem
       } else {
         this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
+        this.$emit('select',this.acomodacao)
       }
 
     },
 
     doSelecionarLeito(){
         this.$emit('onSelecionar', this.acomodacao)
-        this.dialogVisible = false
     },
 
     // publico
@@ -193,7 +165,6 @@ export default {
       for (var i = 0; i < this.quartos.length; i++) {
         if (this.quarto == this.quartos[i].id){
           item = {
-            hospede : this.hospede,
             acomodacao : this.acomodacao
           }
           return item
@@ -269,7 +240,7 @@ export default {
   /*background: #FFF8E1;*/
   /*background: #FFF9C4;*/
   color: #455A64;
-  padding: 10px;
+  padding: 5px;
 
   width: 300px;
   /*height: 100px;*/

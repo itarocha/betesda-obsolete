@@ -11,6 +11,30 @@
       </el-row>
       <el-row type="flex">
         <el-col :sm="24" :md="24" :lg="24">
+          <el-radio-group v-model="q">
+            <el-radio-button v-for="(quarto,index) in itensQuarto" :key="index" :label="quarto">Quarto {{quarto.numero}}</el-radio-button>
+          </el-radio-group>
+        </el-col>
+      </el-row>  
+      <el-row type="flex">
+        <el-col :sm="24" :md="24" :lg="24">
+          <div class="flex-container wrap">
+            <el-card :class="classeSituacaoLeito(leito)" v-for="(leito, i) in leitos" :key="i" shadow="never" style="width:94px;" body-style="bodystyle"
+               @click.native="newSelecionarLeito(leito)" >
+              <div class="clearfix elcardheader" style="text-align:left;">
+                <span class="numero_leito">{{leito.numero}}</span>
+              </div> 
+              <div style="font-size:0.8em">{{leito.tipoLeito.descricao}}</div>
+              <div style="font-size:0.8em">{{leito.tipoLeito.quantidadeCamas}} cama(s)</div>
+            </el-card>
+          </div>
+        </el-col>
+      </el-row>  
+
+      <!--  
+      <el-row type="flex">
+
+        <el-col :sm="24" :md="24" :lg="24">
           <el-tabs type="border-card" ref="tab" v-model="activeTabName" @tab-click="handleTabClick" >
             <el-tab-pane v-for="(quarto, index) in itensQuarto" :key="index" :label="'Quarto ' + quarto.numero" :name="getNomeTab(quarto)" :style="estilo">
 
@@ -28,6 +52,7 @@
           </el-tabs>
         </el-col>
       </el-row>    
+      -->
   </div>
 </template>
 
@@ -44,9 +69,15 @@ export default {
 
 
   data: () =>({
+
     dialogVisible : false,
 
     activeTabName: null,
+
+    q : null,
+
+    _quarto : null,
+
 
     nomeHospede : "",
     hospede : null,
@@ -72,6 +103,15 @@ export default {
       deep: true,
       handler(){
         //console.log('frameSelecaoLeito. mudou o config ', this.config)
+        
+      }
+    },
+
+    q:{
+      deep:true,
+      handler(){
+        //console.log('q mudou ', this.q)
+        this.refreshLeitos(this.q.id)
       }
     }
   },
@@ -143,6 +183,7 @@ export default {
       for(var i=0; i < this.quartos.length; i++){
         if (this.quartos[i].id == quartoId){
           leitos = this.quartos[i].leitos
+          console.log(leitos)
           break
         }
       }
@@ -174,6 +215,18 @@ export default {
       }
 
     },
+
+    newSelecionarLeito(leito){
+      if (this.isLeitoOcupado(leito.id)){
+        // mensagem
+      } else {
+        var quarto = this.q
+        this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
+        this.$emit('onSelecionar', this.acomodacao)
+      }
+
+    },
+    
 
     // publico
     getSelecao(){
@@ -220,7 +273,7 @@ export default {
 <style scoped>
 
 .elcardheader{
-  padding:3px;
+  padding:2px;
 }
 
  .bodystyle{
@@ -256,16 +309,17 @@ export default {
 .flex-item {
   border-radius: 4px;
   line-height:1em;
-  padding:5px;
+  padding-right:5px;
   /*line-height: 1.5em;*/
   /*background: #FFF8E1;*/
   /*background: #FFF9C4;*/
   color: #455A64;
-  padding: 10px;
+  padding: 0px;
 
   width: 300px;
   /*height: 100px;*/
-  margin: 5px;
+  margin-top: 5px;
+  margin-right: 0px;
   
   /*
   line-height: 100px;
@@ -286,7 +340,7 @@ export default {
 }
 
 .leito-livre {
-  background:whitesmoke;
+  background:white;
 }
 
 

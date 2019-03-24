@@ -710,13 +710,16 @@ export default {
 .chip{
   font-size:8pt;
   margin-left:4px;
-  background-color:whitesmoke;
+  background-color:white;
   width:48px;
   text-align:center;
   text-transform:uppercase;
-  padding-top:5px;
+  line-height:1em;
+  margin-top:1px;
+  height: 10px;
+  padding-top:8px;
   padding-bottom: 4px;
-  border: 1px solid #bdbdbd;
+  border: 1px solid #bbb;
   border-radius: 16px;
 }
 

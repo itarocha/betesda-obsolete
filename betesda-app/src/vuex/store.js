@@ -12,7 +12,7 @@ export default new Vuex.Store({
         flashMessage : {
             title : null,
             message : null,
-            type : 'info'
+            type : 'info',
         },
         tela: {
             descricao : '',

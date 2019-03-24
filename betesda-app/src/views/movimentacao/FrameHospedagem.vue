@@ -428,6 +428,12 @@ export default {
         })
     },
 
+
+
+    onSelecionarLeito(acomodacao){
+      this.formTransferencia.acomodacao = acomodacao
+    },
+
     handleSelecionarTransferencia(hpd){
       this.hospedeSelecionado = hpd
       this.formTransferencia.dataTransferencia = null
@@ -441,43 +447,14 @@ export default {
       //this.$refs.frameSelecaoLeito.openDialog(hpd, this.destinacaoHospedagem.id, this.hospedagem.dataEntrada, this.hospedagem.dataPrevistaSaida)
     },
 
-
-    onSelecionarLeito(acomodacao){
-      this.formTransferencia.acomodacao = acomodacao
-    },
-
     handleTransferirHospede(){
       if (this.hospedeSelecionado != null && this.formTransferencia.dataTransferencia != null && this.formTransferencia.acomodacao != null){
         this.transferirHospede(this.hospedeSelecionado.id, this.formTransferencia)
       }
     },
 
-    xxxxxxxxxxxtransferirHospede(hospedeId, data) {
-      /*
-      var dados = {
-        hospedeId : hospedeId,
-        data : data
-      }
-      
-      petra.axiosPost("/app/hospedagem/mapa/baixar", dados, false)
-        .then(response => {
-          this.getInfo(this.hospedagemId)
-          petra.showMessageSuccess('Hóspede baixado com sucesso')
-          this.state = 'browse'
-        }).catch(error => {
-          this.errors = petra.tratarErros(error);
-          console.log(this.errors)
-          petra.showMessageError(this.errors)
-        })
-      */
-    },
-
     transferirHospede(hospedeId, data){
       //var selecao = this.$refs.frameSelecaoLeito.getSelecao()
-
-
-      
-
       var dados = {
         hospedeId : hospedeId,
         leitoId : data.acomodacao.leito.id,

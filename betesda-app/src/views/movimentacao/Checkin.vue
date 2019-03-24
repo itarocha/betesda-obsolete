@@ -1,6 +1,6 @@
 <template>
   <div>
-    <frame-selecao-leito ref="frameSelecaoLeito" @onSelecionar="onSelecionarLeito"></frame-selecao-leito>
+    <dialogo-selecao-leito :visible="dialogoSelecaoLeitoVisible" :config="configSelecaoLeito" @onSelecionar="onSelecionarLeito"></dialogo-selecao-leito>
 
     <el-container v-if="state == 'insert'">
       <el-header>
@@ -207,7 +207,7 @@
 
 <script>
 
-import FrameSelecaoLeito from "./FrameSelecaoLeito.vue"
+import DialogoSelecaoLeito from "./DialogoSelecaoLeito.vue"
 import FrameHospedagem from "./FrameHospedagem.vue"
 import ListagemErros from "../../components/ListagemErros.vue"
 
@@ -216,7 +216,7 @@ export default {
   name: 'Checkin',
 
   components:{
-    FrameSelecaoLeito,
+    DialogoSelecaoLeito,
     FrameHospedagem,
     ListagemErros
   },
@@ -236,6 +236,15 @@ export default {
       })      
   },
 
+  watch: {
+    configSelecaoLeito:{
+      deep: true,
+      handler(){
+      }
+    }
+  },
+
+
   data: () =>({
     dados: [],
 
@@ -252,6 +261,8 @@ export default {
     itensUtilizacao: [{ text: "Total", value: "T" }, { text: "Parcial", value: "P" }],
 
     dialogSelecionarTipoHospede : false,
+
+    dialogoSelecaoLeitoVisible : false,
 
     form : {
       entidadeId: null,
@@ -270,9 +281,16 @@ export default {
 
     hospedeSelecionado : null,
 
-    configHospedagem :{
+    configHospedagem : {
       hospedagemId : 0,
       permitirEditar : false
+    },
+
+    configSelecaoLeito : {
+      hospede : null, 
+      destinacaoHospedagemId : null,
+      dataIni : null, 
+      dataFim: null
     },
 
     rules: {
@@ -441,7 +459,16 @@ export default {
 
     selecionarLeito(hospede) {
       this.hospedeSelecionado = hospede
-      this.$refs.frameSelecaoLeito.openDialog(hospede, this.form.destinacaoHospedagemId, this.form.dataEntrada, this.form.dataPrevistaSaida)
+
+      this.configSelecaoLeito = {
+        hospede : hospede, 
+        destinacaoHospedagemId : this.form.destinacaoHospedagemId,
+        dataIni : this.form.dataEntrada, 
+        dataFim: this.form.dataPrevistaSaida        
+      }
+
+      this.dialogoSelecaoLeitoVisible = true
+
     },
 
     doSelecionarTipoHospede(hospede) {
@@ -477,6 +504,14 @@ export default {
     },
 
     onSelecionarLeito(acomodacao){
+      this.dialogoSelecaoLeitoVisible = false
+
+      this.configSelecaoLeito = {
+        hospede : null, 
+        destinacaoHospedagemId : null,
+        dataIni : null, 
+        dataFim: null
+      }
 
       if (!acomodacao) {
         return

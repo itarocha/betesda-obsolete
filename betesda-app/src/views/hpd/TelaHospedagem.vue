@@ -1,11 +1,12 @@
 <template>
   <div>
+    <listagem-erros :errors="errors"></listagem-erros>
     <el-container v-if="state == 'browse'">
       <el-header>
-          <el-button type="primary">Encerrar</el-button>
-          <el-button type="primary">Renovar</el-button>
+          <el-button type="primary" @click="showSelecionarDataEncerramento" v-if="permitirEncerrar">Encerrar</el-button>
+          <el-button type="primary" @click="showSelecionarDataRenovacao" v-if="permitirRenovar">Renovar</el-button>
           <el-button type="primary">Acrescentar Hóspede</el-button>
-          <el-button type="danger">Excluir</el-button>
+          <el-button type="danger" @click="showConfirmarExclusao">Excluir</el-button>
       </el-header>
       <!-- componente  cabecalho-hospedagem -->
       <el-main style="font-size:10pt; padding:0px 20px;" v-if="hospedagem != null">
@@ -31,8 +32,10 @@
               <el-col :span="4">Situação</el-col>
               <el-col :span="4" class="font-weight-bold">{{hospedagem.status}}</el-col>
             </el-row>
+            <!--
             <el-row :gutter="10">
             </el-row>
+            -->
             <el-row :gutter="10" v-if="hospedagem.servicos != null && hospedagem.servicos.length > 0">
               <el-col :span="6">Serviços</el-col>
               <el-col :span="16" class="font-weight-bold">
@@ -72,10 +75,10 @@
                         <el-col>
                           <!-- showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida) -->
                           <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
-                            @click.native="handleSelecionarDataBaixa(hpd)">Baixar
+                            @click.native="showSelecionarDataBaixa(hpd.id)">Baixar
                           </el-button>
                           <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
-                            @click.native="handleSelecionarTransferencia(hpd)">Transferir
+                            @click.native="showSelecionarTransferencia(hpd)">Transferir
                           </el-button>
                         </el-col>
                       </el-row>
@@ -95,10 +98,10 @@
                         </el-row>
 
                         <el-row v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex">
-                            <el-col>
-                            #{{leito.id}} - <span></span>{{leito.dataEntrada | fmtData}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
-                            <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{leito.dataSaida | fmtData}}</span>
-                            </el-col>
+                          <el-col>
+                          #{{leito.id}} - <span></span>{{leito.dataEntrada | fmtData}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                          <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{leito.dataSaida | fmtData}}</span>
+                          </el-col>
                         </el-row>
                       </div> 
                     </el-collapse-item>
@@ -116,77 +119,40 @@
               </el-col>
             </el-row>
 
-            <div v-if="encaminhador != null && entidade != null">
-              <el-row :gutter="5" class="font-size-10">
-                <el-col :span="16">Encaminhador</el-col>
-                <el-col :span="8">Cargo</el-col>
-              </el-row>
+            <frame-encaminhador v-if="encaminhador != null && entidade != null"
+              :encaminhador="encaminhador" 
+              :entidade="entidade">
+            </frame-encaminhador>
 
-              <el-row :gutter="5" class="font-weight-bold">
-                <el-col :span="16" >{{encaminhador.nome}}</el-col>
-                <el-col :span="8">{{encaminhador.cargo}}</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-size-10">
-                <el-col :span="8">Telefone</el-col>
-                <el-col :span="16">Email</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-weight-bold">
-                <el-col :span="8">{{encaminhador.telefone}}</el-col>
-                <el-col :span="16">{{encaminhador.email}}</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-size-10">
-                <el-col :span="16">Entidade</el-col>
-                <el-col :span="8">CNPJ</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-weight-bold">
-                <el-col :span="16">{{entidade.nome}}</el-col>
-                <el-col :span="8">{{entidade.cnpj | fmtCNPJ}}</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-size-10">
-                <el-col :span="8">Telefone</el-col>
-                <el-col :span="16">Email</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-weight-bold">
-                <el-col :span="8">{{entidade.telefone}}</el-col>
-                <el-col :span="16">{{entidade.email}}</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-size-10">
-                <el-col :span="12">Endereço</el-col>
-                <el-col :span="4">Número</el-col>
-                <el-col :span="8">Complemento</el-col>
-              </el-row>
-
-              <el-row :gutter="5"  v-if="entidade != null && entidade.endereco != null" class="font-weight-bold">
-                <el-col :span="12">{{entidade.endereco.logradouro}}</el-col>
-                <el-col :span="4">{{entidade.endereco.numero}}</el-col>
-                <el-col :span="8">{{entidade.endereco.complemento}}</el-col>
-              </el-row>
-
-              <el-row :gutter="5" class="font-size-10">
-                <el-col :span="8">Bairro</el-col>
-                <el-col :span="4">CEP</el-col>
-                <el-col :span="8">Cidade</el-col>
-                <el-col :span="4">UF</el-col>
-              </el-row>
-              <el-row :gutter="5" v-if="entidade != null && entidade.endereco != null" class="font-weight-bold">
-                <el-col :span="8">{{entidade.endereco.bairro}}</el-col>
-                <el-col :span="4">{{entidade.endereco.cep | fmtCep}}</el-col>
-                <el-col :span="8">{{entidade.endereco.cidade}}</el-col>
-                <el-col :span="4">{{entidade.endereco.uf}}</el-col>
-              </el-row>
-            </div>    
           </el-col>
         </el-row>
 
       </el-main>
     </el-container>
+
+    <dialogo-encerrar-hospedagem 
+      :visible="dialogoEncerramentoVisible" 
+      :hospedagemId="hospedagemId" 
+      @close="onCloseDialogoEncerramento">
+    </dialogo-encerrar-hospedagem>
+
+    <dialogo-renovar-hospedagem 
+      :visible="dialogoRenovacaoVisible" 
+      :hospedagemId="hospedagemId" 
+      @close="onCloseDialogoRenovacao">
+    </dialogo-renovar-hospedagem>
+
+    <dialogo-baixar-hospede
+      :visible="dialogoBaixaVisible" 
+      :hospedeId="hospedeId" 
+      @close="onCloseDialogoBaixa">
+    </dialogo-baixar-hospede>
+
+    <dialogo-excluir-hospedagem
+      :visible="dialogoExclusaoVisible" 
+      :hospededagemId="hospedagemId" 
+      @close="onCloseDialogoExclusao">
+    </dialogo-excluir-hospedagem>
 
   </div>
 
@@ -194,17 +160,31 @@
 
 <script>
 
+import ListagemErros from "../../components/ListagemErros.vue"
+import DialogoEncerrarHospedagem from "./DialogoEncerrarHospedagem.vue"
+import DialogoRenovarHospedagem from "./DialogoRenovarHospedagem.vue"
+import DialogoBaixarHospede from "./DialogoBaixarHospede.vue"
+import DialogoExcluirHospedagem from "./DialogoExcluirHospedagem.vue"
+import FrameEncaminhador from "./FrameEncaminhador.vue"
+
 export default {
   name: 'TelaHospedagem',
 
   components: {
+    ListagemErros,
+    DialogoEncerrarHospedagem,
+    DialogoRenovarHospedagem,
+    DialogoBaixarHospede,
+    DialogoExcluirHospedagem,
+    FrameEncaminhador,
   },
 
   created(){},
 
   mounted(){
     this.$store.dispatch('setAcao','Detalhes de Hospedagem')
-    this.getInfo(60)
+    this.hospedagemId = 60
+    this.getInfo(this.hospedagemId)
   },
 
   data: () =>({
@@ -212,14 +192,38 @@ export default {
 
     dados: [],
 
+    //Talvez seja props
+    hospedagemId : null,
+    hospedeId : null,
+
     hospedagem : {},
     entidade : {},
     encaminhador : {},
+    hospedeSelecionado : {},
+
+    formRenovacao : {
+      dataRenovacao : null
+    },
+
+    formBaixa : {
+      dataBaixa : null
+    },
 
     activeName: null,
     permitirEditar : true,
+    permitirRenovar : true,
+    permitirEncerrar : true,
 
-    erros: [],
+    configAcrescentarHospede : null,
+
+    dialogAcrescentarHospede : false,
+
+    dialogoEncerramentoVisible : false,
+    dialogoRenovacaoVisible : false,
+    dialogoBaixaVisible : false,
+    dialogoExclusaoVisible : false,
+
+    errors: [],
 
   }),
 
@@ -250,6 +254,98 @@ export default {
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
+    },
+
+    //Encerramento
+    showSelecionarDataEncerramento(hospedagemId, dataPrevistaSaida){
+      this.dialogoEncerramentoVisible = true
+    },
+
+    onCloseDialogoEncerramento(sucesso){
+      this.dialogoEncerramentoVisible = false
+      if (sucesso){
+        this.getInfo(this.hospedagemId)
+      }
+    },
+
+    //Renovação
+    showSelecionarDataRenovacao(hospedagemId, dataPrevistaSaida){
+      this.dialogoRenovacaoVisible = true
+    },
+
+    onCloseDialogoRenovacao(sucesso){
+      this.dialogoRenovacaoVisible = false
+      if (sucesso){
+        this.getInfo(this.hospedagemId)
+      }
+    },
+
+    //Exclusão
+    showConfirmarExclusao(hospedagemId){
+      this.dialogoExclusaoVisible = true
+    },
+
+    onCloseDialogoExclusao(sucesso){
+      this.dialogoExclusaoVisible = false
+      if (sucesso){
+        // TODO Sair dessa hospedagem e direcionar para hospedagens
+        //this.getInfo(this.hospedagemId)
+      }
+    },
+
+    // Transferência
+    showSelecionarTransferencia(hpd){
+      this.hospedeSelecionado = hpd
+      this.formTransferencia.dataTransferencia = null
+      this.state = 'transferir'
+      this.configTransferencia = {
+        hospede : hpd,
+        destinacaoHospedagemId : this.destinacaoHospedagem.id,
+        dataEntrada : this.hospedagem.dataEntrada,
+        dataPrevistaSaida : this.hospedagem.dataPrevistaSaida
+      }
+      //this.$refs.frameSelecaoLeito.openDialog(hpd, this.destinacaoHospedagem.id, this.hospedagem.dataEntrada, this.hospedagem.dataPrevistaSaida)
+    },
+
+    handleTransferirHospede(){
+      if (this.hospedeSelecionado != null && this.formTransferencia.dataTransferencia != null && this.formTransferencia.acomodacao != null){
+        this.transferirHospede(this.hospedeSelecionado.id, this.formTransferencia)
+      }
+    },
+
+    transferirHospede(hospedeId, data){
+      //var selecao = this.$refs.frameSelecaoLeito.getSelecao()
+      var dados = {
+        hospedeId : hospedeId,
+        leitoId : data.acomodacao.leito.id,
+        data : data.dataTransferencia
+      }
+
+      //console.log("dados para transferencia:",dados);
+      petra.axiosPost("/app/hospedagem/mapa/transferir", dados)
+        .then(response => {
+          this.getInfo(this.hospedagemId)
+          petra.showMessageSuccess('Hóspede transferido com sucesso')
+          this.state = 'browse'
+          this.dialogVisible = false
+        }).catch(error => {
+          this.errors = petra.tratarErros(error);
+          //console.log(this.errors)
+          //petra.showMessageError(this.errors)
+        })
+    },
+
+    //Baixa de Hóspede
+    showSelecionarDataBaixa(hospedeId){
+      this.hospedeId = hospedeId
+      this.dialogoBaixaVisible = true
+    },
+
+    onCloseDialogoBaixa(sucesso){
+      this.dialogoBaixaVisible = false
+      if (sucesso){
+        this.getInfo(this.hospedagemId)
+      }
     },
 
   }
