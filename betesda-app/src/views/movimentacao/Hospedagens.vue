@@ -106,13 +106,6 @@
                   </el-container>
                 </el-container>
 
-
-
-
-
-
-
-
               </el-tab-pane>
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 
@@ -123,9 +116,6 @@
             </el-tabs>
 
           </el-col>
-
-
-
         </el-row>
       </el-main>
     </el-container>

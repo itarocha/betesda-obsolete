@@ -457,20 +457,6 @@ export default {
       this.postarHospedagem()
     },
 
-    selecionarLeito(hospede) {
-      this.hospedeSelecionado = hospede
-
-      this.configSelecaoLeito = {
-        hospede : hospede, 
-        destinacaoHospedagemId : this.form.destinacaoHospedagemId,
-        dataIni : this.form.dataEntrada, 
-        dataFim: this.form.dataPrevistaSaida        
-      }
-
-      this.dialogoSelecaoLeitoVisible = true
-
-    },
-
     doSelecionarTipoHospede(hospede) {
       this.hospedeSelecionado = hospede 
       this.formTipoHospede.tipoHospedeId = null
@@ -501,6 +487,20 @@ export default {
           this.$store.dispatch("setTipoHospede", data)
         }
       }
+    },
+
+    selecionarLeito(hospede) {
+      this.hospedeSelecionado = hospede
+
+      this.configSelecaoLeito = {
+        hospede : hospede, 
+        destinacaoHospedagemId : this.form.destinacaoHospedagemId,
+        dataIni : this.form.dataEntrada, 
+        dataFim: this.form.dataPrevistaSaida        
+      }
+
+      this.dialogoSelecaoLeitoVisible = true
+
     },
 
     onSelecionarLeito(acomodacao){

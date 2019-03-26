@@ -78,7 +78,7 @@
                             @click.native="showSelecionarDataBaixa(hpd.id)">Baixar
                           </el-button>
                           <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
-                            @click.native="showSelecionarTransferencia(hpd)">Transferir
+                            @click.native="showTransferenciaLeito(hpd)">Transferir
                           </el-button>
                         </el-col>
                       </el-row>
@@ -154,6 +154,9 @@
       @close="onCloseDialogoExclusao">
     </dialogo-excluir-hospedagem>
 
+    <!--@onSelecionar="onSelecionarLeito"-->
+    <dialogo-transferencia-leito :visible="dialogoTransferenciaLeitoVisible" :config="configTransferenciaLeito" @selecionar="onTransferirLeito"></dialogo-transferencia-leito>    
+
   </div>
 
 </template>
@@ -165,6 +168,7 @@ import DialogoEncerrarHospedagem from "./DialogoEncerrarHospedagem.vue"
 import DialogoRenovarHospedagem from "./DialogoRenovarHospedagem.vue"
 import DialogoBaixarHospede from "./DialogoBaixarHospede.vue"
 import DialogoExcluirHospedagem from "./DialogoExcluirHospedagem.vue"
+import DialogoTransferenciaLeito from "./DialogoTransferenciaLeito.vue"
 import FrameEncaminhador from "./FrameEncaminhador.vue"
 
 export default {
@@ -176,6 +180,7 @@ export default {
     DialogoRenovarHospedagem,
     DialogoBaixarHospede,
     DialogoExcluirHospedagem,
+    DialogoTransferenciaLeito,
     FrameEncaminhador,
   },
 
@@ -209,6 +214,13 @@ export default {
       dataBaixa : null
     },
 
+    configTransferenciaLeito : {
+      hospede : null, 
+      destinacaoHospedagemId : null,
+      dataIni : null, 
+      dataFim: null
+    },
+
     activeName: null,
     permitirEditar : true,
     permitirRenovar : true,
@@ -222,6 +234,7 @@ export default {
     dialogoRenovacaoVisible : false,
     dialogoBaixaVisible : false,
     dialogoExclusaoVisible : false,
+    dialogoTransferenciaLeitoVisible : false,
 
     errors: [],
 
@@ -346,6 +359,36 @@ export default {
       if (sucesso){
         this.getInfo(this.hospedagemId)
       }
+    },
+
+    showTransferenciaLeito(hospede) {
+      this.hospedeSelecionado = hospede
+
+      this.configTransferenciaLeito = {
+        hospede : hospede, 
+        destinacaoHospedagemId : this.hospedagem.destinacaoHospedagem.id,
+        dataIni : this.hospedagem.dataEntrada, 
+        dataFim: this.hospedagem.dataPrevistaSaida        
+      }
+
+      this.dialogoTransferenciaLeitoVisible = true
+    },
+
+    onTransferirLeito(sucesso){
+      console.log("onTransferirLeito")
+      this.dialogoTransferenciaLeitoVisible = false
+
+      this.configTransferenciaLeito = {
+        hospede : null, 
+        destinacaoHospedagemId : null,
+        dataIni : null, 
+        dataFim: null
+      }
+
+      if (sucesso) {
+        this.getInfo(this.hospedagemId)
+      }
+
     },
 
   }

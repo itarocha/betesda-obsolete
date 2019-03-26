@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="Selecionar Data de Baixa" :visible.sync="visible" width="500px">
+    <el-dialog title="Confirmação de Exclusão" :visible.sync="visible" width="500px">
       <listagem-erros :errors="errors"></listagem-erros>
       <span>Deseja realmente excluir esta Hospedagem?</span>
       <span slot="footer" class="dialog-footer">
