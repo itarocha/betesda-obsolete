@@ -5,7 +5,7 @@
       <el-header>
           <el-button type="primary" @click="showSelecionarDataEncerramento" v-if="permitirEncerrar">Encerrar</el-button>
           <el-button type="primary" @click="showSelecionarDataRenovacao" v-if="permitirRenovar">Renovar</el-button>
-          <el-button type="primary">Acrescentar Hóspede</el-button>
+          <el-button type="primary" @click="showSelecionarAcrescentarHospede" v-if="permitirAcrescentar">Acrescentar Hóspede</el-button>
           <el-button type="danger" @click="showConfirmarExclusao">Excluir</el-button>
       </el-header>
       <!-- componente  cabecalho-hospedagem -->
@@ -32,10 +32,7 @@
               <el-col :span="4">Situação</el-col>
               <el-col :span="4" class="font-weight-bold">{{hospedagem.status}}</el-col>
             </el-row>
-            <!--
-            <el-row :gutter="10">
-            </el-row>
-            -->
+
             <el-row :gutter="10" v-if="hospedagem.servicos != null && hospedagem.servicos.length > 0">
               <el-col :span="6">Serviços</el-col>
               <el-col :span="16" class="font-weight-bold">
@@ -154,8 +151,17 @@
       @close="onCloseDialogoExclusao">
     </dialogo-excluir-hospedagem>
 
-    <!--@onSelecionar="onSelecionarLeito"-->
-    <dialogo-transferencia-leito :visible="dialogoTransferenciaLeitoVisible" :config="configTransferenciaLeito" @selecionar="onTransferirLeito"></dialogo-transferencia-leito>    
+    <dialogo-transferencia-leito 
+      :visible="dialogoTransferenciaLeitoVisible" 
+      :config="configTransferenciaLeito" 
+      @selecionar="onTransferirLeito">
+    </dialogo-transferencia-leito>    
+
+    <dialogo-acrescentar-hospede
+      :visible="dialogoAcrescentarHospedeVisible" 
+      :config="configAcrescentarHospede" 
+      @selecionar="onAcrescentarHospede">
+    </dialogo-acrescentar-hospede>    
 
   </div>
 
@@ -169,6 +175,7 @@ import DialogoRenovarHospedagem from "./DialogoRenovarHospedagem.vue"
 import DialogoBaixarHospede from "./DialogoBaixarHospede.vue"
 import DialogoExcluirHospedagem from "./DialogoExcluirHospedagem.vue"
 import DialogoTransferenciaLeito from "./DialogoTransferenciaLeito.vue"
+import DialogoAcrescentarHospede from "./DialogoAcrescentarHospede.vue"
 import FrameEncaminhador from "./FrameEncaminhador.vue"
 
 export default {
@@ -181,6 +188,7 @@ export default {
     DialogoBaixarHospede,
     DialogoExcluirHospedagem,
     DialogoTransferenciaLeito,
+    DialogoAcrescentarHospede,
     FrameEncaminhador,
   },
 
@@ -225,9 +233,9 @@ export default {
     permitirEditar : true,
     permitirRenovar : true,
     permitirEncerrar : true,
+    permitirAcrescentar : true,
 
     configAcrescentarHospede : null,
-
     dialogAcrescentarHospede : false,
 
     dialogoEncerramentoVisible : false,
@@ -235,6 +243,7 @@ export default {
     dialogoBaixaVisible : false,
     dialogoExclusaoVisible : false,
     dialogoTransferenciaLeitoVisible : false,
+    dialogoAcrescentarHospedeVisible : false,
 
     errors: [],
 
@@ -375,11 +384,35 @@ export default {
     },
 
     onTransferirLeito(sucesso){
-      console.log("onTransferirLeito")
       this.dialogoTransferenciaLeitoVisible = false
 
       this.configTransferenciaLeito = {
         hospede : null, 
+        destinacaoHospedagemId : null,
+        dataIni : null, 
+        dataFim: null
+      }
+
+      if (sucesso) {
+        this.getInfo(this.hospedagemId)
+      }
+
+    },
+
+    showSelecionarAcrescentarHospede() {
+      this.configAcrescentarHospede = {
+        destinacaoHospedagemId : this.hospedagem.destinacaoHospedagem.id,
+        dataIni : this.hospedagem.dataEntrada, 
+        dataFim: this.hospedagem.dataPrevistaSaida        
+      }
+
+      this.dialogoAcrescentarHospedeVisible = true
+    },
+
+    onAcrescentarHospede(sucesso){
+      this.dialogoAcrescentarHospedeVisible = false
+
+      this.configAcrescentarHospede = {
         destinacaoHospedagemId : null,
         dataIni : null, 
         dataFim: null

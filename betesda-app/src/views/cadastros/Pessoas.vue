@@ -13,15 +13,9 @@
       <el-main>
         <el-row>
           <el-col :sm="24" :md="24" :lg="24">
-            <el-input placeholder="Entre com o texto para busca" v-model="searchValue" ref="edtLocalizar" :class="'input-with-select'">
-              <el-select v-model="searchField" slot="prepend" style="width:200px;">
-                <el-option v-for="item in itensBusca" :key="item.value" :label="item.text" :value="item.value"></el-option>
-              </el-select>
-              <el-button slot="append" @click="handleSearch" icon="el-icon-search"></el-button>
-            </el-input>
+            <edit-search :itens="itensBusca" @search="handleSearch"></edit-search>
           </el-col>
-        </el-row>
-
+        </el-row>  
         <el-row type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="24">
             <el-table :data="dados" stripe style="width: 100%" border size="small" :default-sort="{prop: 'descricao', order: 'ascending'}" :height="tableHeight">
@@ -247,11 +241,16 @@
 
 <script>
 import { mask } from "vue-the-mask";
+import EditSearch from "../../components/EditSearch"
 
 export default {
   name: "Pessoas",
 
   directives: { mask },
+
+  components:{
+    EditSearch
+  },
 
   created() {
     this.resetData()
@@ -264,7 +263,7 @@ export default {
       window.addEventListener('resize', () => {
         this.tableHeight = window.innerHeight - 200
       })
-      setTimeout(() => this.$refs.edtLocalizar.focus(), 500)
+      //setTimeout(() => this.$refs.edtLocalizar.focus(), 500)
     })
 
     this.doGetAll();
@@ -273,7 +272,9 @@ export default {
   data: () => ({
     dados: [],
 
+    //TODO REMOVER
     searchField : 'nome',
+    //TODO REMOVER
     searchValue : '',
 
     form : {},
@@ -440,10 +441,6 @@ export default {
       return null;
     },
 
-    handleSearch(){
-      this.doGetAll(true)
-    },
-
     handleEdit(row) {
       this.resetData();
       this.doGetById(row.id);
@@ -482,6 +479,13 @@ export default {
       if (confirm) {
         this.doDelete();
       }
+    },
+
+    handleSearch(searchField, searchValue){
+      this.searchField = searchField
+      this.searchValue = searchValue
+
+      this.doGetAll(true)
     },
 
     doGetAll(showMessage) {
