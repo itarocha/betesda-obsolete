@@ -4,9 +4,9 @@
     <el-dialog title="Acrescentar Hóspede" :visible.sync="showing" :before-close="handleClose" width="910px">
       <listagem-erros :errors="errors"></listagem-erros>
       <el-row v-if="state != 'zbrowse'">
-        <el-form :model="form" label-position="left" size="small" label-width="140px">
+        <el-form :model="form" label-position="left" label-width="120px">
           <el-row type="flex">
-            <el-col>
+            <el-col :span="12">
               <el-form-item label="Hóspede">
                 <el-input
                   placeholder="Selecione o hóspede"
@@ -17,16 +17,8 @@
                 </el-input>
               </el-form-item>
             </el-col>
-          </el-row>
 
-          <el-row type="flex">
-            <el-col>
-              <el-form-item label="Data de Entrada">
-                <el-date-picker type="date" v-model="form.data" format="dd/MM/yyyy" value-format="yyyy-MM-dd" ></el-date-picker>    
-              </el-form-item>
-            </el-col>
-
-            <el-col>
+            <el-col :span="12">
               <el-form-item label="Quarto/Leito:">
                 <el-input
                   placeholder="Selecione o leito"
@@ -37,6 +29,29 @@
                 </el-input>
               </el-form-item>
             </el-col>
+          </el-row>
+
+          <el-row type="flex">
+
+            <el-col :span="12">  
+              <el-form-item label="Tipo de Hóspede">
+                <el-select v-model="form.tipoHospedeId" placeholder="Selecione um Tipo" style="width: 100%;"> 
+                  <el-option
+                    v-for="item in itensTipoHospede"
+                    :key="item.value"
+                    :label="item.text"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+
+            <el-col :span="12">
+              <el-form-item label="Data de Entrada">
+                <el-date-picker type="date" v-model="form.data" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width:100%"></el-date-picker>    
+              </el-form-item>
+            </el-col>
+
 
           </el-row>
         </el-form>
@@ -87,7 +102,8 @@
       -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="doSelecionarTransferencia(false)">Cancelar</el-button>
-        <el-button type="primary" :disabled="form.acomodacao == null || form.data == null || form.pessoa == null" @click="doSelecionarTransferencia(true)">Confirmar</el-button>
+        <el-button type="primary" :disabled="form.acomodacao == null || form.data == null || form.pessoa == null || form.tipoHospedeId == null" 
+            @click="doSelecionarTransferencia(true)">Confirmar</el-button>
       </span>
     </el-dialog>
 
@@ -115,9 +131,12 @@ export default {
     config:{
       deep: true,
       handler(){
+        console.log("this.config = ",this.config)
+
         var hospede = this.config ? this.config.hospede : null
         this.nomeHospede = hospede ? hospede.pessoa.nome : ""
         this.hospedeId = hospede ? hospede.id : null
+        this.hospedagemId = this.config ? this.config.hospedagemId : null
 
         var dataIni = this.config ? this.config.dataIni : null
         var dataFim = this.config ? this.config.dataFim : null
@@ -168,6 +187,7 @@ export default {
       data : null,
       acomodacao : null,
       pessoa: null,
+      tipoHospede: null
     },
 
     itensBusca: [
@@ -179,10 +199,12 @@ export default {
       {text: "Telefone2", value: "telefone2", type: "text"},
     ],
 
-    dados :[],
+    dados : [],
+    itensTipoHospede : [],
 
     errors : [],
 
+    hospedagemId : null,
     hospedeId : null,
     nomeHospede : "",
 
@@ -201,6 +223,8 @@ export default {
       dataIni : null,
       dataFim : null
     } 
+
+    this.loadListas()
 
   },
 
@@ -238,6 +262,19 @@ export default {
       });
     },
 
+    loadListas() {
+      this.itensDestinacaoHospedagem = [];
+      petra.axiosGet("/app/quarto/listas",false).then(
+        response => {
+          //this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
+          //this.itensTipoLeito = response.data.listaTipoLeito
+          //this.itensSituacaoLeito = response.data.listaSituacaoLeito
+          //this.itensTipoServico = response.data.listaTipoServico
+          this.itensTipoHospede = response.data.listaTipoHospede
+          //this.itensEntidades = response.data.listaEntidade
+        })
+    },
+
     handleSelecionarParaHospedagem(row){
       this.form.pessoa = row
     },
@@ -260,23 +297,25 @@ export default {
 
     doSelecionarTransferencia(ok){
       if (ok){
-        // TODO: Resolver
-        /*
+
         var dados = {
-          hospedeId : this.hospedeId,
-          leitoId : this.acomodacao.leito.id,
+          hospedagemId : this.hospedagemId,
+          pessoaId : this.form.pessoa.id,
+          tipoHospedeId : this.form.tipoHospedeId,
+          leitoId : this.form.acomodacao.leito.id,
           data : this.form.data 
         }
         
-        petra.axiosPost("/app/hospedagem/mapa/transferir", dados)
+        //console.log(dados)
+
+        petra.axiosPost("/app/hospedagem/mapa/adicionar", dados)
           .then(response => {
             this.reset()
-            this.$emit('selecionar', true)
+            //this.$emit('selecionar', true)
             //this.visible = false
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
-        */
       } else {
         this.reset()
         this.$emit('selecionar', false)
@@ -287,6 +326,7 @@ export default {
       this.form.acomodacao = null
       this.form.data = null
       this.form.pessoa = null
+      this.form.tipoHospede = null
     },
 
   }  

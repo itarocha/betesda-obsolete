@@ -727,6 +727,75 @@ public class HospedagemService {
 		
 	} 
 	
+	public void adicionarHospede(Long hospedagemId, Long pessoaId, Long tipoHospedeId, Long leitoId, LocalDate dataEntrada) throws ValidationException{
+		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		
+		Optional<Hospedagem> hospedagemOpt = hospedagemRepo.findById(hospedagemId);
+		Optional<Pessoa> pessoaOpt = pessoaRepo.findById(pessoaId);
+		Optional<Leito> leitoOpt = leitoRepo.findById(leitoId);
+		Optional<TipoHospede> tipoHospedeOpt = tipoHospedeRepo.findById(tipoHospedeId);
+		
+		if (!hospedagemOpt.isPresent()) {
+			throw new ValidationException(new ResultError().addError("*", "Hospedagem não existe"));
+		}
+		
+		if (!pessoaOpt.isPresent()) {
+			throw new ValidationException(new ResultError().addError("*", "Pessoa não cadastrada"));
+		}
+		
+		if (!leitoOpt.isPresent()) {
+			throw new ValidationException(new ResultError().addError("*", "Leito não encontrado"));
+		}
+		
+		Hospedagem hospedagem = hospedagemOpt.get();
+		if (!TipoUtilizacaoHospedagem.T.equals(hospedagem.getTipoUtilizacao())) {
+			throw new ValidationException(new ResultError().addError("*", "Tipo de Utilização da Hospedagem deve ser Total"));
+		} 
+		
+		if ((hospedagem.getDataEfetivaSaida() != null)) {
+			throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
+		}
+
+		if (dataEntrada.isBefore(hospedagem.getDataEntrada())){
+			throw new ValidationException(new ResultError().addError("*", "Data não pode ser inferior a Data de Início da Hospedagem"));
+		}
+		
+		LocalDate hoje = LocalDate.now();
+		
+		if (dataEntrada.isAfter(hoje)) {
+			throw new ValidationException(new ResultError().addError("*", 
+					String.format("Data de Entrada não pode ser superior a data atual (%s)",fmt.format(hoje))));
+		}
+		
+		if (dataEntrada.isAfter(hospedagem.getDataPrevistaSaida())) {
+			throw new ValidationException(new ResultError().addError("*", 
+					String.format("Data de Entrada deve ser inferior a data Prevista de Saída (%s)",fmt.format(hospedagem.getDataPrevistaSaida()))));
+		}
+		
+		//TODO Hóspede não pode já estar hospedado em algum outro leito no período 
+		
+		Quarto q = leitoOpt.get().getQuarto();
+
+		Hospede hospede = new Hospede();
+		hospede.setHospedagem(hospedagem);
+		hospede.setPessoa(pessoaOpt.get());
+		hospede.setTipoHospede(tipoHospedeOpt.get());
+		hospede = hospedeRepo.save(hospede);
+		
+		HospedeLeito hl = new HospedeLeito();
+		hl.setHospede(hospede);
+		hl.setDataEntrada(dataEntrada);
+		hl.setDataSaida(hospedagem.getDataPrevistaSaida());
+		hl.setQuarto(q);
+		hl.setLeito(leitoOpt.get());
+
+		hospedeLeitoRepo.save(hl);
+		
+		hospedagem.getHospedes().add(hospede);
+		hospedagem = hospedagemRepo.save(hospedagem);
+		
+	} 
+	
 	//TODO Implementar renovarHospedagem
 	public void renovarHospedagem(Long hospedagemId, LocalDate dataRenovacao) throws ValidationException{
 		/*

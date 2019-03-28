@@ -235,7 +235,13 @@ export default {
     permitirEncerrar : true,
     permitirAcrescentar : true,
 
-    configAcrescentarHospede : null,
+    configAcrescentarHospede : {
+      hospedagemId : null,
+      destinacaoHospedagemId : null,
+      dataIni : null, 
+      dataFim: null
+    },
+
     dialogAcrescentarHospede : false,
 
     dialogoEncerramentoVisible : false,
@@ -401,10 +407,14 @@ export default {
 
     showSelecionarAcrescentarHospede() {
       this.configAcrescentarHospede = {
+        hospedagemId : this.hospedagem.id,
         destinacaoHospedagemId : this.hospedagem.destinacaoHospedagem.id,
         dataIni : this.hospedagem.dataEntrada, 
         dataFim: this.hospedagem.dataPrevistaSaida        
       }
+
+
+      console.log("enviando... ",this.configAcrescentarHospede)
 
       this.dialogoAcrescentarHospedeVisible = true
     },
@@ -413,6 +423,7 @@ export default {
       this.dialogoAcrescentarHospedeVisible = false
 
       this.configAcrescentarHospede = {
+        hospedagemId : null,
         destinacaoHospedagemId : null,
         dataIni : null, 
         dataFim: null

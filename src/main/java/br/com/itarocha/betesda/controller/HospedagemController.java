@@ -146,6 +146,18 @@ public class HospedagemController {
 		}
 	}
 	
+	@RequestMapping(value="/mapa/adicionar", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> adicionarHospede(@RequestBody AdicionarHospedeRequest model)
+	{
+		try {
+			service.adicionarHospede(model.hospedagemId, model.pessoaId, model.tipoHospedeId, model.leitoId, model.data);
+			return new ResponseEntity<String>("ok", HttpStatus.OK); 
+		} catch(ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@RequestMapping(value="/mapa/hospedagem_info", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public HospedagemFullVO getHospedagemInfo(@RequestBody HospdeagemInfoRequest model)
@@ -182,6 +194,14 @@ public class HospedagemController {
 	private static class TransferenciaRequest{
 		public LocalDate data;
 		public Long hospedeId;
+		public Long leitoId;
+	}
+	
+	private static class AdicionarHospedeRequest{
+		public Long hospedagemId;
+		public Long pessoaId;
+		public Long tipoHospedeId;
+		public LocalDate data;
 		public Long leitoId;
 	}
 	

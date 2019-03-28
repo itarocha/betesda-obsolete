@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <el-container>
-        <el-aside width="250px">
+        <el-aside width="240px">
           <el-row class="logo-container" type="flex" justify="center" align="middle">
             <el-col class="logo-texto">
-              Betesda{{env}}
+              Betesda
             </el-col>
           </el-row>  
 
@@ -36,7 +36,7 @@
             </el-menu-item>
 
             <el-menu-item index="1-6" v-if="isRoot || isAdmin">
-                <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações de Hospedagens</router-link>
+                <router-link to="/destinacoes_hospedagens" tag="div"><i class="fas fa-heartbeat pr"></i>Destinações</router-link>
             </el-menu-item>
 
             <el-menu-item index="1-7" v-if="isRoot || isAdmin || isUser">
@@ -398,6 +398,24 @@ body{
 
 .font-size-8{
   font-size: 8pt;
+}
+
+.cv-header{
+  margin:0;
+  font-size: 8pt !important;
+}
+
+.cv-weeks{
+  font-size:10pt !important;
+}
+
+.theme-default .cv-day.today{
+  background: #FFECB3;
+}
+
+.periodLabel{
+  padding:0;
+  margin:0;
 }
 
 </style>
