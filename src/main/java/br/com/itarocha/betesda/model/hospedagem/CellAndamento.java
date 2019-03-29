@@ -9,5 +9,6 @@ public enum CellAndamento {
 	INDO_VINDO,
 	VINDO_FIM,
 	INICIO_FIM,
+	BAIXADO,
 	FIM;
 }

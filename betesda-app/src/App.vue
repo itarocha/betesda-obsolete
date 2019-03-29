@@ -58,9 +58,6 @@
             <el-menu-item index="2-5" v-if="isRoot">
                 <router-link to="/create_new_user" tag="div"><i class="fas fa-eye pr"></i>Administrador</router-link>
             </el-menu-item>
-            <el-menu-item index="2-6" v-if="isRoot">
-                <router-link to="/tela_hospedagem" tag="div"><i class="fas fa-car pr"></i>Detalhes Hospedagem</router-link>
-            </el-menu-item>
 
             <!--''
             <el-submenu index="1">

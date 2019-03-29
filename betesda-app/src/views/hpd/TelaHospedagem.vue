@@ -3,9 +3,10 @@
     <listagem-erros :errors="errors"></listagem-erros>
     <el-container v-if="state == 'browse'">
       <el-header>
-          <el-button type="primary" @click="showSelecionarDataEncerramento" v-if="permitirEncerrar">Encerrar</el-button>
-          <el-button type="primary" @click="showSelecionarDataRenovacao" v-if="permitirRenovar">Renovar</el-button>
-          <el-button type="primary" @click="showSelecionarAcrescentarHospede" v-if="permitirAcrescentar">Acrescentar Hóspede</el-button>
+          <el-button type="info" @click="handleVoltar" >Voltar</el-button>
+          <el-button type="primary" @click="showSelecionarDataEncerramento" v-if="hospedagem.dataEfetivaSaida == null">Encerrar</el-button>
+          <el-button type="primary" @click="showSelecionarDataRenovacao" v-if="hospedagem.dataEfetivaSaida == null">Renovar</el-button>
+          <el-button type="primary" @click="showSelecionarAcrescentarHospede" v-if="hospedagem.dataEfetivaSaida == null">Acrescentar Hóspede</el-button>
           <el-button type="danger" @click="showConfirmarExclusao">Excluir</el-button>
       </el-header>
       <!-- componente  cabecalho-hospedagem -->
@@ -192,12 +193,18 @@ export default {
     FrameEncaminhador,
   },
 
+  props: ['id'],
+
   created(){},
 
   mounted(){
     this.$store.dispatch('setAcao','Detalhes de Hospedagem')
-    this.hospedagemId = 60
-    this.getInfo(this.hospedagemId)
+    //this.hospedagemId = 60
+    //this.getInfo(this.hospedagemId)
+      console.log("mounted para "+this.id)
+      this.hospedagemId = this.id
+      this.getInfo(this.id)
+
   },
 
   data: () =>({
@@ -255,8 +262,6 @@ export default {
 
   }),
 
-  watch: {},
-
   created(){},
 
   computed: {},
@@ -282,6 +287,10 @@ export default {
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
+    },
+
+    handleVoltar(){
+      this.$emit('close')
     },
 
     //Encerramento
@@ -414,7 +423,7 @@ export default {
       }
 
 
-      console.log("enviando... ",this.configAcrescentarHospede)
+      //console.log("enviando... ",this.configAcrescentarHospede)
 
       this.dialogoAcrescentarHospedeVisible = true
     },

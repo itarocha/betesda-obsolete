@@ -1,6 +1,6 @@
 <template>
   <div>
-    <hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada" @close="onCloseHospedagemInfo"></hospedagem-info>
+    <!--<hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada" @close="onCloseHospedagemInfo"></hospedagem-info>-->
 
     <el-container v-if="state == 'browse'">
       <el-header>
@@ -120,18 +120,20 @@
       </el-main>
     </el-container>
 
+    <tela-hospedagem v-if="state=='info'" @close="onCloseInfo" :id="hospedagemSelecionada"></tela-hospedagem>
   </div>
 
 </template>
 
 <script>
   import HospedagemInfo from "./HospedagemInfo.vue"  
+  import TelaHospedagem from "../hpd/TelaHospedagem.vue"
 
 
 import {
   CalendarView,
 	CalendarViewHeader,
-	CalendarMathMixin,
+  CalendarMathMixin,
 } from "vue-simple-calendar"
 
 
@@ -144,6 +146,7 @@ export default {
 		CalendarView,
     CalendarViewHeader,
     HospedagemInfo,
+    TelaHospedagem
 	},
 	mixins: [CalendarMathMixin],  
 
@@ -168,9 +171,12 @@ export default {
 
     erros: [],
 
-    state : 'browse',
-
     activeTabName: 'mapa',
+
+    showTelaHospedagem : false,
+    state : "browse",
+    hospedagemSelecionada : null,
+
 
     windowHeight: 0,
     styleGrid : 'max-height: 337px',
@@ -216,6 +222,13 @@ export default {
   }),
 
   watch: {
+
+    /*
+    hospedagemSelecionada(newVal, oldVal){
+      console.log("mudou hospedagemSelecionada para "+newVal)
+    },  
+    */
+
     dataAtual(){
 
       var d = moment(this.dataAtual).toDate()
@@ -345,7 +358,7 @@ export default {
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
-            //console.log("getData() ",this.dados)
+            console.log(this.dados)
             this.pessoas = response.data.hospedagens
             //console.log(this.pessoas)
             this.showEstatisticas()
@@ -417,7 +430,7 @@ export default {
       //console.log('hpd:',hospedagem)
       //console.log('dias:',dias)
       if (hospedagem){
-          if (hospedagem.baixado && classe == "INDO"){
+          if (classe == "BAIXADO"){
             return 'grafico grafico_fim_baixado'
           } else
           if (classe == "INICIO") {
@@ -500,7 +513,19 @@ export default {
 
     showHospedagemInfo(id){
       //console.log("this.$refs.hospedagemInfo ",this.$refs.hospedagemInfo)
-      this.$refs.hospedagemInfo.openDialog(id);
+
+      this.state = "info"
+      this.hospedagemSelecionada = id;
+      this.showTelaHospedagem = true;
+
+      //this.$refs.hospedagemInfo.openDialog(id);
+    },
+
+    onCloseInfo(){
+      this.state = "browse"
+      this.hospedagemSelecionada = null;
+      this.$store.dispatch('setAcao','Hospedagens')
+      this.recarregar()
     },
 
 		periodChanged(range, eventSource) {
@@ -511,26 +536,31 @@ export default {
       //var d = range.periodStart
       //this.dataAtual = moment(d).format("YYYY-MM-DD")
 			//console.log(range.periodStart)
-		},
+    },
+    
 		thisMonth(d, h, m) {
 			const t = new Date()
 			return new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0)
-		},
+    },
+    
 		onClickDay(d) {
 
       this.dataAtual = moment(d).format("YYYY-MM-DD")
 
       //console.log(`You clicked: ${this.dataAtual}`)
 
-		},
+    },
+    
 		onClickEvent(e) {
 			this.message = `You clicked: ${e.title}`
-		},
+    },
+    
 		setShowDate(d) {
 			this.message = `Changing calendar view to ${d.toLocaleDateString()}`
       this.showDate = d
       this.dataAtual = moment(d).format("YYYY-MM-DD")
-		},
+    },
+    
 		onDrop(event, date) {
 			this.message = `You dropped ${event.id} on ${date.toLocaleDateString()}`
 			// Determine the delta between the old start date and the date chosen,
@@ -539,7 +569,6 @@ export default {
 			event.originalEvent.startDate = this.addDays(event.startDate, eLength)
 			event.originalEvent.endDate = this.addDays(event.endDate, eLength)
 		},
-
 
     exemplosMoment(){
       /* 

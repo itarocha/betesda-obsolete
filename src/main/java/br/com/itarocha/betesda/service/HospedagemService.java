@@ -4,7 +4,9 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
@@ -225,6 +227,30 @@ public class HospedagemService {
 				.setParameter("DATA_FIM", dFim );
 		List<HospedeLeitoVO> listaHospedes = qHospedeLeito.getResultList();
 		
+		Map<Long, Periodo> mapaHospedes = new HashMap<>();
+		
+		listaHospedes.stream().forEach(x -> {
+			System.out.println(x.getHospede().getId() + " - " +x.getHospedeLeito().getDataEntrada() + " - " + x.getHospedeLeito().getDataSaida());
+			
+			Long id = x.getHospede().getId();
+			LocalDate _dIni = x.getHospedeLeito().getDataEntrada();
+			LocalDate _dFim = x.getHospedeLeito().getDataSaida();
+			
+			if (mapaHospedes.containsKey(id)){
+				Periodo _p = mapaHospedes.get(id);
+				_p.dataIni = _dIni.isBefore(_p.dataIni) ? _dIni : _p.dataIni;
+				_p.dataFim = _dFim.isAfter(_p.dataFim) ? _dFim : _p.dataFim;
+			} else {
+				mapaHospedes.put(id, new Periodo(_dIni, _dFim));
+			}
+		});
+		System.out.println("------------------");
+		mapaHospedes.keySet().forEach(x -> {
+			Periodo _p = mapaHospedes.get(x);
+			System.out.println(x + " - " +_p.dataIni + " - " + _p.dataFim);
+		});
+		
+		
 		// Hóspedes parciais
 		StringBuilder sbHospedeLeitosParciais = StrUtil.loadFile("/sql/hospedes_parciais.sql");
 		TypedQuery<HospedeLeitoVO> qHospedeLeitoParciais = em.createQuery(sbHospedeLeitosParciais.toString(), HospedeLeitoVO.class)
@@ -348,13 +374,29 @@ public class HospedagemService {
 						andamento = CellAndamento.INICIO;
 					} else
 					if (!inicioHospedagem && inicioLeito) {
-						andamento = CellAndamento.VINDO;
+						System.out.println("Veja um caso que DEVERIA ESTAR INICIANDO. BAIXADO => Baixado = "+hhi.getBaixado()+" hóspede = "+hhi.getHospedeId()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+dataSaidaHospedagem);
+						Periodo _p = mapaHospedes.get(hhi.getHospedeId());
+						//System.out.println("Veja um caso que deveria ser BAIXADO => Baixado = "+hhi.getBaixado()+" hóspede = "+hhi.getHospedeId()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+dataSaidaHospedagem);
+						if (_p.dataIni.isEqual(dtmp)) {
+							//System.out.println("ESSE FOI BAIXADO NESTA DATA "+_p.dataFim);
+							andamento = CellAndamento.INICIO;
+						} else {
+							andamento = CellAndamento.VINDO;
+						}
 					} else
 					if (fimHospedagem && fimLeito) {
-							andamento = CellAndamento.FIM;
+						andamento = CellAndamento.FIM;
+						//System.out.println("FIM QUE TALVEZ SEJA BAIXADO => Baixado = "+hhi.getBaixado()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+fimLeito);
 					} else	
 					if (!fimHospedagem && fimLeito) {
+						Periodo _p = mapaHospedes.get(hhi.getHospedeId());
+						//System.out.println("Veja um caso que deveria ser BAIXADO => Baixado = "+hhi.getBaixado()+" hóspede = "+hhi.getHospedeId()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+dataSaidaHospedagem);
+						if (_p.dataFim.isEqual(dtmp)) {
+							//System.out.println("ESSE FOI BAIXADO NESTA DATA "+_p.dataFim);
+							andamento = CellAndamento.BAIXADO;
+						} else {
 							andamento = CellAndamento.INDO;
+						}
 					}	
 					
 					DiaHospedagem dh = hm.getDias()[celulaIndex];
@@ -366,10 +408,6 @@ public class HospedagemService {
 							dh.setFirstIndex(true);
 							firstIndex = celulaIndex;
 						} 
-						//dh.setPossuiContinuidade( (CellAndamento.FIM.equals(andamento) || CellAndamento.INICIO_FIM.equals(andamento)) && hhi.getPossuiContinuidade());
-						//dh.setPossuiContinuidade(hhi.getPossuiContinuidade());
-						//dh.setContinuacao((CellAndamento.INICIO.equals(andamento) || CellAndamento.INICIO_FIM.equals(andamento)) && hhi.getContinuacao());
-						// Provavelmente possuiContinuidade e setContinuacao não servem pra nada!
 						dh.setPossuiContinuidade(hhi.getPossuiContinuidade());
 						dh.setContinuacao(hhi.getContinuacao());
 					}
@@ -966,4 +1004,14 @@ public class HospedagemService {
 		return qtd <= 0; 
 	}
 	
+	private static class Periodo{
+		public LocalDate dataIni;
+		public LocalDate dataFim;
+		
+		public Periodo(LocalDate dataIni, LocalDate dataFim) {
+			this.dataIni = dataIni;
+			this.dataFim = dataFim;
+		}
+	}
 }
+
