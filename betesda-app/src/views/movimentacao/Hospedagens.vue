@@ -1,7 +1,5 @@
 <template>
   <div>
-    <!--<hospedagem-info ref="hospedagemInfo" @save="recarregar" @encerrada="onEncerrada" @close="onCloseHospedagemInfo"></hospedagem-info>-->
-
     <el-container v-if="state == 'browse'">
       <el-header>
         <el-button type="primary" @click="getDadosSemanaAnterior(dados.dataIni)">Semana Anterior</el-button>
@@ -83,22 +81,10 @@
                                     v-if="hospedagem.dias[indice].identificador != '0'"
                                     :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
                                     @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
-                                    <!--<el-tag type="info" size="mini">Mini</el-tag>-->
-                                    
                                 <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
                               </div>                              
                             </div>
                           </el-col>
-                          <!--
-                          <v-flex sm12 v-for="(cell,indice) in celula.cells" :key="indice" style="background:#f5f5f5;" :class="{'grey lighten-2':isIndiceDataAtual(indice)}">
-                            <div class="box hleito">
-                              <div :class="hospedagemClass(cell.andamento)" v-if="cell.hospedagemId != 0" :style="{backgroundColor: colorStatus(cell.status)}" 
-                              @click="showHospedagemInfo(cell.hospedagemId)">
-                                <v-chip color="grey lighten-1" :small="true" text-color="black" v-if="cell.firstIndex" class="chip">{{getNome(cell.id)}}</v-chip>
-                              </div>                              
-                            </div>
-                          </v-flex>
-                          -->
                         </el-row>
                       </div>
 
@@ -108,11 +94,36 @@
 
               </el-tab-pane>
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
+                <el-row type="flex" justify="center" align="middle">
+                  <el-col :sm="24" :md="24" :lg="24">
+                    <el-table :data="pessoas" stripe style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}" :height="tableHeight">
+                      <el-table-column fixed header-align="left" align="right" prop="id" label="CODHPD" width="100"></el-table-column>
+                      <el-table-column fixed prop="pessoaNome" sortable label="Nome" width="250"></el-table-column>
+                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="90" class-name="wordwrap" ></el-table-column>
+                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" sortable label="Dt.Saída" width="90"></el-table-column>
+                      <el-table-column prop="utilizacao" width="100" sortable label="Utilização"></el-table-column>
+                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="120" sortable label="Quarto-Leito"></el-table-column>
+                      <el-table-column prop="destinacaoHospedagemDescricao" width="120" sortable label="Destinação"></el-table-column>
+                      <el-table-column label="Ações" fixed="right" align="center" width="80">
+                        <template slot-scope="scope">
+                          <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                            <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(scope.row.hospedagemId)">
+                              <i class="fas fa-info"></i>
+                            </el-button>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </el-col>
+                </el-row>
                 
               </el-tab-pane>
+              <!--
               <el-tab-pane label="Resumo Diário" namd="resumo">
                 
               </el-tab-pane>
+              -->
             </el-tabs>
 
           </el-col>
@@ -161,10 +172,12 @@ export default {
     this.$nextTick(() => {
       window.addEventListener('resize', () => {
         this.windowHeight = window.innerHeight
+        this.tableHeight = window.innerHeight - 300
       })
     })
 
   },
+
 
   data: () =>({
     dados: [],
@@ -181,6 +194,9 @@ export default {
     windowHeight: 0,
     styleGrid : 'max-height: 337px',
     styleContainerMapa : 'height:300px',
+    
+    tableHeight : window.innerHeight - 300,
+
     txt : '???',
     dataAtual: null,
     dados: [],
@@ -249,6 +265,7 @@ export default {
       this.txt = `mudou de ${oldHeight} para ${newHeight}`
       this.styleGrid = `max-height: ${newHeight - 272}px`
       this.styleContainerMapa = `height: ${newHeight-270}px`
+      this.tableHeight = `${newHeight-270}`
     }    
   },
 
@@ -319,6 +336,7 @@ export default {
     },
 
     refreshMapa(){
+      console.log("refreshMapa...")
       this.getData(this.dataAtual)
     },
 
@@ -352,13 +370,17 @@ export default {
     },
 
     getData(data) {
+      console.log("getData...")
       var dados = {
         data : data
       }
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
-            console.log(this.dados)
+            
+            //console.log("restaurando dados...")
+
+            //console.log(this.dados)
             this.pessoas = response.data.hospedagens
             //console.log(this.pessoas)
             this.showEstatisticas()
@@ -366,6 +388,15 @@ export default {
         .catch(error => {
 
         })
+    },
+
+    fmtDate(row, col, cellValue, index){
+      return petraDateTime.formatDate(cellValue, "DD/MM");
+    },
+
+
+    fmtLeito(row, col){
+      return (row.leitoId != 0 ? row.quartoNumero + "-" + row.leitoNumero : "")
     },
 
     showEstatisticas(){
@@ -505,6 +536,7 @@ export default {
     },
 
     showHospedagemInfoByIdentificador(id){
+      console.log(id)
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
         this.showHospedagemInfo(hospedagem.hospedagemId)
@@ -525,7 +557,9 @@ export default {
       this.state = "browse"
       this.hospedagemSelecionada = null;
       this.$store.dispatch('setAcao','Hospedagens')
-      this.recarregar()
+      console.log("Hospedagens.onCloseInfo")
+      this.refreshMapa()
+      //this.recarregar()
     },
 
 		periodChanged(range, eventSource) {

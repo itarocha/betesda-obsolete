@@ -203,11 +203,10 @@ export default {
     },
     
     handleLogout(){
-      this.$store.dispatch("limparHospedagem")
-      this.$store.dispatch('destroyToken')
-      // promise
-      // .then(response => {this.$router.push({name:'home'})})
-      this.$router.push({name:'home'})
+      petra.doLogout()
+      //this.$store.dispatch("limparHospedagem")
+      //this.$store.dispatch('destroyToken')
+      //this.$router.push({name:'home'})
     },
 
   },

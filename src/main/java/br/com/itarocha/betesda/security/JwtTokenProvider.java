@@ -1,5 +1,7 @@
 package br.com.itarocha.betesda.security;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +37,7 @@ public class JwtTokenProvider {
 
         //FIXME LocalDate? 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        Date expiryDate = toDate(LocalDateTime.now().plusMinutes(60L)); //new Date(now.getTime() + jwtExpirationInMs);
         
         //https://www.programcreek.com/java-api-examples/?api=io.jsonwebtoken.Jwts
         Map<String, Object> data = new HashMap<>();
@@ -79,4 +81,8 @@ public class JwtTokenProvider {
         }
         return false;
     }
+    
+    private Date toDate(LocalDateTime localDateTime) {
+        return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
+    }    
 }

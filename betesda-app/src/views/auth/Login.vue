@@ -63,7 +63,7 @@ export default {
       ],
       password: [
         { required: true, message: "Entre com a senha",trigger: "blur"},
-        { min: 8, max: 32, message: "Senha deve haver de 8 a 32 caracteres",trigger: "blur"}
+        { min: 6, max: 16, message: "Senha deve haver de 6 a 16 caracteres",trigger: "blur"}
       ],
     }
 

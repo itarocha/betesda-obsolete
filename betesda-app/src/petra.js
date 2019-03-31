@@ -109,8 +109,13 @@ export default {
     },
 
     tratarRequestError(error, reject, showPostErrors){
+      var falhaAutorizacao = false
       if ((error.response) && (error.response.status)) {
         if ((error.response.status >= 400) && (error.response.status < 500) && showPostErrors){
+          if (error.response.status == 401){
+            this.showMessageError("Usuário não autorizado ou senha expirada")  
+            falhaAutorizacao = true
+          } else
           if (error.response.status == 403){
             this.showMessageError("Você não tem permissão para acessar esse recurso")  
           } else {
@@ -131,7 +136,11 @@ export default {
         this.showMessageError(error)
       }
 
-      reject(error)
+      if (falhaAutorizacao){
+          this.doLogout()  
+      } else {
+        reject(error)
+      }
     },
 
 
@@ -202,6 +211,11 @@ export default {
         return errors
       },
 
+      doLogout(){
+        store.dispatch("limparHospedagem")
+        store.dispatch('destroyToken')
+        router.push({name:'home'})
+      },
 
       sem_acento(val, replaceBy) {
         replaceBy = replaceBy || '-';

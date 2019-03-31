@@ -1,5 +1,7 @@
 package br.com.itarocha.betesda.repository;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -64,13 +66,29 @@ public interface HospedeLeitoRepository extends JpaRepository<HospedeLeito, Long
 	"FROM       hospede h "+
 	"INNER JOIN hospede_leito hl "+
 	"ON         hl.hospede_id = h.id "+
-	"WHERE      h.hospedagem_id = :hospedagemId ",nativeQuery = true)	
+	"WHERE      h.hospedagem_id = :hospedagemId ", nativeQuery = true)	
 	LocalDate ultimaDataEntradaByHospedagemId(@Param("hospedagemId") Long hospedagemId);
 	
+	@Query(value = "SELECT     MAX(hl.data_entrada) data_entrada "+ 
+	"FROM       hospede h "+
+	"INNER JOIN hospede_leito hl "+
+	"ON         hl.hospede_id = h.id "+
+	"WHERE      h.hospedagem_id = :hospedagemId " +
+	"AND        h.id = :hospedeId ", nativeQuery = true)	
+	LocalDate ultimaDataEntradaByHospedagemId(@Param("hospedagemId") Long hospedagemId, @Param("hospedeId") Long hospedeId);
 	
 	@Query(value = 	"SELECT     DISTINCT hl.leito_id "+
-					"FROM       hospede_leito hl "+
-					"WHERE      (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim)) "+
-					"OR          ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim))) ",nativeQuery = true)
-	List<Long> leitosNoPeriodo(@Param("dataIni") LocalDate dataIni, @Param("dataFim") LocalDate dataFim);
+			"FROM       hospede_leito hl "+
+			"WHERE      (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim)) "+
+			"OR          ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim))) ",nativeQuery = true)
+	List<BigInteger> leitosNoPeriodo(@Param("dataIni") LocalDate dataIni, @Param("dataFim") LocalDate dataFim);
+	
+	@Query(value = 	"SELECT     DISTINCT hl.leito_id "+
+			"FROM       hospede_leito hl "+
+			"INNER JOIN hospede h " + 
+			"ON         h.id = hl.hospede_id " + 
+			"WHERE      h.hospedagem_id = :hospedagemId " +
+			"AND        (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim)) "+
+			"OR          ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim))) ",nativeQuery = true)
+	List<BigInteger> leitosNoPeriodoPorHospedagem(@Param("hospedagemId")Long hospedagemId, @Param("dataIni") LocalDate dataIni, @Param("dataFim") LocalDate dataFim);
 }

@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -45,6 +46,7 @@ import br.com.itarocha.betesda.model.hospedagem.HospedagemHeaderInfo;
 import br.com.itarocha.betesda.model.hospedagem.HospedagemMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
+import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
 import br.com.itarocha.betesda.repository.EncaminhadorRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
@@ -230,7 +232,7 @@ public class HospedagemService {
 		Map<Long, Periodo> mapaHospedes = new HashMap<>();
 		
 		listaHospedes.stream().forEach(x -> {
-			System.out.println(x.getHospede().getId() + " - " +x.getHospedeLeito().getDataEntrada() + " - " + x.getHospedeLeito().getDataSaida());
+			//System.out.println(x.getHospede().getId() + " - " +x.getHospedeLeito().getDataEntrada() + " - " + x.getHospedeLeito().getDataSaida());
 			
 			Long id = x.getHospede().getId();
 			LocalDate _dIni = x.getHospedeLeito().getDataEntrada();
@@ -244,12 +246,13 @@ public class HospedagemService {
 				mapaHospedes.put(id, new Periodo(_dIni, _dFim));
 			}
 		});
+		/*
 		System.out.println("------------------");
 		mapaHospedes.keySet().forEach(x -> {
 			Periodo _p = mapaHospedes.get(x);
 			System.out.println(x + " - " +_p.dataIni + " - " + _p.dataFim);
 		});
-		
+		*/
 		
 		// Hóspedes parciais
 		StringBuilder sbHospedeLeitosParciais = StrUtil.loadFile("/sql/hospedes_parciais.sql");
@@ -374,7 +377,7 @@ public class HospedagemService {
 						andamento = CellAndamento.INICIO;
 					} else
 					if (!inicioHospedagem && inicioLeito) {
-						System.out.println("Veja um caso que DEVERIA ESTAR INICIANDO. BAIXADO => Baixado = "+hhi.getBaixado()+" hóspede = "+hhi.getHospedeId()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+dataSaidaHospedagem);
+						//System.out.println("Veja um caso que DEVERIA ESTAR INICIANDO. BAIXADO => Baixado = "+hhi.getBaixado()+" hóspede = "+hhi.getHospedeId()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+dataSaidaHospedagem);
 						Periodo _p = mapaHospedes.get(hhi.getHospedeId());
 						//System.out.println("Veja um caso que deveria ser BAIXADO => Baixado = "+hhi.getBaixado()+" hóspede = "+hhi.getHospedeId()+" hl -> "+hl.getHospedeLeito().getId() + " hoje = " + dtmp + " saída = "+dataSaidaHospedagem);
 						if (_p.dataIni.isEqual(dtmp)) {
@@ -437,10 +440,25 @@ public class HospedagemService {
 		return retorno;
 	}
 
-	public List<Long> getLeitosOcupadosNoPeriodo(LocalDate dataIni, LocalDate dataFim){
+	public List<OcupacaoLeito> getLeitosOcupadosNoPeriodo(Long hospedagemId, LocalDate dataIni, LocalDate dataFim){
 		
-		return hospedeLeitoRepo.leitosNoPeriodo(dataIni, dataFim);
+		List<BigInteger> todosLeitosNoPeriodo = hospedeLeitoRepo.leitosNoPeriodo(dataIni, dataFim);
+		List<BigInteger> hospedagemLeitosNoPeriodo = hospedeLeitoRepo.leitosNoPeriodoPorHospedagem(hospedagemId, dataIni, dataFim);
 		
+		Map<BigInteger, Boolean> map = new HashMap<>();
+		
+		List<OcupacaoLeito> lista = new ArrayList<OcupacaoLeito>();
+		
+		todosLeitosNoPeriodo.forEach(x -> map.put(x, false));
+		hospedagemLeitosNoPeriodo.forEach(x -> map.put(x, true));
+
+		System.out.println("------------");
+		map.keySet().forEach( i -> {
+			System.out.println(i + " - " + map.get(i));
+			lista.add(new OcupacaoLeito( i.longValue(), map.get(i)));
+		});
+		
+		return lista;
 	}
 	
 	private void atualizarDashBoard(MapaRetorno mapaRetorno, Integer qtdLeitos) {
@@ -725,9 +743,8 @@ public class HospedagemService {
 							String.format("Data de Transferência deve ser inferior a data Prevista de Saída (%s)",fmt.format(h.getDataPrevistaSaida()))));
 				}
 				
-				LocalDate dataMinima = hospedeLeitoRepo.ultimaDataEntradaByHospedagemId(hospedagemId);
-				dataMinima = dataMinima.plusDays(1);
-				if (dataTransferencia.isBefore(dataMinima)) {
+				LocalDate dataMinima = hospedeLeitoRepo.ultimaDataEntradaByHospedagemId(hospedagemId, hospedeId);
+				if (dataTransferencia.isBefore(dataMinima.plusDays(1))) {
 					throw new ValidationException(new ResultError().addError("*", 
 							String.format("Data de Transferência deve ser igual ou superior a Data de Entrada da última movimentação (%s)",fmt.format(dataMinima))));
 				}

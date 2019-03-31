@@ -230,6 +230,7 @@ export default {
     },
 
     configTransferenciaLeito : {
+      hospedagemId : null,
       hospede : null, 
       destinacaoHospedagemId : null,
       dataIni : null, 
@@ -290,6 +291,7 @@ export default {
     },
 
     handleVoltar(){
+      console.log("TelaHospedagem.emit.close...")
       this.$emit('close')
     },
 
@@ -389,6 +391,7 @@ export default {
       this.hospedeSelecionado = hospede
 
       this.configTransferenciaLeito = {
+        hospedagemId : this.hospedagem.id,
         hospede : hospede, 
         destinacaoHospedagemId : this.hospedagem.destinacaoHospedagem.id,
         dataIni : this.hospedagem.dataEntrada, 
@@ -402,6 +405,7 @@ export default {
       this.dialogoTransferenciaLeitoVisible = false
 
       this.configTransferenciaLeito = {
+        hospedagemId : null,
         hospede : null, 
         destinacaoHospedagemId : null,
         dataIni : null, 

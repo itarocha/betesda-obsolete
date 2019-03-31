@@ -1,7 +1,10 @@
 package br.com.itarocha.betesda.controller;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,6 +21,7 @@ import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
+import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 import br.com.itarocha.betesda.util.validation.ResultError;
@@ -88,11 +92,13 @@ public class HospedagemController {
 
 	@RequestMapping(value="/leitos_ocupados", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
-	public ResponseEntity<?> leitosOcupados(@RequestBody PeriodoRequest model)
+	public ResponseEntity<?> leitosOcupados(@RequestBody HospedagemPeriodoRequest model)
 	{
 		try {
-			List<Long> retorno = service.getLeitosOcupadosNoPeriodo(model.dataIni, model.dataFim);
-			return new ResponseEntity<List<Long>>(retorno, HttpStatus.OK);
+			List<OcupacaoLeito> retorno = service.getLeitosOcupadosNoPeriodo(model.hospedagemId, model.dataIni, model.dataFim);
+			
+			//List<Long> retorno = service.getLeitosOcupadosNoPeriodo(model.hospedagemId, model.dataIni, model.dataFim);
+			return new ResponseEntity<List<OcupacaoLeito>>(retorno, HttpStatus.OK);
 		} catch(Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -181,6 +187,12 @@ public class HospedagemController {
 		public LocalDate data;
 	}
 
+	private static class HospedagemPeriodoRequest{
+		public Long hospedagemId;
+		public LocalDate dataIni;
+		public LocalDate dataFim;
+	}
+	
 	private static class PeriodoRequest{
 		public LocalDate dataIni;
 		public LocalDate dataFim;

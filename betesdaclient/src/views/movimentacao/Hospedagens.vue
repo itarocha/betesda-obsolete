@@ -261,7 +261,7 @@ export default {
 
     colorCache: {},
     headers: [
-      { text: 'Hospedagem', align: 'left', value:'id', width: '5%',  sortable: false,},
+      { text: 'Hospedagem', align: 'left', value:'id', width: '5%',  sortable: false,}, 
       { text: 'Nome',  align:'left', value:'nome', width: '30%' },
       { text: 'Dt.Entrada',  align:'left', value:'dataEntrada', width: '5%' },
       { text: 'Dt.Prevista',  align:'left', value:'dataPrevistaSaida', width: '5%' },

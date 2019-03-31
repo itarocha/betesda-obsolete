@@ -28,6 +28,7 @@ export default {
   
   props : ['config'],
 
+  hospedagemId : null,
   dataIni : null,
   dataFim : null,
 
@@ -38,7 +39,8 @@ export default {
 
     leitos : [],
     quartos : [],
-    leitosOcupados : []
+    leitosOcupados : [],
+
   }),
 
   created(){
@@ -77,12 +79,14 @@ export default {
       var dataIni = this.config ? this.config.dataIni : null
       var dataFim = this.config ? this.config.dataFim : null
       var destinacaoHospedagemId = this.config ? this.config.destinacaoHospedagemId : null
-
+      var hospedagemId = this.config ? (this.config.hospedagemId ? this.config.hospedagemId : null) : null
 
       var hoje = petraDateTime.hoje()
       this.dataIni = dataIni || hoje
       this.dataFim = dataFim || hoje
+      this.hospedagemId = hospedagemId || 0
 
+      console.log("loadLeitosOcupados")
       this.loadLeitosOcupados(() =>{
         this.loadQuartosPorTipoUtilizacao(destinacaoHospedagemId)
       })
@@ -136,21 +140,56 @@ export default {
       var id = leito ? leito.id : -1
 
       var leitoSelecionado = this.leitoSelecionado(id)
-      var leitoOcupado = this.isLeitoOcupado(id)
-      return leitoSelecionado ? "flex-item leito-selecionado" : leitoOcupado ? "flex-item leito-ocupado" : "flex-item  leito-livre"
+      var leitoOcupado = this.getLeitoOcupado(id)
+
+      if (leitoOcupado){
+        console.log(leitoOcupado)
+      }
+
+      if (leitoSelecionado){
+        return "flex-item leito-selecionado"
+      } else {
+        if (leitoOcupado){
+          return leitoOcupado.esta == true ? "flex-item  leito-local" : "flex-item  leito-ocupado"
+        } else {
+          return "flex-item  leito-livre"
+        }
+      }
+      //return leitoSelecionado ? "flex-item leito-selecionado" : leitoOcupado ? "flex-item leito-ocupado" : "flex-item  leito-livre"
+
+      return "flex-item  leito-livre"
     },
 
-    isLeitoOcupado(id){
-      return (this.leitosOcupados.indexOf(id) >= 0);
+    getLeitoOcupado(id){
+      return _.find(this.leitosOcupados,{leitoId : id});
     },
+
+    /*
+    isLeitoOcupado(id){
+      
+
+      return false
+      //return (this.leitosOcupados.indexOf(id) >= 0);
+      //return (this.leitosOcupados.get(id) >= null);
+    },
+    */
 
     selecionarLeito(quarto, leito){
-      if (this.isLeitoOcupado(leito.id)){
+      var leitoOcupado = this.getLeitoOcupado(leito.id)
+
+      if (!leitoOcupado || (leitoOcupado && leitoOcupado.esta)){
+        this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
+        this.$emit('select',this.acomodacao)
+      }
+
+      /*
+      if (this.getLeitoOcupado(leito.id)){
         // mensagem
       } else {
         this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
         this.$emit('select',this.acomodacao)
       }
+      */
 
     },
 
@@ -176,19 +215,24 @@ export default {
     loadLeitosOcupados(callback, reject) {
 
       var request = {
+        hospedagemId : this.hospedagemId,
         dataIni : this.dataIni,
         dataFim : this.dataFim
       }
 
+      console.log("chamando leitos ocupados")
       this.leitosOcupados = []
       petra.axiosPost("/app/hospedagem/leitos_ocupados", request).then(
         response => {
+          console.log("leitos ocupados")
+          console.log(response.data)
           this.leitosOcupados = response.data
           callback(response)
         })
     },
 
     reset(){
+      this.hospedagemId = null
       this.tipoHospede = null
       this.acomodacao = null
       this.leitos = []
@@ -266,6 +310,11 @@ export default {
 
 .leito-livre {
   background:whitesmoke;
+}
+
+.leito-local {
+  background:#4DB6AC;
+  color: white;
 }
 
 

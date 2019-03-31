@@ -4,7 +4,7 @@
       <listagem-erros :errors="errors"></listagem-erros>
       <el-row type="flex">
         <el-col :span="18">
-          <h4>{{nomeHospede}}</h4>
+          <div class="font-weight-bold" style="font-size:1.2em; padding-bottom:5px;">{{nomeHospede}}</div>
         </el-col>
         <el-col :span="6">
           <h4 v-if="acomodacao != null">Seleção: Quarto {{acomodacao.quarto.numero}} Leito {{acomodacao.leito.numero}}</h4>
@@ -15,7 +15,7 @@
           <el-row type="flex">
             <el-col>
               <el-form-item label="Data de Transferência">
-                <el-date-picker type="date" v-model="form.data" format="dd/MM/yyyy" value-format="yyyy-MM-dd" ></el-date-picker>    
+                <el-date-picker type="date" v-model="form.data" format="dd/MM/yyyy" size="small" value-format="yyyy-MM-dd" ></el-date-picker>    
               </el-form-item>
             </el-col>
           </el-row>
@@ -56,8 +56,10 @@ export default {
       deep: true,
       handler(){
         var hospede = this.config ? this.config.hospede : null
+        console.log("DialogoTransferenciaLeito.config.hospede",hospede)
         this.nomeHospede = hospede ? hospede.pessoa.nome : ""
         this.hospedeId = hospede ? hospede.id : null
+        this.hospedagemId = this.config ? this.config.hospedagemId : null
 
         var dataIni = this.config ? this.config.dataIni : null
         var dataFim = this.config ? this.config.dataFim : null
@@ -65,6 +67,7 @@ export default {
         var destinacaoHospedagemId = this.config ? this.config.destinacaoHospedagemId : null
 
         this.configTabSelecaoLeito = {
+          hospedagemId : this.hospedagemId,
           destinacaoHospedagemId : destinacaoHospedagemId,
           dataIni : dataIni,
           dataFim : dataFim
@@ -83,6 +86,7 @@ export default {
   data: () =>({
 
     configTabSelecaoLeito: {
+      hospedagemId : null,
       destinacaoHospedagemId : null,
       dataIni : null,
       dataFim : null
@@ -95,6 +99,7 @@ export default {
     
     errors : [],
 
+    hospedagemId : 0,
     hospedeId : null,
     nomeHospede : "",
 
@@ -109,6 +114,7 @@ export default {
   mounted(){
 
     this.configTabSelecaoLeito = {
+      hospedagemId : null,
       destinacaoHospedagemId : null,
       dataIni : null,
       dataFim : null
@@ -138,7 +144,6 @@ export default {
           .then(response => {
             this.reset()
             this.$emit('selecionar', true)
-            //this.visible = false
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
