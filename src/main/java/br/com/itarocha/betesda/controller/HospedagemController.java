@@ -46,11 +46,11 @@ public class HospedagemController {
 				if ("T".equals(model.getTipoUtilizacao()) && (h.getAcomodacao() == null)) {
 					v.addError("id", String.format("É necessário informar o Leito para o Hóspede [%s]", h.getPessoaNome()));
 				}
-				
+				/*
 				if (!service.pessoaLivre(h.getPessoaId())) {
 					v.addError("id", String.format("[%s] está utilizando uma Hospedagem ainda pendente", h.getPessoaNome()));
 				}
-
+				*/
 				if ("T".equals(model.getTipoUtilizacao()) && (h.getAcomodacao() != null) && 
 					(h.getAcomodacao().getLeitoId() != null) && 
 					(model.getDataEntrada() != null) && (model.getDataPrevistaSaida() != null) )
@@ -82,6 +82,7 @@ public class HospedagemController {
 		}
 	}
 	
+	
 	@RequestMapping(value="/mapa", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaRetorno mapaNew(@RequestBody MapaHospedagemRequest model)
@@ -90,6 +91,7 @@ public class HospedagemController {
 		return retorno;
 	}
 
+	
 	@RequestMapping(value="/leitos_ocupados", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> leitosOcupados(@RequestBody HospedagemPeriodoRequest model)
@@ -104,6 +106,7 @@ public class HospedagemController {
 		}
 	}
 
+	
 	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> encerramento(@RequestBody OperacoesRequest model)

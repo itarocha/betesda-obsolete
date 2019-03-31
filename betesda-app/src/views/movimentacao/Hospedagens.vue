@@ -96,15 +96,25 @@
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 <el-row type="flex" justify="center" align="middle">
                   <el-col :sm="24" :md="24" :lg="24">
-                    <el-table :data="pessoas" stripe style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}" :height="tableHeight">
-                      <el-table-column fixed header-align="left" align="right" prop="id" label="CODHPD" width="100"></el-table-column>
+                    <el-table :data="pessoas" 
+                       style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
+                      :height="tableHeight"
+                      :row-class-name="tableRowClassName">
+                      <el-table-column fixed header-align="left" align="right" prop="id" label="CODHPD" width="80"></el-table-column>
                       <el-table-column fixed prop="pessoaNome" sortable label="Nome" width="250"></el-table-column>
-                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="90" class-name="wordwrap" ></el-table-column>
-                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" sortable label="Dt.Saída" width="90"></el-table-column>
+
+                      <el-table-column prop="leitoDataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="90" class-name="wordwrap" ></el-table-column>
+
                       <el-table-column prop="utilizacao" width="100" sortable label="Utilização"></el-table-column>
                       <el-table-column prop="leitoId" :formatter="fmtLeito" width="120" sortable label="Quarto-Leito"></el-table-column>
                       <el-table-column prop="destinacaoHospedagemDescricao" width="120" sortable label="Destinação"></el-table-column>
+
+                      <el-table-column prop="statusHospedagem" width="120" sortable label="Situação"></el-table-column>
+
+                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="90" class-name="wordwrap" ></el-table-column>
+                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" sortable label="Hpd.Saída" width="110"></el-table-column>
                       <el-table-column label="Ações" fixed="right" align="center" width="80">
                         <template slot-scope="scope">
                           <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
@@ -370,7 +380,7 @@ export default {
     },
 
     getData(data) {
-      console.log("getData...")
+      console.log("getData e getPessoas...")
       var dados = {
         data : data
       }
@@ -382,7 +392,7 @@ export default {
 
             //console.log(this.dados)
             this.pessoas = response.data.hospedagens
-            //console.log(this.pessoas)
+            console.log(this.pessoas)
             this.showEstatisticas()
         })
         .catch(error => {
@@ -390,6 +400,27 @@ export default {
         })
     },
 
+    tableRowClassName({row, rowIndex}) {
+      //console.log("linha")
+      //console.log(row)
+
+      if (row.statusHospedagem == "ABERTA"){
+        return 'green-row'
+      } else
+      if (row.statusHospedagem == "VENCIDA"){
+        return 'red-row'
+      } 
+      return ''
+      /*
+      if (rowIndex === 1) {
+        return 'warning-row'
+      } else if (rowIndex === 3) {
+        return 'success-row'
+      }
+      return ''
+      */
+    },
+    
     fmtDate(row, col, cellValue, index){
       return petraDateTime.formatDate(cellValue, "DD/MM");
     },

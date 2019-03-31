@@ -1,6 +1,5 @@
 package br.com.itarocha.betesda.service;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -124,6 +123,13 @@ public class HospedagemService {
 			throw new ValidationException(new ResultError().addError("*", 
 					String.format("Data Prevista de Saída não pode ser inferior a Data de Entrada (%s)",fmt.format(model.getDataEntrada()))));
 		}
+		
+		for (HospedeVO h : model.getHospedes()) {
+			if (!this.pessoaLivreNoPeriodo(h.getPessoaId(), model.getDataEntrada(), model.getDataPrevistaSaida())) {
+				throw new ValidationException(new ResultError().addError("*", String.format("[%s] está em outra hospedagem nesse período", h.getPessoaNome() )));
+			}
+		}
+		
 		
 		hospedagem = new Hospedagem();
 		
@@ -452,9 +458,9 @@ public class HospedagemService {
 		todosLeitosNoPeriodo.forEach(x -> map.put(x, false));
 		hospedagemLeitosNoPeriodo.forEach(x -> map.put(x, true));
 
-		System.out.println("------------");
+		//System.out.println("------------");
 		map.keySet().forEach( i -> {
-			System.out.println(i + " - " + map.get(i));
+			//System.out.println(i + " - " + map.get(i));
 			lista.add(new OcupacaoLeito( i.longValue(), map.get(i)));
 		});
 		
@@ -829,6 +835,8 @@ public class HospedagemService {
 		
 		//TODO Hóspede não pode já estar hospedado em algum outro leito no período 
 		
+		
+		
 		Quarto q = leitoOpt.get().getQuarto();
 
 		Hospede hospede = new Hospede();
@@ -879,10 +887,16 @@ public class HospedagemService {
 			// Para cada leito (caso seja Total), verificar se ele está sendo utilizado no período (dataPrevistaSaida ~ dataRenovacao)
 			
 			List<HospedeLeito> hlToSave = new ArrayList<HospedeLeito>();
-			
+
+			// Para cada pessoa, verificar se ele está em outra hospedagem no período entre h.getDataPrevistaSaida() e dataRenovacao 
 			if (TipoUtilizacaoHospedagem.T.equals(h.getTipoUtilizacao())) {
 				List<Hospede> hospedes = h.getHospedes();
 				for (Hospede hpd : hospedes) {
+					
+					//hpd.getPessoa().getId()
+					if (!this.pessoaLivreNoPeriodo(hpd.getPessoa().getId(), h.getDataPrevistaSaida().plusDays(1L), dataRenovacao)) {
+						throw new ValidationException(new ResultError().addError("*", String.format("[%s] está em outra hospedagem nesse novo período", hpd.getPessoa().getNome() )));
+					}
 
 					List<HospedeLeito> listaHospedeLeito = hospedeLeitoRepo.findUltimoByHospedeId(hpd.getId());
 					
@@ -968,6 +982,46 @@ public class HospedagemService {
 	private String makeLeitoKey(Long leitoId, Integer quartoNumero, Integer leitoNumero) {
 		return String.format("%06d-%06d-%06d", quartoNumero, leitoNumero, leitoId); 
 	}
+
+	public boolean pessoaLivreNoPeriodo(Long pessoaId, LocalDate dataIni, LocalDate dataFim) {
+		StringBuilder sb = new StringBuilder();
+		
+		// Verificação em Hospedagem total (possui leito)
+		sb.append("SELECT     count(*) "); 
+		sb.append("FROM       hospede h ");
+		sb.append("INNER JOIN hospede_leito hl ");
+		sb.append("ON         hl.hospede_id = h.id ");
+		sb.append("WHERE      h.pessoa_id = :pessoaId  "); 
+		sb.append("AND        (((hl.data_entrada BETWEEN :dataIni AND :dataFim) OR (hl.data_saida BETWEEN :dataIni AND :dataFim))  "); 
+		sb.append("OR         ((hl.data_entrada <= :dataIni) AND (hl.data_saida >= :dataFim)))  ");
+		
+		Query query = em.createNativeQuery(sb.toString());
+		Long qtd = ((Number)query.setParameter("pessoaId", pessoaId)
+								 .setParameter("dataIni", dataIni)
+								 .setParameter("dataFim", dataFim)
+								 .getSingleResult()).longValue();
+		
+		StringBuilder sbP = new StringBuilder();
+		sbP.append("SELECT     count(*) "); 
+		sbP.append("FROM       hospedagem hpd "); 
+		sbP.append("INNER JOIN hospede h "); 
+		sbP.append("ON         h.hospedagem_id = hpd.id "); 
+		sbP.append("WHERE      h.pessoa_id = :pessoaId "); 
+		sbP.append("AND        hpd.tipo_utilizacao = :tipoUtilizacao "); 
+		sbP.append("AND        (((hpd.data_entrada BETWEEN :dataIni AND :dataFim) OR (COALESCE(hpd.data_efetiva_saida,hpd.data_prevista_saida) BETWEEN :dataIni AND :dataFim)) "); 
+		sbP.append("OR          ((hpd.data_entrada <= :dataIni) AND (COALESCE(hpd.data_efetiva_saida,hpd.data_prevista_saida) >= :dataFim))) "); 
+		
+		Query queryP = em.createNativeQuery(sbP.toString());
+		Long qtdP = ((Number)queryP.setParameter("pessoaId", pessoaId)
+				 				 .setParameter("tipoUtilizacao", "P")
+				 				 .setParameter("dataIni", dataIni)
+								 .setParameter("dataFim", dataFim)
+								 .getSingleResult()).longValue();
+		
+		
+		return ((qtd <= 0) && (qtdP <= 0)); 
+	}
+	
 	
 	public boolean leitoLivreNoPeriodo(Long leitoId, LocalDate dataIni, LocalDate dataFim) {
 		StringBuilder sb = new StringBuilder();
@@ -1005,6 +1059,9 @@ public class HospedagemService {
 		return lista; 
 	}
 
+	// INÚTIL
+	/*
+	@Deprecated
 	public boolean pessoaLivre(Long pessoaId) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("SELECT count(*) ");
@@ -1020,6 +1077,7 @@ public class HospedagemService {
 		
 		return qtd <= 0; 
 	}
+	*/
 	
 	private static class Periodo{
 		public LocalDate dataIni;

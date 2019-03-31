@@ -5,7 +5,7 @@
       <el-form :model="form" label-position="left" label-width="140px;">
         <el-row type="flex">
           <el-col>
-            <el-form-item label="Data de Renovação">
+            <el-form-item label="Nova Data Prevista de Saída">
               <el-date-picker type="date" v-model="form.data" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>    
             </el-form-item>
           </el-col>

@@ -270,8 +270,19 @@ body{
     word-break: keep-all;
   }
 
+
+  .el-table .red-row {
+    color:red !important;
+  }
+
+  .el-table .green-row {
+    color:green !important;
+  }
+
+
   .el-table .warning-row {
-    background-color:red !important;
+    color:red !important;
+    /*background-color:red !important;*/
   }
 
   .el-table .success-row {
