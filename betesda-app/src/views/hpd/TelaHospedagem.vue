@@ -199,12 +199,8 @@ export default {
 
   mounted(){
     this.$store.dispatch('setAcao','Detalhes de Hospedagem')
-    //this.hospedagemId = 60
-    //this.getInfo(this.hospedagemId)
-      console.log("mounted para "+this.id)
       this.hospedagemId = this.id
       this.getInfo(this.id)
-
   },
 
   data: () =>({
@@ -291,7 +287,6 @@ export default {
     },
 
     handleVoltar(){
-      console.log("TelaHospedagem.emit.close...")
       this.$emit('close')
     },
 
@@ -360,7 +355,6 @@ export default {
         data : data.dataTransferencia
       }
 
-      //console.log("dados para transferencia:",dados);
       petra.axiosPost("/app/hospedagem/mapa/transferir", dados)
         .then(response => {
           this.getInfo(this.hospedagemId)
@@ -369,8 +363,6 @@ export default {
           this.dialogVisible = false
         }).catch(error => {
           this.errors = petra.tratarErros(error);
-          //console.log(this.errors)
-          //petra.showMessageError(this.errors)
         })
     },
 
@@ -425,9 +417,6 @@ export default {
         dataIni : this.hospedagem.dataEntrada, 
         dataFim: this.hospedagem.dataPrevistaSaida        
       }
-
-
-      //console.log("enviando... ",this.configAcrescentarHospede)
 
       this.dialogoAcrescentarHospedeVisible = true
     },

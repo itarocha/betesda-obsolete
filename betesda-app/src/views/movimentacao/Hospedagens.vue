@@ -249,18 +249,9 @@ export default {
 
   watch: {
 
-    /*
-    hospedagemSelecionada(newVal, oldVal){
-      console.log("mudou hospedagemSelecionada para "+newVal)
-    },  
-    */
-
     dataAtual(){
 
       var d = moment(this.dataAtual).toDate()
-
-      //new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0)
-
 
       this.setShowDate(d)
       this.getDadosSemanaAtual()
@@ -330,7 +321,6 @@ export default {
   methods: {
 
     handleTabClick(tab, event) {
-      //console.log(tab, event);
     },
 
     selecionarDia(dia, index){
@@ -346,7 +336,6 @@ export default {
     },
 
     refreshMapa(){
-      console.log("refreshMapa...")
       this.getData(this.dataAtual)
     },
 
@@ -380,7 +369,6 @@ export default {
     },
 
     getData(data) {
-      console.log("getData e getPessoas...")
       var dados = {
         data : data
       }
@@ -388,11 +376,7 @@ export default {
         .then(response => {
             this.dados = response.data
             
-            //console.log("restaurando dados...")
-
-            //console.log(this.dados)
             this.pessoas = response.data.hospedagens
-            console.log(this.pessoas)
             this.showEstatisticas()
         })
         .catch(error => {
@@ -401,8 +385,6 @@ export default {
     },
 
     tableRowClassName({row, rowIndex}) {
-      //console.log("linha")
-      //console.log(row)
 
       if (row.statusHospedagem == "ABERTA"){
         return 'green-row'
@@ -411,14 +393,6 @@ export default {
         return 'red-row'
       } 
       return ''
-      /*
-      if (rowIndex === 1) {
-        return 'warning-row'
-      } else if (rowIndex === 3) {
-        return 'success-row'
-      }
-      return ''
-      */
     },
     
     fmtDate(row, col, cellValue, index){
@@ -487,10 +461,6 @@ export default {
     hospedagemClass(id, classe, dias){
       var hospedagem = this.getHospedagemById(id);
 
-      hospedagem.baixado
-
-      //console.log('hpd:',hospedagem)
-      //console.log('dias:',dias)
       if (hospedagem){
           if (classe == "BAIXADO"){
             return 'grafico grafico_fim_baixado'
@@ -567,7 +537,6 @@ export default {
     },
 
     showHospedagemInfoByIdentificador(id){
-      console.log(id)
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
         this.showHospedagemInfo(hospedagem.hospedagemId)
@@ -575,8 +544,6 @@ export default {
     },
 
     showHospedagemInfo(id){
-      //console.log("this.$refs.hospedagemInfo ",this.$refs.hospedagemInfo)
-
       this.state = "info"
       this.hospedagemSelecionada = id;
       this.showTelaHospedagem = true;
@@ -588,9 +555,7 @@ export default {
       this.state = "browse"
       this.hospedagemSelecionada = null;
       this.$store.dispatch('setAcao','Hospedagens')
-      console.log("Hospedagens.onCloseInfo")
       this.refreshMapa()
-      //this.recarregar()
     },
 
 		periodChanged(range, eventSource) {
@@ -611,8 +576,6 @@ export default {
 		onClickDay(d) {
 
       this.dataAtual = moment(d).format("YYYY-MM-DD")
-
-      //console.log(`You clicked: ${this.dataAtual}`)
 
     },
     

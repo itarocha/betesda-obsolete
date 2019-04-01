@@ -56,7 +56,7 @@ export default {
       deep: true,
       handler(){
         var hospede = this.config ? this.config.hospede : null
-        console.log("DialogoTransferenciaLeito.config.hospede",hospede)
+
         this.nomeHospede = hospede ? hospede.pessoa.nome : ""
         this.hospedeId = hospede ? hospede.id : null
         this.hospedagemId = this.config ? this.config.hospedagemId : null

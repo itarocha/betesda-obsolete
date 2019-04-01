@@ -95,11 +95,7 @@
           <tab-selecao-leito :config="configTabSelecaoLeito" @select="onSelect" v-if="state == 'leito'"></tab-selecao-leito>
         </el-col>
       </el-row>    
-      <!--
-      <el-row type="flex" v-if="state != 'browse'">
-        <el-button type="primary" size="mini" @click="handleSelectState('browse')">Voltar para edição</el-button>
-      </el-row>  
-      -->
+
       <span slot="footer" class="dialog-footer">
         <el-button @click="doSelecionarTransferencia(false)">Cancelar</el-button>
         <el-button type="primary" :disabled="form.acomodacao == null || form.data == null || form.pessoa == null || form.tipoHospedeId == null" 
@@ -144,6 +140,7 @@ export default {
         var destinacaoHospedagemId = this.config ? this.config.destinacaoHospedagemId : null
 
         this.configTabSelecaoLeito = {
+          hospedagemId : this.hospedagemId,
           destinacaoHospedagemId : destinacaoHospedagemId,
           dataIni : dataIni,
           dataFim : dataFim
@@ -178,6 +175,7 @@ export default {
     state : "browse", // browse | hospede | leito
 
     configTabSelecaoLeito: {
+      hospedagemId : null,
       destinacaoHospedagemId : null,
       dataIni : null,
       dataFim : null
@@ -219,6 +217,7 @@ export default {
   mounted(){
 
     this.configTabSelecaoLeito = {
+      hospedagemId : null,
       destinacaoHospedagemId : null,
       dataIni : null,
       dataFim : null
@@ -266,12 +265,7 @@ export default {
       this.itensDestinacaoHospedagem = [];
       petra.axiosGet("/app/quarto/listas",false).then(
         response => {
-          //this.itensDestinacaoHospedagem = response.data.listaDestinacaoHospedagem
-          //this.itensTipoLeito = response.data.listaTipoLeito
-          //this.itensSituacaoLeito = response.data.listaSituacaoLeito
-          //this.itensTipoServico = response.data.listaTipoServico
           this.itensTipoHospede = response.data.listaTipoHospede
-          //this.itensEntidades = response.data.listaEntidade
         })
     },
 
@@ -285,7 +279,6 @@ export default {
         this.state = "edit";
         this.$nextTick(() => {
           setTimeout(() => {
-            //this.$refs.edtdescricao.focus()
           }, 500);
         });
       });
@@ -296,8 +289,8 @@ export default {
     },
 
     doSelecionarTransferencia(ok){
-      if (ok){
 
+      if (ok){
         var dados = {
           hospedagemId : this.hospedagemId,
           pessoaId : this.form.pessoa.id,
@@ -306,13 +299,10 @@ export default {
           data : this.form.data 
         }
         
-        //console.log(dados)
-
         petra.axiosPost("/app/hospedagem/mapa/adicionar", dados)
           .then(response => {
             this.reset()
-            //this.$emit('selecionar', true)
-            //this.visible = false
+            this.$emit('selecionar', true)
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
