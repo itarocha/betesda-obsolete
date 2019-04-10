@@ -343,7 +343,6 @@ export default {
     },
 
     destinacaoHospedagemId(){
-      //this.loadQuartosPorTipoUtilizacao(this.formOpcoes.destinacaoHospedagem)
       this.clearLeitos()
     },
 
@@ -445,12 +444,6 @@ export default {
 
     removerHospede(item){
       this.$store.dispatch("removerHospede", item)
-      /*
-      var indice = this.hospedes.indexOf(item);
-      if (indice > -1){
-        this.hospedes.splice(indice,1)
-      }
-      */
      },
 
     handleLancarHospedagem(){

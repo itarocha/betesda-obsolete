@@ -395,6 +395,10 @@ body{
   background: #d3dce6;
 }
 
+.font-size-2{
+  font-size: 2em;
+}
+
 .font-weight-bold{
   font-weight: bold;
 }

@@ -14,8 +14,8 @@
         <el-row style="padding:5px;">
           <el-col :sm="24" :md="24" :lg="24">
             <el-row :gutter="10">
-              <el-col :span="4">Número da Hospedagem</el-col>
-              <el-col :span="4" class="font-weight-bold">{{hospedagem.id}}</el-col>
+              <el-col :span="4">CODHPD</el-col>
+              <el-col :span="4" class="font-weight-bold font-size-2">{{hospedagem.id}}</el-col>
             </el-row>
             <el-row :gutter="10">
               <el-col :span="4">Data de Entrada</el-col>
@@ -64,7 +64,7 @@
               <el-row :gutter="10">
                 <el-col :span="24">
                   <el-collapse v-for="(hpd, i) in hospedagem.hospedes" :key="i" v-model="activeName" accordion>
-                    <el-collapse-item :title="hpd.pessoa.nome + ' - ' + hpd.tipoHospede.descricao" :name="i" 
+                    <el-collapse-item :title="hpd.pessoa.id + ' - ' + hpd.pessoa.nome + ' - ' + hpd.tipoHospede.descricao" :name="i" 
                       :class="{'grey-lighten-4' : !hpd.baixado != 'S', 'amber-lighten-4' : hpd.baixado == 'S'}">   
                       <el-row v-if="hpd.baixado == 'S'" class="font-weight-bold">
                         BAIXADO
@@ -73,10 +73,19 @@
                         <el-col>
                           <!-- showSelecionarDataBaixa(hpd.id, hospedagem.dataPrevistaSaida) -->
                           <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
+                            @click.native="showAlterarHospede(hpd)">Alterar Hóspede
+                          </el-button>
+                          <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S'" 
                             @click.native="showSelecionarDataBaixa(hpd.id)">Baixar
                           </el-button>
                           <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
                             @click.native="showTransferenciaLeito(hpd)">Transferir
+                          </el-button>
+                          <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null" 
+                            @click.native="showConfirmarRemoverHospede(hpd)">Remover
+                          </el-button>
+                          <el-button type="primary" size="mini"
+                            @click.native="showDialogoPessoa(hpd)">Pessoa
                           </el-button>
                         </el-col>
                       </el-row>
@@ -92,12 +101,12 @@
 
                       <div xs12 sm12 md12 v-if="hospedagem.tipoUtilizacao == 'T'">
                         <el-row>
-                          <el-col>Histórico de Leitos</el-col>
+                          <el-col>Movimentação</el-col>
                         </el-row>
 
                         <el-row v-for="(leito, leitoIndex) in hpd.leitos" :key="leitoIndex">
                           <el-col>
-                          #{{leito.id}} - <span></span>{{leito.dataEntrada | fmtData}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
+                          <span class="font-weight-bold"># {{leito.id}}</span> - {{leito.dataEntrada | fmtData}} - Quarto {{leito.quartoNumero}} Leito {{leito.leitoNumero}}
                           <span v-if="(hpd.baixado == 'S') && (leitoIndex == hpd.leitos.length-1)" class="font-weight-bold"> - Baixado em {{leito.dataSaida | fmtData}}</span>
                           </el-col>
                         </el-row>
@@ -164,6 +173,23 @@
       @selecionar="onAcrescentarHospede">
     </dialogo-acrescentar-hospede>    
 
+    <dialogo-alterar-hospede
+      :visible="dialogoAlterarHospedeVisible" 
+      :config="configAlterarHospede" 
+      @close="onCloseDialogoAlterarHospede">
+    </dialogo-alterar-hospede>
+
+    <dialogo-remover-hospede
+      :visible="dialogoRemoverHospedeVisible" 
+      :config="configRemoverHospede"
+      @close="onCloseDialogoRemoverHospede">
+    </dialogo-remover-hospede>
+
+    <dialogo-pessoa
+      :visible="dialogoPessoaVisible" 
+      :id="pessoaId"
+      @close="onCloseDialogoPessoa">
+    </dialogo-pessoa>
   </div>
 
 </template>
@@ -177,6 +203,9 @@ import DialogoBaixarHospede from "./DialogoBaixarHospede.vue"
 import DialogoExcluirHospedagem from "./DialogoExcluirHospedagem.vue"
 import DialogoTransferenciaLeito from "./DialogoTransferenciaLeito.vue"
 import DialogoAcrescentarHospede from "./DialogoAcrescentarHospede.vue"
+import DialogoAlterarHospede from "./DialogoAlterarHospede.vue"
+import DialogoRemoverHospede from "./DialogoRemoverHospede.vue"
+import DialogoPessoa from "../cadastros/DialogoPessoa.vue"
 import FrameEncaminhador from "./FrameEncaminhador.vue"
 
 export default {
@@ -190,6 +219,9 @@ export default {
     DialogoExcluirHospedagem,
     DialogoTransferenciaLeito,
     DialogoAcrescentarHospede,
+    DialogoAlterarHospede,
+    DialogoRemoverHospede,
+    DialogoPessoa,
     FrameEncaminhador,
   },
 
@@ -211,6 +243,7 @@ export default {
     //Talvez seja props
     hospedagemId : null,
     hospedeId : null,
+    pessoaId : null,
 
     hospedagem : {},
     entidade : {},
@@ -233,6 +266,11 @@ export default {
       dataFim: null
     },
 
+    configRemoverHospede : {
+      hospedagemId : null,
+      hospede : null, 
+    },
+
     activeName: null,
     permitirEditar : true,
     permitirRenovar : true,
@@ -246,6 +284,10 @@ export default {
       dataFim: null
     },
 
+    configAlterarHospede : {
+      hospede : null
+    },
+
     dialogAcrescentarHospede : false,
 
     dialogoEncerramentoVisible : false,
@@ -254,6 +296,9 @@ export default {
     dialogoExclusaoVisible : false,
     dialogoTransferenciaLeitoVisible : false,
     dialogoAcrescentarHospedeVisible : false,
+    dialogoAlterarHospedeVisible : false,
+    dialogoRemoverHospedeVisible : false,
+    dialogoPessoaVisible : false,
 
     errors: [],
 
@@ -275,12 +320,6 @@ export default {
             this.hospedagem = response.data
             this.entidade = (this.hospedagem && this.hospedagem.entidade) ? this.hospedagem.entidade : null
             this.encaminhador = (this.hospedagem && this.hospedagem.encaminhador) ? this.hospedagem.encaminhador : null
-            /*
-            this.hospedes = this.hospedagem.hospedes
-            this.servicos = (this.hospedagem && this.hospedagem.servicos) ? this.hospedagem.servicos : []
-            this.tipoHospede = this.hospedagem.hospedes[0].tipoHospede
-            this.destinacaoHospedagem = this.hospedagem.destinacaoHospedagem
-            */
           }).catch(error => {
             this.errors = petra.tratarErros(error);
           })
@@ -322,10 +361,57 @@ export default {
     onCloseDialogoExclusao(sucesso){
       this.dialogoExclusaoVisible = false
       if (sucesso){
-        // TODO Sair dessa hospedagem e direcionar para hospedagens
-        //this.getInfo(this.hospedagemId)
+        petra.axiosDelete("/app/hospedagem/"+this.hospedagemId, false)
+          .then(response => {
+            petra.showMessageSuccess('Hóspedagem excluíuda com sucesso')
+            this.$emit('close')
+            this.reset()
+          }).catch(error => {
+            this.errors = petra.tratarErros(error);
+          })
       }
     },
+
+    doConfirmarExclusao(hospedagemId) {
+      petra.axiosDelete("/app/hospedagem/"+this.hospedagemId, false)
+        .then(response => {
+          this.reset()
+          this.$emit('close',true)
+          petra.showMessageSuccess('Hóspedagem excluíuda com sucesso')
+        }).catch(error => {
+          this.errors = petra.tratarErros(error);
+        })
+    },
+
+    // Remover Hóspede
+    showConfirmarRemoverHospede(hpd){
+      this.configRemoverHospede = {
+        hospede : hpd,
+        hospedagemId : this.hospedagemId
+      }
+      this.dialogoRemoverHospedeVisible = true
+    },
+
+    onCloseDialogoRemoverHospede(sucesso){
+      this.dialogoRemoverHospedeVisible = false
+      if (sucesso) {
+        this.getInfo(this.hospedagemId)
+      }
+    },
+
+    // Pessoa
+    showDialogoPessoa(hpd){
+      this.pessoaId = hpd.pessoa.id
+      this.dialogoPessoaVisible = true
+    },
+
+    onCloseDialogoPessoa(sucesso){
+      this.dialogoPessoaVisible = false
+      if (sucesso) {
+        this.getInfo(this.hospedagemId)
+      }
+    },
+
 
     // Transferência
     showSelecionarTransferencia(hpd){
@@ -338,7 +424,6 @@ export default {
         dataEntrada : this.hospedagem.dataEntrada,
         dataPrevistaSaida : this.hospedagem.dataPrevistaSaida
       }
-      //this.$refs.frameSelecaoLeito.openDialog(hpd, this.destinacaoHospedagem.id, this.hospedagem.dataEntrada, this.hospedagem.dataPrevistaSaida)
     },
 
     handleTransferirHospede(){
@@ -348,7 +433,6 @@ export default {
     },
 
     transferirHospede(hospedeId, data){
-      //var selecao = this.$refs.frameSelecaoLeito.getSelecao()
       var dados = {
         hospedeId : hospedeId,
         leitoId : data.acomodacao.leito.id,
@@ -374,6 +458,22 @@ export default {
 
     onCloseDialogoBaixa(sucesso){
       this.dialogoBaixaVisible = false
+      if (sucesso){
+        this.getInfo(this.hospedagemId)
+      }
+    },
+
+    //Alterar Hóspede
+    showAlterarHospede(hospede){
+      this.configAlterarHospede = {
+        hospede : hospede, 
+      }
+
+      this.dialogoAlterarHospedeVisible = true
+    },
+
+    onCloseDialogoAlterarHospede(sucesso){
+      this.dialogoAlterarHospedeVisible = false
       if (sucesso){
         this.getInfo(this.hospedagemId)
       }
@@ -415,7 +515,7 @@ export default {
         hospedagemId : this.hospedagem.id,
         destinacaoHospedagemId : this.hospedagem.destinacaoHospedagem.id,
         dataIni : this.hospedagem.dataEntrada, 
-        dataFim: this.hospedagem.dataPrevistaSaida        
+        dataFim : this.hospedagem.dataPrevistaSaida        
       }
 
       this.dialogoAcrescentarHospedeVisible = true

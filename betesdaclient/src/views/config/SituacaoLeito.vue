@@ -6,7 +6,7 @@
     <v-layout row wrap>
       <v-flex xs12 sm12 md12>
         <v-btn dark small color="cyan darken-4" @click="incluir">
-            Incluir
+          Incluir
         </v-btn>
       </v-flex>
 

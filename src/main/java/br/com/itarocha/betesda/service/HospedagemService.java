@@ -373,10 +373,18 @@ public class HospedagemService {
 					if (duranteLeito) {
 						andamento = CellAndamento.DURANTE;
 					} else
+					if (inicioLeito && fimLeito && inicioHospedagem && fimHospedagem) {
+						andamento = CellAndamento.INICIO_FIM;
+					} else	
 					if (inicioLeito && fimHospedagem) {
 						andamento = CellAndamento.VINDO_FIM;
 					} else	
+					if (inicioLeito && fimLeito && inicioHospedagem && !fimHospedagem) {
+						// REVISAR
+						andamento = CellAndamento.INICIO_INDO;
+					} else	
 					if (inicioLeito && fimLeito) {
+						// REVISAR
 						andamento = CellAndamento.INDO_VINDO;
 					} else	
 					if (inicioHospedagem && inicioLeito) {
@@ -621,7 +629,7 @@ public class HospedagemService {
 			}
 
 			if (TipoUtilizacaoHospedagem.P.equals(h.getTipoUtilizacao())) {
-				if (h.getDataEntrada().isBefore(dataEncerramento)) {
+				if (h.getDataEntrada().isAfter(dataEncerramento)) {
 					throw new ValidationException(new ResultError().addError("*", 
 							String.format("Data de Encerramento deve ser igual ou superior a Data de Entrada (%s)", fmt.format(h.getDataEntrada())) ));
 				} 
@@ -706,7 +714,48 @@ public class HospedagemService {
 		}
 		
 	} 
+
+	public void removerHospede(Long hospedagemId, Long hospedeId) throws ValidationException{
+		Optional<Hospede> hospedeOpt = hospedeRepo.findById(hospedeId);
+		if (hospedeOpt.isPresent()) {
+			
+			Hospede hospede = hospedeOpt.get();
+
+			Optional<Hospedagem> opt = hospedagemRepo.findById(hospedagemId);
+			if (opt.isPresent()) {
+				
+				Hospedagem h = opt.get();
+				if ((h.getDataEfetivaSaida() != null)) {
+					throw new ValidationException(new ResultError().addError("*", "Hospedagem deve ter status = emAberto"));
+				}
+				
+				Long qtd = hospedeLeitoRepo.countHospedesNaoBaixadosByHospedagemId(hospedagemId);
+				if (qtd <= 1) {
+					throw new ValidationException(new ResultError().addError("*", "Para remover hóspede é necessário ter pelo menos 2 hóspedes ativos na hospedagem"));
+				}
+				
+				hospedeRepo.delete(hospede);
+				
+			}
+		}
+		
+	} 
 	
+	public void alterarTipoHospede(Long hospedeId, Long tipoHospedeId) throws ValidationException{
+		Optional<Hospede> hospedeOpt = hospedeRepo.findById(hospedeId);
+		if (hospedeOpt.isPresent()) {
+			Hospede hospede = hospedeOpt.get();
+
+			if ((Logico.S.equals(hospede.getBaixado())  )) {
+				throw new ValidationException(new ResultError().addError("*", "Hóspede já está baixado"));
+			}
+	
+			Optional<TipoHospede> th = tipoHospedeRepo.findById(tipoHospedeId);
+			hospede.setTipoHospede(th.get());
+			hospedeRepo.save(hospede);
+		}
+	} 
+
 	public void transferirHospede(Long hospedeId, Long leitoId, LocalDate dataTransferencia) throws ValidationException{
 		DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		Optional<Hospede> hospedeOpt = hospedeRepo.findById(hospedeId);

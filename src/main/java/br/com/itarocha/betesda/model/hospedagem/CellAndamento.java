@@ -3,6 +3,7 @@ package br.com.itarocha.betesda.model.hospedagem;
 public enum CellAndamento {
 	VAZIO,
 	INICIO,
+	INICIO_INDO,
 	DURANTE,
 	INDO,
 	VINDO,

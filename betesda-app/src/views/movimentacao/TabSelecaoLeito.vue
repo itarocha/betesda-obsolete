@@ -164,32 +164,19 @@ export default {
       return _.find(this.leitosOcupados,{leitoId : id});
     },
 
-    /*
-    isLeitoOcupado(id){
-      
-
-      return false
-      //return (this.leitosOcupados.indexOf(id) >= 0);
-      //return (this.leitosOcupados.get(id) >= null);
-    },
-    */
-
     selecionarLeito(quarto, leito){
       var leitoOcupado = this.getLeitoOcupado(leito.id)
 
+      /*
       if (!leitoOcupado || (leitoOcupado && leitoOcupado.esta)){
         this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
         this.$emit('select',this.acomodacao)
       }
-
-      /*
-      if (this.getLeitoOcupado(leito.id)){
-        // mensagem
-      } else {
-        this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
-        this.$emit('select',this.acomodacao)
-      }
       */
+
+      // Agora poderá selecionar qualquer um. A validação ficará por conta do serviço
+      this.acomodacao = {quarto: {id: quarto.id, numero: quarto.numero}, leito: {id: leito.id, numero: leito.numero}}
+      this.$emit('select',this.acomodacao)
 
     },
 

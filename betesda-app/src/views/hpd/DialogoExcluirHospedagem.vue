@@ -34,14 +34,16 @@ export default {
 
   methods: {
     handleConfirmar(ok){
-      if (ok && this.form.data != null){
-        this.doConfirmar(this.hospedagemId)
+      if (ok){
+        this.$emit('close',true)
+        //this.doConfirmar(this.hospedagemId)
       } else {
         this.reset()
         this.$emit('close',false)
       }
     },
 
+    /*
     doConfirmar(hospedagemId) {
 
       petra.axiosDelete("/app/hospedagem/"+this.hospedagemId, false)
@@ -53,6 +55,7 @@ export default {
           this.errors = petra.tratarErros(error);
         })
     },
+    */
 
     reset(){
       this.errors=[]

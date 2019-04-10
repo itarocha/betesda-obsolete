@@ -60,7 +60,7 @@
     </el-row>
     <el-row :gutter="5" v-if="entidade != null && entidade.endereco != null" class="font-weight-bold">
       <el-col :span="8">{{entidade.endereco.bairro}}</el-col>
-      <el-col :span="4">{{entidade.endereco.cep | fmtCep}}</el-col>
+      <el-col :span="4">{{entidade.endereco.cep | fmtCep }}</el-col>
       <el-col :span="8">{{entidade.endereco.cidade}}</el-col>
       <el-col :span="4">{{entidade.endereco.uf}}</el-col>
     </el-row>

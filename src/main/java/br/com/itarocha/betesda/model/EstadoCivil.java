@@ -4,6 +4,7 @@ public enum EstadoCivil {
 
 	S("Solteiro"),
 	C("Casado"),
+	P("Separado"),
 	D("Divorciado"),
 	U("União Estável"),
 	V("Viúvo");

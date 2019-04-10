@@ -56,7 +56,7 @@ public class EntidadesController {
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
-	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody Entidade model) {
 		
 		if (model.getCnpj() != null) {
@@ -92,7 +92,7 @@ public class EntidadesController {
 	}
 	
 	@RequestMapping(value = "{id}", method=RequestMethod.DELETE)
-	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
 		try {
 			service.remove(id);

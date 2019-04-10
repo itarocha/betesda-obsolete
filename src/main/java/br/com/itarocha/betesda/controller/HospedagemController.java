@@ -1,10 +1,7 @@
 package br.com.itarocha.betesda.controller;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -106,6 +103,18 @@ public class HospedagemController {
 		}
 	}
 
+	@RequestMapping(value="/mapa/alterar_hospede", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> alterarHospede(@RequestBody AlteracaoHospedeRequest model)
+	{
+		try {
+			service.alterarTipoHospede(model.hospedeId, model.tipoHospedeId);
+			return new ResponseEntity<String>("ok", HttpStatus.OK);
+		} catch(ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	
 	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
@@ -126,6 +135,18 @@ public class HospedagemController {
 		try {
 			service.renovarHospedagem(model.hospedagemId, model.data);
 			return new ResponseEntity<String>("ok", HttpStatus.OK);
+		} catch(ValidationException e) {
+			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@RequestMapping(value="/remover_hospede", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> removerHospede(@RequestBody RemoverHospedeRequest model)
+	{
+		try {
+			service.removerHospede(model.hospedagemId, model.hospedeId);
+			return new ResponseEntity<String>("ok", HttpStatus.OK); 
 		} catch(ValidationException e) {
 			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		}
@@ -212,12 +233,22 @@ public class HospedagemController {
 		public Long leitoId;
 	}
 	
+	private static class AlteracaoHospedeRequest {
+		public Long hospedeId;
+		public Long tipoHospedeId;
+	}
+	
 	private static class AdicionarHospedeRequest{
 		public Long hospedagemId;
 		public Long pessoaId;
 		public Long tipoHospedeId;
 		public LocalDate data;
 		public Long leitoId;
+	}
+
+	private static class RemoverHospedeRequest{
+		public Long hospedagemId;
+		public Long hospedeId;
 	}
 	
 	private static class OperacoesRequest{

@@ -1,6 +1,5 @@
 package br.com.itarocha.betesda.repository;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;

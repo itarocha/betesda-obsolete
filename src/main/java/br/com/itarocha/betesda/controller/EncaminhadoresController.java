@@ -50,7 +50,7 @@ public class EncaminhadoresController {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
-	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody Encaminhador model) {
 		ItaValidator<Encaminhador> v = new ItaValidator<Encaminhador>(model);
 		v.validate();
@@ -68,7 +68,7 @@ public class EncaminhadoresController {
 	}
 	
 	@RequestMapping(value = "{id}", method=RequestMethod.DELETE)
-	@PreAuthorize("hasAnyRole('ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> excluir(@PathVariable("id") Long id) {
 		try {
 			service.remove(id);

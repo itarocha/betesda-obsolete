@@ -70,6 +70,9 @@
                             <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null && hpd.baixado != 'S' && hospedagem.tipoUtilizacao == 'T'" 
                               @click.native="handleSelecionarTransferencia(hpd)">Transferir
                             </el-button>
+                            <el-button type="primary" size="mini" v-if="hospedagem.dataEfetivaSaida == null" 
+                              @click.native="handleRemoverHospede(hpd)">Remover
+                            </el-button>
                           </el-col>
                         </el-row>
 
@@ -98,7 +101,7 @@
                     </el-collapse> 
                   </el-col>
                 </el-row>
-                </el-tab-pane>
+              </el-tab-pane>
 
               <el-tab-pane label="Encaminhador" style="height:280px;">
                 <div v-if="entidade != null">
@@ -433,6 +436,24 @@ export default {
     onSelecionarLeito(acomodacao){
       this.formTransferencia.acomodacao = acomodacao
     },
+
+    handleRemoverHospede(hpd){
+      this.hospedeSelecionado = hpd
+
+      /*
+      this.formTransferencia.dataTransferencia = null
+      this.state = 'transferir'
+      this.configTransferencia = {
+        hospede : hpd,
+        destinacaoHospedagemId : this.destinacaoHospedagem.id,
+        dataEntrada : this.hospedagem.dataEntrada,
+        dataPrevistaSaida : this.hospedagem.dataPrevistaSaida
+      }
+      //this.$refs.frameSelecaoLeito.openDialog(hpd, this.destinacaoHospedagem.id, this.hospedagem.dataEntrada, this.hospedagem.dataPrevistaSaida)
+      */
+    },
+
+
 
     handleSelecionarTransferencia(hpd){
       this.hospedeSelecionado = hpd

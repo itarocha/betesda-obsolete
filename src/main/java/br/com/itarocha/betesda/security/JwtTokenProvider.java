@@ -37,7 +37,7 @@ public class JwtTokenProvider {
 
         //FIXME LocalDate? 
         Date now = new Date();
-        Date expiryDate = toDate(LocalDateTime.now().plusMinutes(60L)); //new Date(now.getTime() + jwtExpirationInMs);
+        Date expiryDate = toDate(LocalDateTime.now().plusHours(5L)); //new Date(now.getTime() + jwtExpirationInMs); .plusMinutes(60L)
         
         //https://www.programcreek.com/java-api-examples/?api=io.jsonwebtoken.Jwts
         Map<String, Object> data = new HashMap<>();

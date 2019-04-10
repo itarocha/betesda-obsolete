@@ -77,12 +77,27 @@
                           <el-col sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey-lighten-2':isIndiceDataAtual(indice)}">
                             <div class="thebox hleito" v-if="celula.hospedagens.length == 0"></div>
                             <div class="thebox hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
-                              <div :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe, hospedagem.dias[indice])" 
-                                    v-if="hospedagem.dias[indice].identificador != '0'"
-                                    :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
-                                    @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
-                                <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
-                              </div>                              
+
+
+                            <el-popover
+                                placement="top-start"
+                                width="300"
+                                :title="hospedagem.dias[indice].identificador"
+                                trigger="hover"
+                                :open-delay="1000"
+                                :content="getNome(hospedagem.dias[indice].identificador, true)">
+
+
+                                <div slot="reference" :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe, hospedagem.dias[indice])" 
+                                      v-if="hospedagem.dias[indice].identificador != '0'"
+                                      :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
+                                      @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
+                                  <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
+                                </div>
+
+
+                            </el-popover>                                
+
                             </div>
                           </el-col>
                         </el-row>
@@ -100,21 +115,26 @@
                        style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
                       :height="tableHeight"
                       :row-class-name="tableRowClassName">
-                      <el-table-column fixed header-align="left" align="right" prop="id" label="CODHPD" width="80"></el-table-column>
-                      <el-table-column fixed prop="pessoaNome" sortable label="Nome" width="250"></el-table-column>
+
+                      <el-table-column fixed prop="pessoaNome" label="Nome" width="250" sortable></el-table-column>
 
                       <el-table-column prop="leitoDataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="90" class-name="wordwrap" ></el-table-column>
+                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="90" class-name="wordwrap" sortable></el-table-column>
 
-                      <el-table-column prop="utilizacao" width="100" sortable label="Utilização"></el-table-column>
-                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="120" sortable label="Quarto-Leito"></el-table-column>
-                      <el-table-column prop="destinacaoHospedagemDescricao" width="120" sortable label="Destinação"></el-table-column>
+                      <el-table-column prop="utilizacao" width="100" label="Utilização" sortable></el-table-column>
+                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="120" label="Quarto-Leito" sortable></el-table-column>
+                      <el-table-column prop="destinacaoHospedagemDescricao" width="120" label="Destinação" sortable></el-table-column>
 
-                      <el-table-column prop="statusHospedagem" width="120" sortable label="Situação"></el-table-column>
+                      <el-table-column prop="statusHospedagem" width="120" label="Situação" sortable></el-table-column>
 
                       <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="90" class-name="wordwrap" ></el-table-column>
-                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" sortable label="Hpd.Saída" width="110"></el-table-column>
+                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="90" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="110" sortable></el-table-column>
+
+                      <el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>
+                      <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
+                      <el-table-column header-align="left" align="right" prop="pessoaId" label="CODPES" width="100" sortable></el-table-column>
+
                       <el-table-column label="Ações" fixed="right" align="center" width="80">
                         <template slot-scope="scope">
                           <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
@@ -129,11 +149,6 @@
                 </el-row>
                 
               </el-tab-pane>
-              <!--
-              <el-tab-pane label="Resumo Diário" namd="resumo">
-                
-              </el-tab-pane>
-              -->
             </el-tabs>
 
           </el-col>
@@ -147,7 +162,7 @@
 </template>
 
 <script>
-  import HospedagemInfo from "./HospedagemInfo.vue"  
+  //import HospedagemInfo from "./HospedagemInfo.vue"  
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
 
 
@@ -166,7 +181,7 @@ export default {
   components: {
 		CalendarView,
     CalendarViewHeader,
-    HospedagemInfo,
+    //HospedagemInfo,
     TelaHospedagem
 	},
 	mixins: [CalendarMathMixin],  
@@ -468,6 +483,12 @@ export default {
           if (classe == "INICIO") {
             return 'grafico grafico_inicio'
           } else 
+          if (classe == "INICIO_FIM") {
+            return 'grafico grafico_inicio grafico_fim'
+          } else 
+          if (classe == "INICIO_INDO") {
+            return 'grafico grafico_inicio_indo' // grafico_indo grafico_inicio
+          } else 
           if (classe == "DURANTE") {
             return 'grafico grafico_durante'
           } else 
@@ -524,14 +545,19 @@ export default {
       return _.find(this.dados.hospedagens,{identificador : id});
     },
 
-    getNome(id){
+    getNome(id, completo){
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
-        var nome = hospedagem.pessoaNome.split(" ")[0];
-        if (nome.length > 4){
-          nome = nome.substr(0,4) + "..."
+        if (completo)  {
+          return hospedagem.pessoaNome
+        } else {
+          var nome = hospedagem.pessoaNome.split(" ")[0];
+  
+          if (nome.length > 4){
+            nome = nome.substr(0,4) + "..."
+          }
+          return nome;
         }
-        return nome;
       }
       return '???';
     },
@@ -719,6 +745,17 @@ export default {
 }
 
 /*  https://css-tricks.com/the-shapes-of-css/ */
+.grafico_inicio_indo {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  width: calc(100% - 6px);
+  margin-left: 3px;
+
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 0px;
+}
+
 .grafico_indo {
   border-color:#000;
   border-style: dotted;
