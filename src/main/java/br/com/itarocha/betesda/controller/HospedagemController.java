@@ -19,6 +19,7 @@ import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
+import br.com.itarocha.betesda.report.HospedePermanencia;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 import br.com.itarocha.betesda.util.validation.ResultError;
@@ -88,6 +89,18 @@ public class HospedagemController {
 		return retorno;
 	}
 
+	@RequestMapping(value="/planilha_geral", method = RequestMethod.POST)
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<?> planilhaGeral(@RequestBody PeriodoRequest model)
+	{
+		try {
+			List<HospedePermanencia> retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			return new ResponseEntity<List<HospedePermanencia>>(retorno, HttpStatus.OK);
+		} catch(Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+	}
 	
 	@RequestMapping(value="/leitos_ocupados", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")

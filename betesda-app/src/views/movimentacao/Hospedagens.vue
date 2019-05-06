@@ -5,6 +5,7 @@
         <el-button type="primary" @click="getDadosSemanaAnterior(dados.dataIni)">Semana Anterior</el-button>
         <el-button type="primary" @click="getDadosHoje()">Hoje</el-button>
         <el-button type="primary" @click="getDadosProximaSemana(dados.dataFim)">Semana Seguinte</el-button>
+        <el-button type="danger" @click="getPlanilhaGeral()">Teste</el-button>
       </el-header>
       <el-main>
         <el-row type="flex" :gutter="10">
@@ -149,6 +150,30 @@
                 </el-row>
                 
               </el-tab-pane>
+
+              <el-tab-pane label="Planilha Geral" name="planilhaGeral">
+                <el-row type="flex" justify="center" align="middle">
+                  <el-col :sm="24" :md="24" :lg="24">
+                    <el-table :data="dadosPlanilhaGeral" 
+                       style="width: 100%" border size="small" :default-sort="{prop: 'pessoaId', order: 'ascending'}"
+                      :height="tableHeight"
+                      :row-class-name="tableRowClassName">
+
+                      <el-table-column fixed prop="pessoaId" label="Pessoa" width="100" align="right" sortable></el-table-column>
+                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="dataSaida" :formatter="fmtDate" label="Saída" width="90" class-name="wordwrap" sortable></el-table-column>
+
+                      <el-table-column prop="hospedagemId" label="HospedagemId" align="right" width="90" ></el-table-column>
+                      <el-table-column prop="encaminhadorId" label="EncaminhadorId" align="right" width="90" ></el-table-column>
+                      <el-table-column prop="tipoUtilizacao" label="TipoUtilizacao" align="right" width="90" ></el-table-column>
+
+                      <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
+                    </el-table>
+                  </el-col>
+                </el-row>
+                
+              </el-tab-pane>
+
             </el-tabs>
 
           </el-col>
@@ -226,6 +251,7 @@ export default {
     dataAtual: null,
     dados: [],
     pessoas:[],
+    dadosPlanilhaGeral:[],
 
 		qtdLeitosTotais : 0,
 		qtdLeitosOcupados : 0,
@@ -365,6 +391,25 @@ export default {
 
     getDadosHoje(){
       this.dataAtual = petraDateTime.hoje()
+    },
+
+    getPlanilhaGeral(){
+      this.getDadosPlanilhaGeral("2019-04-01", "2019-04-30")
+    },
+
+    getDadosPlanilhaGeral(dataIni, dataFim) {
+      var dados = {
+        dataIni : dataIni,
+        dataFim : dataFim
+      }
+      petra.axiosPost("/app/hospedagem/planilha_geral", dados)
+        .then(response => {
+          this.dadosPlanilhaGeral = response.data
+          console.log(this.dadosPlanilhaGeral)
+        })
+        .catch(error => {
+
+        })
     },
 
     getDadosSemanaAnterior(data){

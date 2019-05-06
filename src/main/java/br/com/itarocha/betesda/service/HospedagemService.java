@@ -5,9 +5,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -46,6 +49,7 @@ import br.com.itarocha.betesda.model.hospedagem.HospedagemMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
+import br.com.itarocha.betesda.report.HospedePermanencia;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
 import br.com.itarocha.betesda.repository.EncaminhadorRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
@@ -61,6 +65,7 @@ import br.com.itarocha.betesda.repository.TipoServicoRepository;
 import br.com.itarocha.betesda.util.validation.ResultError;
 import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional /* todo (rollbackForClassName)*/
@@ -109,6 +114,7 @@ public class HospedagemService {
 
 	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
+
 	public Hospedagem create(HospedagemVO model) throws ValidationException {
 		Hospedagem hospedagem = null;
 
@@ -129,7 +135,6 @@ public class HospedagemService {
 				throw new ValidationException(new ResultError().addError("*", String.format("[%s] está em outra hospedagem nesse período", h.getPessoaNome() )));
 			}
 		}
-		
 		
 		hospedagem = new Hospedagem();
 		
@@ -252,13 +257,6 @@ public class HospedagemService {
 				mapaHospedes.put(id, new Periodo(_dIni, _dFim));
 			}
 		});
-		/*
-		System.out.println("------------------");
-		mapaHospedes.keySet().forEach(x -> {
-			Periodo _p = mapaHospedes.get(x);
-			System.out.println(x + " - " +_p.dataIni + " - " + _p.dataFim);
-		});
-		*/
 		
 		// Hóspedes parciais
 		StringBuilder sbHospedeLeitosParciais = StrUtil.loadFile("/sql/hospedes_parciais.sql");
@@ -454,6 +452,99 @@ public class HospedagemService {
 		return retorno;
 	}
 
+	public List<HospedePermanencia> buildPlanilhaGeral(LocalDate dataIni, LocalDate dataFim){
+		
+		// Hóspedagens Totais
+		StringBuilder sbHospedePermanencia = StrUtil.loadFile("/sql/hospede_permanencia_total.sql");
+		TypedQuery<HospedePermanencia> qHospedePermanencia = em.createQuery(sbHospedePermanencia.toString(), HospedePermanencia.class)
+				.setParameter("DATA_INI", dataIni )
+				.setParameter("DATA_FIM", dataFim );
+		List<HospedePermanencia> listaHospedePermanencia = qHospedePermanencia.getResultList();
+		
+		//List<HospedePermanencia> lista = new ArrayList<>();
+		List<HospedePermanencia> listaOutros = new ArrayList<>();
+		
+		//HospedePermanencia old = new HospedePermanencia(-1L, -1L, -1L, null, null, "T");
+		
+		Map<String, HospedePermanencia> map = new HashMap<>();
+		
+		for (HospedePermanencia hp : listaHospedePermanencia) {
+			
+			String key = String.format("%06d-%06d", hp.getPessoaId(), hp.getHospedagemId());
+			
+			if (!map.containsKey(key)) {
+				map.put(key, hp);
+			} else {
+				HospedePermanencia hpOld = map.get(key);
+				System.out.println(String.format("Old : %d %s - %s - %d", hpOld.getPessoaId(), hpOld.getDataEntrada(), hpOld.getDataSaida(), hpOld.getHospedagemId() ));
+				System.out.println(String.format("Novo: %d %s - %s - %d", hp.getPessoaId(), hp.getDataEntrada(), hp.getDataSaida(), hp.getHospedagemId()));
+				long dias = java.time.temporal.ChronoUnit.DAYS.between(hpOld.getDataSaida(), hp.getDataEntrada());
+				System.out.println(String.format("DIAS: %d", dias));
+				
+				if (dias > 1) {
+					System.out.println("*************************************");
+					listaOutros.add(hpOld);
+					
+					map.put(key, hp);
+				} else {
+					if (hpOld.getDataEntrada().isBefore(hp.getDataEntrada())) {
+						hp.setDataEntrada(hpOld.getDataEntrada());
+					}
+					if (hpOld.getDataSaida().isAfter(hp.getDataSaida())) {
+						hp.setDataSaida(hpOld.getDataSaida());
+					}
+					map.put(key, hp);
+				}
+				System.out.println("-------------------------------------------");
+			}
+			
+			
+			/*
+			if ( old.getPessoaId().equals(hp.getPessoaId()) && old.getHospedagemId().equals(hp.getHospedagemId())) {
+				old.setDataSaida(hp.getDataSaida());
+			} else {
+				lista.add(old);
+				old = hp;
+			}
+			*/
+		}
+		
+		List<HospedePermanencia> retorno = new ArrayList(map.values());
+		
+		for(HospedePermanencia o : listaOutros) {
+			retorno.add(o);
+		}
+		
+		retorno.sort( (a, b) -> {
+			if(a.getPessoaId().equals(b.getPessoaId())) {
+				return a.getDataEntrada().compareTo(b.getDataEntrada());
+			}
+			return a.getPessoaId().compareTo(b.getPessoaId());
+		});
+		long total = 0;
+		for(HospedePermanencia o : retorno) {
+			if (o.getDataEntrada().isBefore(dataIni)) {
+				System.out.println(String.format("*** DataAntes : %d %s - %s - %d", o.getPessoaId(), o.getDataEntrada(), o.getDataSaida(), o.getHospedagemId()));
+				o.setDataEntrada(dataIni);
+			}
+			if (o.getDataSaida().isAfter(dataFim)) {
+				System.out.println(String.format("*** DataPassou: %d %s - %s - %d", o.getPessoaId(), o.getDataEntrada(), o.getDataSaida(), o.getHospedagemId()));
+				o.setDataSaida(dataFim);
+			}
+			
+			long dias = java.time.temporal.ChronoUnit.DAYS.between(o.getDataEntrada(), o.getDataSaida());
+			o.setDiasPermanencia(dias+1);
+			total += o.getDiasPermanencia();
+		}
+		
+		System.out.println(String.format("*** Total : %d", total));
+		
+		return retorno;
+		
+		//return listaHospedePermanencia;
+	}
+	
+	
 	public List<OcupacaoLeito> getLeitosOcupadosNoPeriodo(Long hospedagemId, LocalDate dataIni, LocalDate dataFim){
 		
 		List<BigInteger> todosLeitosNoPeriodo = hospedeLeitoRepo.leitosNoPeriodo(dataIni, dataFim);

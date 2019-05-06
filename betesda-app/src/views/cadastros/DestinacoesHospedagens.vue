@@ -88,6 +88,19 @@ export default {
   name: 'DestinacoesHospedagens',
 
   created(){
+
+    console.log("oua")
+
+    const user = {
+      firstname: 'Robin',
+      lastname: 'Wieruch',
+    }
+
+    const {fn, ln} = user
+
+    console.log(fn,ln)
+
+
   },
 
   mounted(){
