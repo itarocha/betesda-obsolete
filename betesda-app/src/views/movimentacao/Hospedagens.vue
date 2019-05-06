@@ -6,6 +6,7 @@
         <el-button type="primary" @click="getDadosHoje()">Hoje</el-button>
         <el-button type="primary" @click="getDadosProximaSemana(dados.dataFim)">Semana Seguinte</el-button>
         <el-button type="danger" @click="getPlanilhaGeral()">Teste</el-button>
+        <el-button type="danger" @click="excel">Excel Download</el-button>
       </el-header>
       <el-main>
         <el-row type="flex" :gutter="10">
@@ -189,6 +190,7 @@
 <script>
   //import HospedagemInfo from "./HospedagemInfo.vue"  
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
+  import XLSX from 'xlsx'
 
 
 import {
@@ -410,6 +412,40 @@ export default {
         .catch(error => {
 
         })
+    },
+
+    excel() { // On Click Excel download button
+
+      var animals = [
+                  {"name": "cat", "category": "animal"}
+                  ,{"name": "dog", "category": "animal"}
+                  ,{"name": "pig", "category": "animal"}
+                ]
+
+      var pokemons = [
+                  {"name": "pikachu", "category": "pokemon"}
+                  ,{"name": "Arbok", "category": "pokemon"}
+                  ,{"name": "Eevee", "category": "pokemon"}
+                ]
+
+    
+      // export json to Worksheet of Excel
+      // only array possible
+      var movimentacaoWS = XLSX.utils.json_to_sheet(this.dadosPlanilhaGeral) 
+      var animalWS = XLSX.utils.json_to_sheet(animals) 
+      var pokemonWS = XLSX.utils.json_to_sheet(pokemons) 
+
+      // A workbook is the name given to an Excel file
+      var wb = XLSX.utils.book_new() // make Workbook of Excel
+
+      // add Worksheet to Workbook
+      // Workbook contains one or more worksheets
+      XLSX.utils.book_append_sheet(wb, movimentacaoWS, 'Movimentacao') // sheetAName is name of Worksheet
+      XLSX.utils.book_append_sheet(wb, animalWS, 'animals') // sheetAName is name of Worksheet
+      XLSX.utils.book_append_sheet(wb, pokemonWS, 'pokemons')   
+
+      // export Excel file
+      XLSX.writeFile(wb, 'book.xlsx') // name of the file is 'book.xlsx'
     },
 
     getDadosSemanaAnterior(data){

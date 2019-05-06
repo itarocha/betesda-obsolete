@@ -455,11 +455,27 @@ public class HospedagemService {
 	public List<HospedePermanencia> buildPlanilhaGeral(LocalDate dataIni, LocalDate dataFim){
 		
 		// Hóspedagens Totais
-		StringBuilder sbHospedePermanencia = StrUtil.loadFile("/sql/hospede_permanencia_total.sql");
-		TypedQuery<HospedePermanencia> qHospedePermanencia = em.createQuery(sbHospedePermanencia.toString(), HospedePermanencia.class)
+		StringBuilder sbHPTotal = StrUtil.loadFile("/sql/hospede_permanencia_total.sql");
+		TypedQuery<HospedePermanencia> qHPTotal = em.createQuery(sbHPTotal.toString(), HospedePermanencia.class)
 				.setParameter("DATA_INI", dataIni )
 				.setParameter("DATA_FIM", dataFim );
-		List<HospedePermanencia> listaHospedePermanencia = qHospedePermanencia.getResultList();
+		List<HospedePermanencia> listaHPTotal = qHPTotal.getResultList();
+
+		
+		// Hóspedagens Totais
+		StringBuilder sbHPParcial = StrUtil.loadFile("/sql/hospede_permanencia_parcial.sql");
+		TypedQuery<HospedePermanencia> qHPParcial = em.createQuery(sbHPParcial.toString(), HospedePermanencia.class)
+				.setParameter("DATA_INI", dataIni )
+				.setParameter("DATA_FIM", dataFim )
+				.setParameter("TIPO_UTILIZACAO", TipoUtilizacaoHospedagem.P);
+		
+		List<HospedePermanencia> listaHPParcial = qHPParcial.getResultList();
+		
+		for(HospedePermanencia x : listaHPParcial) {
+			System.out.println("******************** "+x.getPessoaId());
+		}
+		listaHPTotal.addAll(listaHPParcial);
+		
 		
 		//List<HospedePermanencia> lista = new ArrayList<>();
 		List<HospedePermanencia> listaOutros = new ArrayList<>();
@@ -468,7 +484,7 @@ public class HospedagemService {
 		
 		Map<String, HospedePermanencia> map = new HashMap<>();
 		
-		for (HospedePermanencia hp : listaHospedePermanencia) {
+		for (HospedePermanencia hp : listaHPTotal) {
 			
 			String key = String.format("%06d-%06d", hp.getPessoaId(), hp.getHospedagemId());
 			

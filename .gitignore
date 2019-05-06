@@ -11,6 +11,8 @@ betesdaclient/node_modules/**
 betesdabuilder/output/**
 
 
+*.sh
+
 # Compiled class file
 *.class
 
