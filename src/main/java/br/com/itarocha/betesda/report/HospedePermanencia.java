@@ -2,6 +2,13 @@ package br.com.itarocha.betesda.report;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import br.com.itarocha.betesda.model.Hospedagem;
+import br.com.itarocha.betesda.model.Hospede;
+import br.com.itarocha.betesda.model.Pessoa;
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "hospedagem", "hospede" })
 public class HospedePermanencia {
 	
 	private Long pessoaId;
@@ -11,15 +18,18 @@ public class HospedePermanencia {
 	private LocalDate dataSaida;
 	private String tipoUtilizacao;
 	private Long diasPermanencia;
+	private Pessoa pessoa;
+	private Hospedagem hospedagem;
+	private Hospede hospede;
 	
-	public HospedePermanencia(Long pessoaId, Long hospedagemId, Long encaminhadorId, LocalDate dataEntrada,
-			LocalDate dataSaida, String tipoUtilizacao) {
+	public HospedePermanencia(Long pessoaId, Long hospedagemId, Long encaminhadorId, LocalDate dataEntrada, LocalDate dataSaida, String tipoUtilizacao, Hospede hospede) {
 		this.pessoaId = pessoaId;
 		this.hospedagemId = hospedagemId;
 		this.encaminhadorId = encaminhadorId;
 		this.dataEntrada = dataEntrada;
 		this.dataSaida = dataSaida;
 		this.tipoUtilizacao = tipoUtilizacao;
+		this.hospede = hospede;
 	}
 
 	public Long getPessoaId() {
@@ -76,6 +86,30 @@ public class HospedePermanencia {
 
 	public void setDiasPermanencia(Long diasPermanencia) {
 		this.diasPermanencia = diasPermanencia;
+	}
+
+	public Pessoa getPessoa() {
+		return pessoa;
+	}
+
+	public void setPessoa(Pessoa pessoa) {
+		this.pessoa = pessoa;
+	}
+
+	public Hospedagem getHospedagem() {
+		return hospedagem;
+	}
+
+	public void setHospedagem(Hospedagem hospedagem) {
+		this.hospedagem = hospedagem;
+	}
+
+	public Hospede getHospede() {
+		return hospede;
+	}
+
+	public void setHospede(Hospede hospede) {
+		this.hospede = hospede;
 	}
 
 }

@@ -161,12 +161,26 @@
                       :row-class-name="tableRowClassName">
 
                       <el-table-column fixed prop="pessoaId" label="Pessoa" width="100" align="right" sortable></el-table-column>
-                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataSaida" :formatter="fmtDate" label="Saída" width="90" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column fixed prop="pessoaNome" label="Nome" width="300" sortable></el-table-column>
+                      <el-table-column prop="pessoaDataNascimento" label="Data de Nascimento" width="120"></el-table-column>
+                      <el-table-column prop="pessoaIdade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
+                      <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
+                      <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
+                      <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
+                      <el-table-column prop="pessoaTelefone" label="Telefone" width="140"></el-table-column>
+                      <el-table-column prop="pessoaCidadeOrigem" label="Cidade de Origem" width="200"></el-table-column>
+                      <el-table-column prop="pessoaCidadeOrigemUF" label="UF Origem" width="80"></el-table-column>
+
+
+                      <!--<el-table-column prop="hospedagem.tipoUtilizacao" label="Utilização" width="300" sortable></el-table-column>-->
+                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Data de Ingresso" width="90" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="dataSaida" :formatter="fmtDate" label="Data de Desligamento" width="90" class-name="wordwrap" sortable></el-table-column>
 
                       <el-table-column prop="hospedagemId" label="HospedagemId" align="right" width="90" ></el-table-column>
                       <el-table-column prop="encaminhadorId" label="EncaminhadorId" align="right" width="90" ></el-table-column>
-                      <el-table-column prop="tipoUtilizacao" label="TipoUtilizacao" align="right" width="90" ></el-table-column>
+                      <el-table-column prop="encaminhadorNome" label="Encaminhador" width="300" ></el-table-column>
+                      <el-table-column prop="tipoUtilizacao" label="Tipo de Utilização" width="90" ></el-table-column>
+                      <el-table-column prop="tipoHospede" label="Tipo de Hóspede" width="140" ></el-table-column>
 
                       <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
                     </el-table>
