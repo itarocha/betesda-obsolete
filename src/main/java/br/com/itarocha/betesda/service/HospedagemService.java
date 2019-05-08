@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -12,12 +13,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.collections4.bag.SynchronizedSortedBag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,8 +54,12 @@ import br.com.itarocha.betesda.model.hospedagem.HospedagemMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
+import br.com.itarocha.betesda.report.ChaveValor;
+import br.com.itarocha.betesda.report.CidadeQuantidade;
+import br.com.itarocha.betesda.report.CidadeUF;
 import br.com.itarocha.betesda.report.HospedePermanencia;
 import br.com.itarocha.betesda.report.PlanilhaGeral;
+import br.com.itarocha.betesda.report.RelatorioAtendimentos;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
 import br.com.itarocha.betesda.repository.EncaminhadorRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
@@ -455,7 +462,9 @@ public class HospedagemService {
 		return retorno;
 	}
 
-	public List<PlanilhaGeral> buildPlanilhaGeral(LocalDate dataIni, LocalDate dataFim){
+	public RelatorioAtendimentos buildPlanilhaGeral(LocalDate dataIni, LocalDate dataFim){
+		
+		RelatorioAtendimentos relatorio = new RelatorioAtendimentos();
 		
 		// Hóspedagens Totais
 		StringBuilder sbHPTotal = StrUtil.loadFile("/sql/hospede_permanencia_total.sql");
@@ -464,13 +473,6 @@ public class HospedagemService {
 				.setParameter("DATA_FIM", dataFim );
 		List<HospedePermanencia> listaHPTotal = qHPTotal.getResultList();
 
-		
-		/*
-		for (Pessoa p: listaPTotal) {
-			System.out.println(String.format("%04d %s", p.getId(), p.getNome()));
-		}
-		*/
-		
 		// Hóspedagens Totais
 		StringBuilder sbHPParcial = StrUtil.loadFile("/sql/hospede_permanencia_parcial.sql");
 		TypedQuery<HospedePermanencia> qHPParcial = em.createQuery(sbHPParcial.toString(), HospedePermanencia.class)
@@ -480,22 +482,9 @@ public class HospedagemService {
 		
 		List<HospedePermanencia> listaHPParcial = qHPParcial.getResultList();
 		
-
-		
-		Map<Long, Pessoa> mapaPessoas = getPessoasPorPeriodo(dataIni, dataFim);
-		Map<Long, Hospedagem> mapaHospedagens = getHospedagensPorPeriodo(dataIni, dataFim);
-		
-		
-		/*
-		mapaPessoas.values().forEach(p -> {
-			System.out.println(String.format("%04d %s", p.getId(), p.getNome()));
-		});
-		*/
-		
 		listaHPTotal.addAll(listaHPParcial);
 		
 		
-		//List<HospedePermanencia> lista = new ArrayList<>();
 		List<HospedePermanencia> listaOutros = new ArrayList<>();
 		
 		Map<String, HospedePermanencia> map = new HashMap<>();
@@ -508,13 +497,13 @@ public class HospedagemService {
 				map.put(key, hp);
 			} else {
 				HospedePermanencia hpOld = map.get(key);
-				System.out.println(String.format("Old : %d %s - %s - %d", hpOld.getPessoaId(), hpOld.getDataEntrada(), hpOld.getDataSaida(), hpOld.getHospedagemId() ));
-				System.out.println(String.format("Novo: %d %s - %s - %d", hp.getPessoaId(), hp.getDataEntrada(), hp.getDataSaida(), hp.getHospedagemId()));
+				//System.out.println(String.format("Old : %d %s - %s - %d", hpOld.getPessoaId(), hpOld.getDataEntrada(), hpOld.getDataSaida(), hpOld.getHospedagemId() ));
+				//System.out.println(String.format("Novo: %d %s - %s - %d", hp.getPessoaId(), hp.getDataEntrada(), hp.getDataSaida(), hp.getHospedagemId()));
 				long dias = java.time.temporal.ChronoUnit.DAYS.between(hpOld.getDataSaida(), hp.getDataEntrada());
-				System.out.println(String.format("DIAS: %d", dias));
+				//System.out.println(String.format("DIAS: %d", dias));
 				
 				if (dias > 1) {
-					System.out.println("*************************************");
+					//System.out.println("*************************************");
 					listaOutros.add(hpOld);
 					
 					map.put(key, hp);
@@ -527,73 +516,64 @@ public class HospedagemService {
 					}
 					map.put(key, hp);
 				}
-				System.out.println("-------------------------------------------");
+				//System.out.println("-------------------------------------------");
 			}
 			
-			
-			/*
-			if ( old.getPessoaId().equals(hp.getPessoaId()) && old.getHospedagemId().equals(hp.getHospedagemId())) {
-				old.setDataSaida(hp.getDataSaida());
-			} else {
-				lista.add(old);
-				old = hp;
-			}
-			*/
 		}
 		
-		List<HospedePermanencia> retorno = new ArrayList(map.values());
+		List<HospedePermanencia> lstHospedePerm = new ArrayList(map.values());
 		
 		for(HospedePermanencia o : listaOutros) {
-			retorno.add(o);
+			lstHospedePerm.add(o);
 		}
 		
-		retorno.sort( (a, b) -> {
+		//TODO ordenar a planilha
+		lstHospedePerm.sort( (a, b) -> {
 			if(a.getPessoaId().equals(b.getPessoaId())) {
 				return a.getDataEntrada().compareTo(b.getDataEntrada());
 			}
 			return a.getPessoaId().compareTo(b.getPessoaId());
 		});
-		long total = 0;
+		//long total = 0;
 		
-		
-		
-		
-		
-		for(HospedePermanencia o : retorno) {
+		for(HospedePermanencia o : lstHospedePerm) {
 			if (o.getDataEntrada().isBefore(dataIni)) {
-				System.out.println(String.format("*** DataAntes : %d %s - %s - %d", o.getPessoaId(), o.getDataEntrada(), o.getDataSaida(), o.getHospedagemId()));
+				//System.out.println(String.format("*** DataAntes : %d %s - %s - %d", o.getPessoaId(), o.getDataEntrada(), o.getDataSaida(), o.getHospedagemId()));
 				o.setDataEntrada(dataIni);
 			}
 			if (o.getDataSaida().isAfter(dataFim)) {
-				System.out.println(String.format("*** DataPassou: %d %s - %s - %d", o.getPessoaId(), o.getDataEntrada(), o.getDataSaida(), o.getHospedagemId()));
+				//System.out.println(String.format("*** DataPassou: %d %s - %s - %d", o.getPessoaId(), o.getDataEntrada(), o.getDataSaida(), o.getHospedagemId()));
 				o.setDataSaida(dataFim);
 			}
 			
 			long dias = java.time.temporal.ChronoUnit.DAYS.between(o.getDataEntrada(), o.getDataSaida());
 			o.setDiasPermanencia(dias+1);
 			
-			o.setPessoa(mapaPessoas.get(o.getPessoaId()));
-			o.setHospedagem(mapaHospedagens.get(o.getHospedagemId()));
+			//o.setPessoa(mapaPessoas.get(o.getPessoaId()));
+			//o.setHospedagem(mapaHospedagens.get(o.getHospedagemId()));
 			
-			total += o.getDiasPermanencia();
+			//total += o.getDiasPermanencia();
 		}
 		
-		System.out.println(String.format("*** Total : %d", total));
+		//System.out.println(String.format("*** Total : %d", total));
 		
 		
-		List<PlanilhaGeral> planilha = retorno.stream().map( temp -> {
+		List<PlanilhaGeral> planilha = lstHospedePerm.stream().map( temp -> {
 			PlanilhaGeral pg = new PlanilhaGeral();
 
 			pg.setPessoaId(temp.getPessoaId());
 			pg.setPessoaNome(temp.getPessoa().getNome());
 			pg.setPessoaCPF(temp.getPessoa().getCpf());
 			pg.setPessoaRG(temp.getPessoa().getRg());
-			pg.setPessoaEndereco(temp.getPessoa().getEndereco() == null ? "" : temp.getPessoa().getEndereco().toString());
+			pg.setPessoaEndereco(temp.getPessoa().getEndereco() == null ? "" : temp.getPessoa().getEndereco().semCidadeToString());
 			pg.setPessoaTelefone(temp.getPessoa().getTelefone());
 			
 			pg.setPessoaDataNascimento(temp.getPessoa().getDataNascimento());
-			pg.setPessoaCidadeOrigem(temp.getPessoa().getNaturalidadeCidade());
-			pg.setPessoaCidadeOrigemUF(temp.getPessoa().getNaturalidadeUf().toString());
+			
+			pg.setCidadeOrigem(new CidadeUF(temp.getPessoa().getEndereco().getCidade(), temp.getPessoa().getEndereco().getUf().toString()));
+			
+			//////////pg.setPessoaCidadeOrigem(temp.getPessoa().getEndereco().getCidade());
+			//////////pg.setPessoaCidadeOrigemUF(temp.getPessoa().getEndereco().getUf().toString());
 			
 			pg.setDataEntrada(temp.getDataEntrada());
 			pg.setDataSaida(temp.getDataSaida());
@@ -611,12 +591,61 @@ public class HospedagemService {
 			
 			return pg;
 		}).collect(Collectors.toList());
+
 		
-		return planilha;
+		// Ranking de cidades
+		Map<CidadeUF, Long> mapaCidades = new TreeMap<>();
 		
-		//return listaHospedePermanencia;
+		for (PlanilhaGeral p : planilha) {
+			if (mapaCidades.containsKey(p.getCidadeOrigem())) {
+				Long dias = mapaCidades.get(p.getCidadeOrigem());
+				mapaCidades.put(p.getCidadeOrigem(), p.getDiasPermanencia() + dias );
+			} else {
+				mapaCidades.put(p.getCidadeOrigem(), p.getDiasPermanencia());
+			}
+		}
+		
+		List<CidadeQuantidade> rankingCidades = mapaCidades.entrySet().stream().map(temp -> {
+			return new CidadeQuantidade(temp.getKey().getCidade(), temp.getKey().getUf(), temp.getValue());
+		}).collect(Collectors.toList());
+		
+		rankingCidades.sort((a, b) -> b.getQuantidade().compareTo(a.getQuantidade()));
+		rankingCidades.stream().forEach(x -> System.out.println(String.format("%03d %s %s", x.getQuantidade(),  x.getCidade(), x.getUf())));
+		
+		
+		// Ranking de Encaminhadores
+		Map<String, Long> mapaEncaminhadores = new TreeMap<>();
+		
+		for (PlanilhaGeral p : planilha) {
+			if (mapaEncaminhadores.containsKey(p.getEncaminhadorNome())) {
+				Long dias = mapaEncaminhadores.get(p.getEncaminhadorNome());
+				mapaEncaminhadores.put(p.getEncaminhadorNome(), p.getDiasPermanencia() + dias );
+			} else {
+				mapaEncaminhadores.put(p.getEncaminhadorNome(), p.getDiasPermanencia());
+			}
+		}
+		
+		System.out.println("--------------------------------------");
+		
+		List<ChaveValor> rankingEncaminhamentos = mapaEncaminhadores.entrySet().stream().map(temp -> {
+			return new ChaveValor(temp.getKey(), temp.getValue());
+		}).collect(Collectors.toList());
+		
+		rankingEncaminhamentos.sort((a, b) -> b.getQuantidade().compareTo(a.getQuantidade()));
+		rankingEncaminhamentos.stream().forEach(x -> System.out.println(String.format("%03d %s", x.getQuantidade(), x.getNome() )));
+		
+		/*
+		Map<CidadeUF, Long> mapa = planilha.stream()
+									.collect(Collectors.groupingBy(PlanilhaGeral::getCidadeOrigem, Collectors.co .counting()));
+		*/
+		
+		relatorio.setPlanilhaGeral(planilha);
+		relatorio.setRankingCidades(rankingCidades);
+		relatorio.setRankingEncaminhamentos(rankingEncaminhamentos);
+		
+		
+		return relatorio;
 	}
-	
 	
 	private Map<Long, Pessoa> getPessoasPorPeriodo(LocalDate dataIni, LocalDate dataFim) {
 		Map<Long, Pessoa> mapa = new HashMap<>();

@@ -4,7 +4,9 @@ SELECT      new br.com.itarocha.betesda.report.HospedePermanencia( hospede.pesso
 			, hospedeLeito.dataEntrada
 			, hospedeLeito.dataSaida
 			, 'T'
-			, hospede)
+			, hospedagem
+			, hospede
+			, hospede.pessoa)
 FROM        HospedeLeito hospedeLeito
 INNER JOIN  hospedeLeito.leito leito
 INNER JOIN  hospedeLeito.hospede hospede

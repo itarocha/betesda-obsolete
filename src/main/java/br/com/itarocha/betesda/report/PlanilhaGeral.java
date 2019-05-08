@@ -2,6 +2,9 @@ package br.com.itarocha.betesda.report;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({"hibernateLazyInitializer", "cidadeOrigem" })
 public class PlanilhaGeral {
 	
 	private Long pessoaId;
@@ -14,6 +17,8 @@ public class PlanilhaGeral {
 	private String pessoaEndereco;
 	private String pessoaCidadeOrigem;
 	private String pessoaCidadeOrigemUF;
+	
+	private CidadeUF cidadeOrigem;
 	
 	private Long hospedagemId;
 	private Long encaminhadorId;
@@ -77,7 +82,7 @@ public class PlanilhaGeral {
 		return pessoaCidadeOrigem;
 	}
 	public void setPessoaCidadeOrigem(String pessoaCidadeOrigem) {
-		this.pessoaCidadeOrigem = pessoaCidadeOrigem;
+		this.pessoaCidadeOrigem = pessoaCidadeOrigem == null ?  null : pessoaCidadeOrigem.trim();
 	}
 	public Long getHospedagemId() {
 		return hospedagemId;
@@ -121,6 +126,17 @@ public class PlanilhaGeral {
 	public void setDiasPermanencia(Long diasPermanencia) {
 		this.diasPermanencia = diasPermanencia;
 	}
+	
+	public void setCidadeOrigem(CidadeUF cidadeUF) {
+		this.pessoaCidadeOrigem = cidadeUF.getCidade();
+		this.pessoaCidadeOrigemUF = cidadeUF.getUf();
+		this.cidadeOrigem = cidadeUF;
+	}
+	
+	public CidadeUF getCidadeOrigem() {
+		return this.cidadeOrigem;
+	}
+	
 	public String getPessoaCidadeOrigemUF() {
 		return pessoaCidadeOrigemUF;
 	}
@@ -135,3 +151,4 @@ public class PlanilhaGeral {
 	}
 	
 }
+

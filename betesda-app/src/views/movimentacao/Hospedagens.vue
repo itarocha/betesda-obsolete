@@ -156,31 +156,36 @@
                 <el-row type="flex" justify="center" align="middle">
                   <el-col :sm="24" :md="24" :lg="24">
                     <el-table :data="dadosPlanilhaGeral" 
-                       style="width: 100%" border size="small" :default-sort="{prop: 'pessoaId', order: 'ascending'}"
+                       style="width: 100%" border size="small" 
                       :height="tableHeight"
                       :row-class-name="tableRowClassName">
 
-                      <el-table-column fixed prop="pessoaId" label="Pessoa" width="100" align="right" sortable></el-table-column>
-                      <el-table-column fixed prop="pessoaNome" label="Nome" width="300" sortable></el-table-column>
+                      <el-table-column prop="hospedagemId" label="Atendimento" align="right" width="90" ></el-table-column>
+
+                      <el-table-column prop="tipoUtilizacao" label="Tipo de Hospedagem" width="120" ></el-table-column>
+
+                      <el-table-column prop="encaminhadorNome" label="Encaminhador" width="300" ></el-table-column>
+
+                      <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
+                      <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
+
+
+                      <el-table-column prop="pessoaId" label="Pessoa" width="100" align="right" sortable></el-table-column>
+                      <el-table-column prop="pessoaNome" label="Nome" width="300" sortable></el-table-column>
+
                       <el-table-column prop="pessoaDataNascimento" label="Data de Nascimento" width="120"></el-table-column>
                       <el-table-column prop="pessoaIdade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
-                      <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
-                      <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
-                      <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
+
                       <el-table-column prop="pessoaTelefone" label="Telefone" width="140"></el-table-column>
+
+                      <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
                       <el-table-column prop="pessoaCidadeOrigem" label="Cidade de Origem" width="200"></el-table-column>
                       <el-table-column prop="pessoaCidadeOrigemUF" label="UF Origem" width="80"></el-table-column>
 
+                      <el-table-column prop="tipoHospede" label="Tipo de Hospedagem" width="140" ></el-table-column>
 
-                      <!--<el-table-column prop="hospedagem.tipoUtilizacao" label="Utilização" width="300" sortable></el-table-column>-->
                       <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Data de Ingresso" width="90" header-align="left" sortable></el-table-column>
                       <el-table-column prop="dataSaida" :formatter="fmtDate" label="Data de Desligamento" width="90" class-name="wordwrap" sortable></el-table-column>
-
-                      <el-table-column prop="hospedagemId" label="HospedagemId" align="right" width="90" ></el-table-column>
-                      <el-table-column prop="encaminhadorId" label="EncaminhadorId" align="right" width="90" ></el-table-column>
-                      <el-table-column prop="encaminhadorNome" label="Encaminhador" width="300" ></el-table-column>
-                      <el-table-column prop="tipoUtilizacao" label="Tipo de Utilização" width="90" ></el-table-column>
-                      <el-table-column prop="tipoHospede" label="Tipo de Hóspede" width="140" ></el-table-column>
 
                       <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
                     </el-table>
@@ -268,6 +273,8 @@ export default {
     dados: [],
     pessoas:[],
     dadosPlanilhaGeral:[],
+    dadosRankingCidades:[],
+    dadosRankingEncaminhamentos:[],
 
 		qtdLeitosTotais : 0,
 		qtdLeitosOcupados : 0,
@@ -420,8 +427,11 @@ export default {
       }
       petra.axiosPost("/app/hospedagem/planilha_geral", dados)
         .then(response => {
-          this.dadosPlanilhaGeral = response.data
-          console.log(this.dadosPlanilhaGeral)
+          this.dadosPlanilhaGeral = response.data.planilhaGeral
+          this.dadosRankingCidades = response.data.rankingCidades;
+          this.dadosRankingEncaminhamentos = response.data.rankingEncaminhamentos;
+
+          //console.log(response.data)
         })
         .catch(error => {
 
@@ -429,7 +439,7 @@ export default {
     },
 
     excel() { // On Click Excel download button
-
+      /*
       var animals = [
                   {"name": "cat", "category": "animal"}
                   ,{"name": "dog", "category": "animal"}
@@ -441,25 +451,29 @@ export default {
                   ,{"name": "Arbok", "category": "pokemon"}
                   ,{"name": "Eevee", "category": "pokemon"}
                 ]
-
+      */
     
       // export json to Worksheet of Excel
       // only array possible
-      var movimentacaoWS = XLSX.utils.json_to_sheet(this.dadosPlanilhaGeral) 
-      var animalWS = XLSX.utils.json_to_sheet(animals) 
-      var pokemonWS = XLSX.utils.json_to_sheet(pokemons) 
+      var dadosPlanilhaGeralWS = XLSX.utils.json_to_sheet(this.dadosPlanilhaGeral) 
+      var dadosRankingCidadesWS = XLSX.utils.json_to_sheet(this.dadosRankingCidades) 
+      var dadosRankingEncaminhamentosWS = XLSX.utils.json_to_sheet(this.dadosRankingEncaminhamentos) 
+
+
+      //var animalWS = XLSX.utils.json_to_sheet(animals) 
+      //var pokemonWS = XLSX.utils.json_to_sheet(pokemons) 
 
       // A workbook is the name given to an Excel file
       var wb = XLSX.utils.book_new() // make Workbook of Excel
 
       // add Worksheet to Workbook
       // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, movimentacaoWS, 'Movimentacao') // sheetAName is name of Worksheet
-      XLSX.utils.book_append_sheet(wb, animalWS, 'animals') // sheetAName is name of Worksheet
-      XLSX.utils.book_append_sheet(wb, pokemonWS, 'pokemons')   
+      XLSX.utils.book_append_sheet(wb, dadosPlanilhaGeralWS, 'Movimentacao') // sheetAName is name of Worksheet
+      XLSX.utils.book_append_sheet(wb, dadosRankingCidadesWS, 'Ranking de Cidades') // sheetAName is name of Worksheet
+      XLSX.utils.book_append_sheet(wb, dadosRankingEncaminhamentosWS, 'Ranking de Encaminhadores')   
 
       // export Excel file
-      XLSX.writeFile(wb, 'book.xlsx') // name of the file is 'book.xlsx'
+      XLSX.writeFile(wb, 'atendimentosNoMes.xlsx') // name of the file is 'book.xlsx'
     },
 
     getDadosSemanaAnterior(data){

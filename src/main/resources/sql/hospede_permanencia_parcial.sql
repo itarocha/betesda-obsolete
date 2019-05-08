@@ -4,7 +4,9 @@ SELECT      new br.com.itarocha.betesda.report.HospedePermanencia( hospede.pesso
 			, hospedagem.dataEntrada
 			, COALESCE(hospedagem.dataEfetivaSaida,hospedagem.dataPrevistaSaida) AS dataSaida
 			, 'P'
-			, hospede)
+			, hospedagem
+			, hospede
+			, hospede.pessoa)
 FROM        Hospede hospede
 INNER JOIN  hospede.hospedagem hospedagem
 WHERE       (((hospedagem.dataEntrada BETWEEN :DATA_INI AND :DATA_FIM) OR (COALESCE(hospedagem.dataEfetivaSaida,hospedagem.dataPrevistaSaida) BETWEEN :DATA_INI AND :DATA_FIM))

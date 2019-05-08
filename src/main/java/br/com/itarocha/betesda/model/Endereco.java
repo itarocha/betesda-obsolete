@@ -162,14 +162,14 @@ public class Endereco  extends UserDateAudit implements Serializable{
 	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.logradouro + ", ");
-		sb.append("Nro. "+this.numero + ", ");
+		sb.append(this.numero + ", ");
 		
 		if ((this.complemento != null) &&  (!this.complemento.isEmpty()) ) {
 			sb.append(this.complemento + ", ");
 		}
 
 		if ((this.bairro != null) &&  (!this.bairro.isEmpty()) ) {
-			sb.append("Bairro: "+this.bairro + ", ");
+			sb.append("BAIRRO: "+this.bairro + ", ");
 		}
 		
 		if ((this.cep != null) &&  (!this.cep.isEmpty()) ) {
@@ -179,6 +179,26 @@ public class Endereco  extends UserDateAudit implements Serializable{
 		sb.append(this.cidade + " - ");
 		sb.append(this.uf);
 		
+		return sb.toString();
+	}
+
+	public String semCidadeToString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.logradouro + ", ");
+		sb.append(this.numero == null ? " " : this.numero + ", ");
+		
+		if ((this.complemento != null) &&  (!this.complemento.isEmpty()) ) {
+			sb.append(this.complemento + ", ");
+		}
+
+		if ((this.bairro != null) &&  (!this.bairro.isEmpty()) ) {
+			sb.append(this.bairro);
+		}
+		/*
+		if ((this.cep != null) &&  (!this.cep.isEmpty()) ) {
+			sb.append("CEP: "+this.cep + ", ");
+		}
+		*/
 		return sb.toString();
 	}
 	

@@ -22,14 +22,26 @@ public class HospedePermanencia {
 	private Hospedagem hospedagem;
 	private Hospede hospede;
 	
-	public HospedePermanencia(Long pessoaId, Long hospedagemId, Long encaminhadorId, LocalDate dataEntrada, LocalDate dataSaida, String tipoUtilizacao, Hospede hospede) {
+	public HospedePermanencia(
+			Long pessoaId, 
+			Long hospedagemId, 
+			Long encaminhadorId, 
+			LocalDate dataEntrada, 
+			LocalDate dataSaida, 
+			String tipoUtilizacao, 
+			Hospedagem hospedagem,
+			Hospede hospede,
+			Pessoa pessoa) {
+		
 		this.pessoaId = pessoaId;
 		this.hospedagemId = hospedagemId;
 		this.encaminhadorId = encaminhadorId;
 		this.dataEntrada = dataEntrada;
 		this.dataSaida = dataSaida;
 		this.tipoUtilizacao = tipoUtilizacao;
+		this.hospedagem = hospedagem;
 		this.hospede = hospede;
+		this.pessoa = pessoa;
 	}
 
 	public Long getPessoaId() {

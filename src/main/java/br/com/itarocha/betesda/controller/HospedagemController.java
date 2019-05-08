@@ -21,6 +21,7 @@ import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
 import br.com.itarocha.betesda.report.HospedePermanencia;
 import br.com.itarocha.betesda.report.PlanilhaGeral;
+import br.com.itarocha.betesda.report.RelatorioAtendimentos;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 import br.com.itarocha.betesda.util.validation.ResultError;
@@ -95,8 +96,8 @@ public class HospedagemController {
 	public ResponseEntity<?> planilhaGeral(@RequestBody PeriodoRequest model)
 	{
 		try {
-			List<PlanilhaGeral> retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
-			return new ResponseEntity<List<PlanilhaGeral>>(retorno, HttpStatus.OK);
+			RelatorioAtendimentos retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			return new ResponseEntity<RelatorioAtendimentos>(retorno, HttpStatus.OK);
 		} catch(Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
