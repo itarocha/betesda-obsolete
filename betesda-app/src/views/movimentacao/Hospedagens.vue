@@ -152,48 +152,6 @@
                 
               </el-tab-pane>
 
-              <el-tab-pane label="Planilha Geral" name="planilhaGeral">
-                <el-row type="flex" justify="center" align="middle">
-                  <el-col :sm="24" :md="24" :lg="24">
-                    <el-table :data="dadosPlanilhaGeral" 
-                       style="width: 100%" border size="small" 
-                      :height="tableHeight"
-                      :row-class-name="tableRowClassName">
-
-                      <el-table-column prop="hospedagemId" label="Atendimento" align="right" width="90" ></el-table-column>
-
-                      <el-table-column prop="tipoUtilizacao" label="Tipo de Hospedagem" width="120" ></el-table-column>
-
-                      <el-table-column prop="encaminhadorNome" label="Encaminhador" width="300" ></el-table-column>
-
-                      <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
-                      <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
-
-
-                      <el-table-column prop="pessoaId" label="Pessoa" width="100" align="right" sortable></el-table-column>
-                      <el-table-column prop="pessoaNome" label="Nome" width="300" sortable></el-table-column>
-
-                      <el-table-column prop="pessoaDataNascimento" label="Data de Nascimento" width="120"></el-table-column>
-                      <el-table-column prop="pessoaIdade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
-
-                      <el-table-column prop="pessoaTelefone" label="Telefone" width="140"></el-table-column>
-
-                      <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
-                      <el-table-column prop="pessoaCidadeOrigem" label="Cidade de Origem" width="200"></el-table-column>
-                      <el-table-column prop="pessoaCidadeOrigemUF" label="UF Origem" width="80"></el-table-column>
-
-                      <el-table-column prop="tipoHospede" label="Tipo de Hospedagem" width="140" ></el-table-column>
-
-                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Data de Ingresso" width="90" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataSaida" :formatter="fmtDate" label="Data de Desligamento" width="90" class-name="wordwrap" sortable></el-table-column>
-
-                      <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
-                    </el-table>
-                  </el-col>
-                </el-row>
-                
-              </el-tab-pane>
-
             </el-tabs>
 
           </el-col>
@@ -209,8 +167,6 @@
 <script>
   //import HospedagemInfo from "./HospedagemInfo.vue"  
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
-  import XLSX from 'xlsx'
-
 
 import {
   CalendarView,
@@ -251,6 +207,7 @@ export default {
 
 
   data: () =>({
+
     dados: [],
 
     erros: [],
@@ -414,66 +371,6 @@ export default {
 
     getDadosHoje(){
       this.dataAtual = petraDateTime.hoje()
-    },
-
-    getPlanilhaGeral(){
-      this.getDadosPlanilhaGeral("2019-04-01", "2019-04-30")
-    },
-
-    getDadosPlanilhaGeral(dataIni, dataFim) {
-      var dados = {
-        dataIni : dataIni,
-        dataFim : dataFim
-      }
-      petra.axiosPost("/app/hospedagem/planilha_geral", dados)
-        .then(response => {
-          this.dadosPlanilhaGeral = response.data.planilhaGeral
-          this.dadosRankingCidades = response.data.rankingCidades;
-          this.dadosRankingEncaminhamentos = response.data.rankingEncaminhamentos;
-
-          //console.log(response.data)
-        })
-        .catch(error => {
-
-        })
-    },
-
-    excel() { // On Click Excel download button
-      /*
-      var animals = [
-                  {"name": "cat", "category": "animal"}
-                  ,{"name": "dog", "category": "animal"}
-                  ,{"name": "pig", "category": "animal"}
-                ]
-
-      var pokemons = [
-                  {"name": "pikachu", "category": "pokemon"}
-                  ,{"name": "Arbok", "category": "pokemon"}
-                  ,{"name": "Eevee", "category": "pokemon"}
-                ]
-      */
-    
-      // export json to Worksheet of Excel
-      // only array possible
-      var dadosPlanilhaGeralWS = XLSX.utils.json_to_sheet(this.dadosPlanilhaGeral) 
-      var dadosRankingCidadesWS = XLSX.utils.json_to_sheet(this.dadosRankingCidades) 
-      var dadosRankingEncaminhamentosWS = XLSX.utils.json_to_sheet(this.dadosRankingEncaminhamentos) 
-
-
-      //var animalWS = XLSX.utils.json_to_sheet(animals) 
-      //var pokemonWS = XLSX.utils.json_to_sheet(pokemons) 
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, dadosPlanilhaGeralWS, 'Movimentacao') // sheetAName is name of Worksheet
-      XLSX.utils.book_append_sheet(wb, dadosRankingCidadesWS, 'Ranking de Cidades') // sheetAName is name of Worksheet
-      XLSX.utils.book_append_sheet(wb, dadosRankingEncaminhamentosWS, 'Ranking de Encaminhadores')   
-
-      // export Excel file
-      XLSX.writeFile(wb, 'atendimentosNoMes.xlsx') // name of the file is 'book.xlsx'
     },
 
     getDadosSemanaAnterior(data){

@@ -52,6 +52,7 @@ yarn-error.log*
 
 
 betesdabuilder/upload\.sh
+betesda-app/package-lock.json
 *.xlsm
 *.xlsx
 planilha/\.~lock\.betesda122018\.xlsm#

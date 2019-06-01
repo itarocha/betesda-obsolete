@@ -16,6 +16,7 @@ import Entidades from '@/views/cadastros/Entidades'
 import Quartos from '@/views/cadastros/Quartos'
 import Checkin from '@/views/movimentacao/Checkin'
 import Hospedagens from '@/views/movimentacao/Hospedagens'
+import PlanilhaGeral from '@/views/movimentacao/PlanilhaGeral'
 
 import TelaHospedagem from '@/views/hpd/TelaHospedagem'
 
@@ -109,6 +110,14 @@ const router = new Router({
       path: '/hospedagens',
       name: 'hospedagens',
       component: Hospedagens,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/planilha_geral',
+      name: 'planilha_geral',
+      component: PlanilhaGeral,
       meta: {
         requiresAuth: true
       }
