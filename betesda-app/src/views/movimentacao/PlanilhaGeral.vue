@@ -3,16 +3,13 @@
     <el-container v-if="state != 'browse'">
       <el-header>
         <el-row type="flex">  
-          <el-tooltip content="Gravar alterações" placement="bottom" :open-delay="toolTipDelay">
-            <div style="margin-right:10px;"><el-button type="primary" @click="getPlanilhaGeral">Buscar</el-button></div>
-          </el-tooltip>
+          <div style="margin-right:10px;"><el-button type="primary" @click="getPlanilhaGeral">Gerar Planilha</el-button></div>
         </el-row>
       </el-header>
       <el-main>
         
         <el-row class="container" type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="18">
-
               <el-form :model="form" :rules="rules" ref="form"
                 label-position="top" size="small" label-width="140px">
                 <el-form-item label="Data Inicial" prop="dataInicial" :error="getErro('dataInicial')">
@@ -21,7 +18,6 @@
                 <el-form-item label="Data Final" prop="dataFinal" :error="getErro('dataFinal')">
                   <el-date-picker v-model="form.dataFinal" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" ></el-date-picker>
                 </el-form-item>
-
               </el-form>
           </el-col>
         </el-row>
@@ -34,46 +30,78 @@
         <el-row type="flex">  
           <el-button type="primary" @click="handleSelect">Selecionar Período</el-button>
           <el-button type="primary" @click="excel">Download da Planilha</el-button>
-          <div style="margin-left:10px;">Período: {{periodoSelecionado()}}</div>
+          <div style="margin-left:10px; line-height:1em;">Período: {{periodoSelecionado()}}</div>
         </el-row>
       </el-header>
       <el-main>
         <el-row type="flex" justify="center" align="middle">
           <el-col :sm="24" :md="24" :lg="24">
 
-            <el-table :data="dadosPlanilhaGeral" 
-                style="width: 100%" border size="small" 
-              :height="tableHeight">
+            <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
 
-              <el-table-column prop="hospedagemId" label="Atendimento" align="right" width="90" ></el-table-column>
+              <el-tab-pane label="Movimentação" name="movimentacao">
+                <el-table :data="dadosPlanilhaGeral" 
+                  style="width: 100%" border size="small" 
+                  :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
+                  :height="tableHeight">
 
-              <el-table-column prop="tipoUtilizacao" label="Tipo de Hospedagem" width="120" ></el-table-column>
+                  <el-table-column prop="hospedagemId" label="Atendimento" fixed align="right" width="90" ></el-table-column>
 
-              <el-table-column prop="encaminhadorNome" label="Encaminhador" width="300" ></el-table-column>
+                  <el-table-column prop="pessoaId" label="Pessoa" fixed width="100" align="right" sortable></el-table-column>
+                  <el-table-column prop="pessoaNome" label="Nome" fixed width="300" sortable></el-table-column>
 
-              <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
-              <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
+                  <el-table-column prop="pessoaDataNascimento" :formatter="fmtDateFull" label="Nascimento" width="120"></el-table-column>
+                  <el-table-column prop="pessoaIdade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
+                  <el-table-column prop="pessoaFaixaEtaria" label="Faixa Etária" width="120"></el-table-column>
+
+                  <el-table-column prop="tipoUtilizacaoDescricao" label="Tipo" width="120" ></el-table-column>
+
+                  <el-table-column prop="encaminhadorNome" label="Encaminhador" sortable width="300" ></el-table-column>
 
 
-              <el-table-column prop="pessoaId" label="Pessoa" width="100" align="right" sortable></el-table-column>
-              <el-table-column prop="pessoaNome" label="Nome" width="300" sortable></el-table-column>
+                  <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
+                  <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
 
-              <el-table-column prop="pessoaDataNascimento" :formatter="fmtDateFull" label="Data de Nascimento" width="120"></el-table-column>
-              <el-table-column prop="pessoaIdade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
+                  <el-table-column prop="pessoaTelefone" label="Telefone" width="140"></el-table-column>
 
-              <el-table-column prop="pessoaTelefone" label="Telefone" width="140"></el-table-column>
+                  <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
+                  <el-table-column prop="pessoaCidadeOrigem" label="Cidade de Origem" width="200"></el-table-column>
+                  <el-table-column prop="pessoaCidadeOrigemUF" label="UF Origem" width="80"></el-table-column>
 
-              <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
-              <el-table-column prop="pessoaCidadeOrigem" label="Cidade de Origem" width="200"></el-table-column>
-              <el-table-column prop="pessoaCidadeOrigemUF" label="UF Origem" width="80"></el-table-column>
+                  <el-table-column prop="tipoHospede" label="Tipo de Hospedagem" width="140" ></el-table-column>
 
-              <el-table-column prop="tipoHospede" label="Tipo de Hospedagem" width="140" ></el-table-column>
+                  <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Dt. Ingresso" width="140" header-align="left" sortable></el-table-column>
+                  <el-table-column prop="dataSaida" :formatter="fmtDate" label="Dt. Desligamento" width="140" class-name="wordwrap" sortable></el-table-column>
 
-              <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Data de Ingresso" width="90" header-align="left" sortable></el-table-column>
-              <el-table-column prop="dataSaida" :formatter="fmtDate" label="Data de Desligamento" width="90" class-name="wordwrap" sortable></el-table-column>
+                  <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
+                </el-table>
+              </el-tab-pane>
 
-              <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
-            </el-table>
+              <el-tab-pane label="Ranking de Cidades" name="cidades">
+                <el-table :data="dadosRankingCidades" 
+                  style="width: 100%" border size="small" 
+                  :default-sort="{prop: 'quantidade', order: 'descending'}"
+                  :height="tableHeight">
+
+                  <el-table-column prop="cidade" label="Cidade" sortable width="300"></el-table-column>
+                  <el-table-column prop="uf" label="UF" width="80"></el-table-column>
+                  <el-table-column prop="quantidade" label="Atendimentos" align="right" sortable width="150" ></el-table-column>
+                </el-table>
+              </el-tab-pane>
+
+              <el-tab-pane label="Ranking de Encaminhadores" name="encaminhadores">
+
+                <el-table :data="dadosRankingEncaminhamentos" 
+                  style="width: 100%" border size="small" 
+                  :default-sort="{prop: 'quantidade', order: 'descending'}"
+                  :height="tableHeight">
+
+                  <el-table-column prop="nome" label="Encaminhador" sortable width="400"></el-table-column>
+                  <el-table-column prop="quantidade" label="Atendimentos" sortable align="right" width="150" ></el-table-column>
+                </el-table>
+
+              </el-tab-pane>
+            </el-tabs>
 
           </el-col>
         </el-row>
@@ -93,8 +121,8 @@ export default {
   name: 'PlanilhaGeral',
 
   created(){
-    this.form.dataInicial = petraDateTime.hoje()
-    this.form.dataFinal = this.form.dataInicial
+    this.form.dataInicial = petraDateTime.primeiroDiaMesAnterior()
+    this.form.dataFinal = petraDateTime.ultimoDiaMesAnterior()
   },
 
   mounted(){
@@ -118,10 +146,12 @@ export default {
 
     state : 'edit',
 
-    dialogExclusaoVisible : false,
+    activeTabName: 'movimentacao',
 
-    idToDelete : null,
-    textToDelete : null,
+    //dialogExclusaoVisible : false,
+
+    //idToDelete : null,
+    //textToDelete : null,
 
     form : {
       dataInicial : null,
@@ -133,7 +163,7 @@ export default {
     dadosRankingEncaminhamentos:[],
 
     windowHeight: 0,
-    tableHeight : window.innerHeight - 300,
+    tableHeight : window.innerHeight - 270,
 
     rules: {
       dataInicial: [
@@ -147,6 +177,15 @@ export default {
     toolTipDelay: 500
 
   }),
+
+  watch: {
+    windowHeight(newHeight, oldHeight) {
+      //this.txt = `mudou de ${oldHeight} para ${newHeight}`
+      //this.styleGrid = `max-height: ${newHeight - 272}px`
+      //this.styleContainerMapa = `height: ${newHeight-270}px`
+      this.tableHeight = `${newHeight-270}`
+    }    
+  },  
 
   methods: {
 
@@ -172,6 +211,9 @@ export default {
         return retorno.errorMessage
       }
       return null
+    },
+
+    handleTabClick(tab, event) {
     },
 
     handleEdit(row){
@@ -213,7 +255,7 @@ export default {
           this.dadosRankingCidades = response.data.rankingCidades;
           this.dadosRankingEncaminhamentos = response.data.rankingEncaminhamentos;
 
-          //console.log(response.data)
+          console.log(response.data)
           this.state="browse"
         })
         .catch(error => {
@@ -241,6 +283,8 @@ export default {
       var dadosPlanilhaGeralWS = XLSX.utils.json_to_sheet(this.dadosPlanilhaGeral) 
       var dadosRankingCidadesWS = XLSX.utils.json_to_sheet(this.dadosRankingCidades) 
       var dadosRankingEncaminhamentosWS = XLSX.utils.json_to_sheet(this.dadosRankingEncaminhamentos) 
+
+
 
 
       //var animalWS = XLSX.utils.json_to_sheet(animals) 

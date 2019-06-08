@@ -2,12 +2,13 @@ package br.com.itarocha.betesda.model;
 
 public enum EstadoCivil {
 
-	S("Solteiro"),
-	C("Casado"),
-	P("Separado"),
-	D("Divorciado"),
+	S("Solteiro(a)"),
+	C("Casado(a)"),
+	P("Separado(a)"),
+	A("Amasiado(a)"),
+	D("Divorciado(a)"),
 	U("União Estável"),
-	V("Viúvo");
+	V("Viúvo(a)");
 	
 	private String descricao;
 	

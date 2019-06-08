@@ -1,5 +1,6 @@
 package br.com.itarocha.betesda.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,10 +20,9 @@ import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
-import br.com.itarocha.betesda.report.HospedePermanencia;
-import br.com.itarocha.betesda.report.PlanilhaGeral;
 import br.com.itarocha.betesda.report.RelatorioAtendimentos;
 import br.com.itarocha.betesda.service.HospedagemService;
+import br.com.itarocha.betesda.service.PlanilhaGeralService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 import br.com.itarocha.betesda.util.validation.ResultError;
 
@@ -95,6 +95,29 @@ public class HospedagemController {
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> planilhaGeral(@RequestBody PeriodoRequest model)
 	{
+		/*
+		try {
+			PlanilhaGeralService.toExcel();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		*/
+		
+		ItaValidator<PeriodoRequest> v = new ItaValidator<PeriodoRequest>(model);
+		v.validate();
+		
+		if (model.dataIni == null) {
+			v.addError("dataIni", "Data Inicial deve ser preenchida");
+		}
+		if (model.dataIni == null) {
+			v.addError("dataFim", "Data Final deve ser preenchida");
+		}
+		
+		if (!v.hasErrors() ) {
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
+		}
+
 		try {
 			RelatorioAtendimentos retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
 			return new ResponseEntity<RelatorioAtendimentos>(retorno, HttpStatus.OK);

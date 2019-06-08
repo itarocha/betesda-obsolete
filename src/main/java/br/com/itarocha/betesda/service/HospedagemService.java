@@ -516,7 +516,6 @@ public class HospedagemService {
 					}
 					map.put(key, hp);
 				}
-				//System.out.println("-------------------------------------------");
 			}
 			
 		}
@@ -534,7 +533,6 @@ public class HospedagemService {
 			}
 			return a.getPessoaId().compareTo(b.getPessoaId());
 		});
-		//long total = 0;
 		
 		for(HospedePermanencia o : lstHospedePerm) {
 			if (o.getDataEntrada().isBefore(dataIni)) {
@@ -610,7 +608,7 @@ public class HospedagemService {
 		}).collect(Collectors.toList());
 		
 		rankingCidades.sort((a, b) -> b.getQuantidade().compareTo(a.getQuantidade()));
-		rankingCidades.stream().forEach(x -> System.out.println(String.format("%03d %s %s", x.getQuantidade(),  x.getCidade(), x.getUf())));
+		/////////////rankingCidades.stream().forEach(x -> System.out.println(String.format("%03d %s %s", x.getQuantidade(),  x.getCidade(), x.getUf())));
 		
 		
 		// Ranking de Encaminhadores
@@ -625,14 +623,14 @@ public class HospedagemService {
 			}
 		}
 		
-		System.out.println("--------------------------------------");
+		//System.out.println("--------------------------------------");
 		
 		List<ChaveValor> rankingEncaminhamentos = mapaEncaminhadores.entrySet().stream().map(temp -> {
 			return new ChaveValor(temp.getKey(), temp.getValue());
 		}).collect(Collectors.toList());
 		
 		rankingEncaminhamentos.sort((a, b) -> b.getQuantidade().compareTo(a.getQuantidade()));
-		rankingEncaminhamentos.stream().forEach(x -> System.out.println(String.format("%03d %s", x.getQuantidade(), x.getNome() )));
+		//rankingEncaminhamentos.stream().forEach(x -> System.out.println(String.format("%03d %s", x.getQuantidade(), x.getNome() )));
 		
 		/*
 		Map<CidadeUF, Long> mapa = planilha.stream()

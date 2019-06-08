@@ -23,13 +23,15 @@ echo "Arquivo  /home/itamar/betesda/bts.tar.gz criado com sucesso"
 
 echo "Gerando betesda.war"
 
+
+
 echo "Os comandos abaixo foram executados no spring sts"
 
-echo "cd /home/itamar/projetos_spring/betesda"
+cd /home/itamar/projetos_spring/betesda
 
 echo "mvn dependency:tree"
 
-echo "mvn clean package"
+mvn clean package
 
 echo "Copiando betesda.war"
 

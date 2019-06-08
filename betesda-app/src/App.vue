@@ -56,11 +56,11 @@
                 <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
             </el-menu-item>
 
-            <el-menu-item index="2-4" v-if="isRoot || isAdmin || isUser">
+            <el-menu-item index="2-5" v-if="isRoot || isAdmin || isUser">
                 <router-link to="/planilha_geral" tag="div"><i class="fas fa-file-excel pr"></i>Planilha Geral</router-link>
             </el-menu-item>
 
-            <el-menu-item index="2-5" v-if="isRoot">
+            <el-menu-item index="2-6" v-if="isRoot">
                 <router-link to="/create_new_user" tag="div"><i class="fas fa-eye pr"></i>Administrador</router-link>
             </el-menu-item>
 

@@ -49,6 +49,26 @@ export default {
       return moment(data).add(1, "days").format("YYYY-MM-DD")
     },
   
+    primeiroDiaMesAtual(){
+      return moment().startOf('month').format("YYYY-MM-DD")
+    },
+
+    ultimoDiaMesAtual(){
+      return moment().endOf('month').format("YYYY-MM-DD")
+    },
+
+    primeiroDiaMesAnterior(){
+      const dataMesPassado =  moment().startOf('month').add(-1,"days")
+      return moment(dataMesPassado).startOf('month').format("YYYY-MM-DD")
+    },
+
+    ultimoDiaMesAnterior(){
+      const dataMesPassado =  moment().startOf('month').add(-1,"days")
+      return moment(dataMesPassado).endOf('month').format("YYYY-MM-DD")
+    },
+
+
+
 }
 
 /* 

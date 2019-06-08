@@ -13,6 +13,7 @@ public class PlanilhaGeral {
 	private String pessoaRG;
 	private LocalDate pessoaDataNascimento;
 	private int pessoaIdade;
+	private String pessoaFaixaEtaria;
 	private String pessoaTelefone;
 	private String pessoaEndereco;
 	private String pessoaCidadeOrigem;
@@ -27,6 +28,7 @@ public class PlanilhaGeral {
 	private LocalDate dataEntrada;
 	private LocalDate dataSaida;
 	private String tipoUtilizacao;
+	private String tipoUtilizacaoDescricao;
 	private String tipoHospede;
 	private Long diasPermanencia;
 
@@ -65,6 +67,22 @@ public class PlanilhaGeral {
 	}
 	public void setPessoaIdade(int pessoaIdade) {
 		this.pessoaIdade = pessoaIdade;
+		
+		if (this.pessoaIdade < 13) {
+			this.pessoaFaixaEtaria = "Criança";
+		} else if (this.pessoaIdade >= 13 && this.pessoaIdade < 19) {
+			this.pessoaFaixaEtaria = "Adolescente";
+		} else if (this.pessoaIdade >= 19 && this.pessoaIdade < 60) {
+			this.pessoaFaixaEtaria = "Adulto";
+		} else {
+			this.pessoaFaixaEtaria = "Idoso";
+		}
+	}
+	public String getPessoaFaixaEtaria() {
+		return pessoaFaixaEtaria;
+	}
+	public void setPessoaFaixaEtaria(String pessoaFaixaEtaria) {
+		this.pessoaFaixaEtaria = pessoaFaixaEtaria;
 	}
 	public String getPessoaTelefone() {
 		return pessoaTelefone;
@@ -113,6 +131,12 @@ public class PlanilhaGeral {
 	}
 	public void setTipoUtilizacao(String tipoUtilizacao) {
 		this.tipoUtilizacao = tipoUtilizacao;
+	}
+	public String getTipoUtilizacaoDescricao() {
+		return "T".equals(this.getTipoUtilizacao()) ? "Total" : "Parcial";
+	}
+	public void setTipoUtilizacaoDescricao(String tipoUtilizacaoDescricao) {
+		this.tipoUtilizacaoDescricao = tipoUtilizacaoDescricao;
 	}
 	public String getTipoHospede() {
 		return tipoHospede;

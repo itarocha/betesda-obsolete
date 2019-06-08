@@ -2,14 +2,29 @@
   <div>
     <el-container v-if="state == 'browse'">
       <el-header>
-        <el-button type="primary" @click="getDadosSemanaAnterior(dados.dataIni)">Semana Anterior</el-button>
-        <el-button type="primary" @click="getDadosHoje()">Hoje</el-button>
-        <el-button type="primary" @click="getDadosProximaSemana(dados.dataFim)">Semana Seguinte</el-button>
-        <el-button type="danger" @click="getPlanilhaGeral()">Teste</el-button>
-        <el-button type="danger" @click="excel">Excel Download</el-button>
+        <el-row type="flex" style="line-height:1em;">
+          <el-button type="primary" @click="getDadosSemanaAnterior(dados.dataIni)">Semana Anterior</el-button>
+          <el-button type="primary" @click="getDadosHoje()">Hoje</el-button>
+          <el-button type="primary" @click="getDadosProximaSemana(dados.dataFim)">Semana Seguinte</el-button>
+
+          <div class="block-date">
+            <span style="width:200px; text-align:right; margin-right: 10px; padding-top:10px;">Data Selecionada:</span>
+            <el-date-picker v-model="dataAtual" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" ></el-date-picker>
+          </div>
+          <!--
+          <el-form :model="form" :rules="rules" ref="form" label-position="left" size="small" label-width="100px">
+            <el-form-item label="Data" prop="dataBase" >
+              <el-date-picker v-model="dataAtual" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" ></el-date-picker>
+            </el-form-item>
+          </el-form>
+          -->
+        </el-row>
+
       </el-header>
       <el-main>
         <el-row type="flex" :gutter="10">
+
+          <!--
           <el-col :sm="8" :md="8" :lg="8" style="height:400px;">
             <calendar-view
               :show-date="showDate"
@@ -37,14 +52,15 @@
             </calendar-view>
 
           </el-col>
-
-          <el-col :sm="16" :md="16" :lg="16">
+          -->
+          <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
               <el-tab-pane label="Mapa de Hospedagem" name="mapa">
 
                 <el-container style="margin:2px;">
                   <el-container :style="styleContainerMapa">
+
                     <el-header style="line-height:20px; height:54px;">
                       <el-row type="flex">
                         <el-col>
@@ -80,7 +96,6 @@
                             <div class="thebox hleito" v-if="celula.hospedagens.length == 0"></div>
                             <div class="thebox hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
 
-
                             <el-popover
                                 placement="top-start"
                                 width="300"
@@ -89,15 +104,12 @@
                                 :open-delay="1000"
                                 :content="getNome(hospedagem.dias[indice].identificador, true)">
 
-
                                 <div slot="reference" :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe, hospedagem.dias[indice])" 
                                       v-if="hospedagem.dias[indice].identificador != '0'"
                                       :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
                                       @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
                                   <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
                                 </div>
-
-
                             </el-popover>                                
 
                             </div>
@@ -168,6 +180,7 @@
   //import HospedagemInfo from "./HospedagemInfo.vue"  
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
 
+/*
 import {
   CalendarView,
 	CalendarViewHeader,
@@ -176,17 +189,17 @@ import {
 
 
 require("vue-simple-calendar/static/css/default.css")
+*/
 
 export default {
   name: 'Hospedagens',
 
   components: {
-		CalendarView,
-    CalendarViewHeader,
-    //HospedagemInfo,
+		//CalendarView,
+    //CalendarViewHeader,
     TelaHospedagem
 	},
-	mixins: [CalendarMathMixin],  
+	//mixins: [CalendarMathMixin],  
 
   created(){
   },
@@ -227,6 +240,9 @@ export default {
 
     txt : '???',
     dataAtual: null,
+    form: {
+      dataBase: null
+    },
     dados: [],
     pessoas:[],
     dadosPlanilhaGeral:[],
@@ -251,7 +267,7 @@ export default {
 
     toolTipDelay: 500,
 
-			showDate: null, /*this.thisMonth(1),*/
+			showDate: null, 
 			message: "",
 			startingDayOfWeek: 0,
 			disablePast: false,
@@ -390,13 +406,14 @@ export default {
     },
 
     getData(data) {
+      console.log("oua")
       var dados = {
         data : data
       }
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
-            
+            console.log(this.dados)
             this.pessoas = response.data.hospedagens
             this.showEstatisticas()
         })
@@ -557,10 +574,11 @@ export default {
         if (completo)  {
           return hospedagem.pessoaNome
         } else {
-          var nome = hospedagem.pessoaNome.split(" ")[0];
+          //var nome = hospedagem.pessoaNome.split(" ")[0]
+          var nome = hospedagem.pessoaNome
   
-          if (nome.length > 4){
-            nome = nome.substr(0,4) + "..."
+          if (nome.length > 10){
+            nome = nome.substr(0,10) + "..."
           }
           return nome;
         }
@@ -590,6 +608,7 @@ export default {
       this.refreshMapa()
     },
 
+    /*
 		periodChanged(range, eventSource) {
 			// Demo does nothing with this information, just including the method to demonstrate how
 			// you can listen for changes to the displayed range and react to them (by loading events, etc.)
@@ -600,10 +619,6 @@ export default {
 			//console.log(range.periodStart)
     },
     
-		thisMonth(d, h, m) {
-			const t = new Date()
-			return new Date(t.getFullYear(), t.getMonth(), d, h || 0, m || 0)
-    },
     
 		onClickDay(d) {
 
@@ -614,6 +629,7 @@ export default {
 		onClickEvent(e) {
 			this.message = `You clicked: ${e.title}`
     },
+    */
     
 		setShowDate(d) {
 			this.message = `Changing calendar view to ${d.toLocaleDateString()}`
@@ -656,6 +672,13 @@ export default {
 </script>
 
 <style scoped>
+
+  .block-date {
+    display:flex;
+    margin-left:10px;
+    padding-left:4px;
+  }
+
   .el-header {
     line-height: 60px;
   }
@@ -801,7 +824,7 @@ export default {
   font-size:8pt;
   margin-left:4px;
   background-color:white;
-  width:48px;
+  width:88px;
   text-align:center;
   text-transform:uppercase;
   line-height:1em;

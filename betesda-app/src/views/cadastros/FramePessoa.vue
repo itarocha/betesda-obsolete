@@ -215,6 +215,7 @@ export default {
       { text: "CASADO(A)", value:"C"},
       { text: "SEPARADO(A)", value:"P"},
       { text: "DIVORCIADO(A)", value:"D"},
+      { text: "AMASIADO(A)", value:"A"},
       { text: "UNIÃO ESTÁVEL", value:"U"},
       { text: "VIÚVO(A)", value:"V"}],
     itensUF : [
