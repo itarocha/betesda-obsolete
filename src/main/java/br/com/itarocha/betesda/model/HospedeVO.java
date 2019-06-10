@@ -7,17 +7,11 @@ import br.com.itarocha.betesda.model.AcomodacaoVO;
 public class HospedeVO {
 
 	private Long id;
-	
 	private Long pessoaId;
-	
 	private String pessoaNome;
-	
 	private LocalDate pessoaDataNascimento;
-	
 	private Long tipoHospedeId;
-	
 	private String tipoHospedeDescricao;
-	
 	private AcomodacaoVO acomodacao;
 
 	public Long getId() {
@@ -51,7 +45,7 @@ public class HospedeVO {
 	public void setPessoaDataNascimento(LocalDate pessoaDataNascimento) {
 		this.pessoaDataNascimento = pessoaDataNascimento;
 	}
-
+	
 	public Long getTipoHospedeId() {
 		return tipoHospedeId;
 	}

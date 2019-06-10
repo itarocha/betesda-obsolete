@@ -11,48 +11,11 @@
             <span style="width:200px; text-align:right; margin-right: 10px; padding-top:10px;">Data Selecionada:</span>
             <el-date-picker v-model="dataAtual" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" ></el-date-picker>
           </div>
-          <!--
-          <el-form :model="form" :rules="rules" ref="form" label-position="left" size="small" label-width="100px">
-            <el-form-item label="Data" prop="dataBase" >
-              <el-date-picker v-model="dataAtual" type="date" format="dd/MM/yyyy" value-format="yyyy-MM-dd" style="width: 100%;" ></el-date-picker>
-            </el-form-item>
-          </el-form>
-          -->
         </el-row>
 
       </el-header>
       <el-main>
         <el-row type="flex" :gutter="10">
-
-          <!--
-          <el-col :sm="8" :md="8" :lg="8" style="height:400px;">
-            <calendar-view
-              :show-date="showDate"
-              :time-format-options="{hour: 'numeric', minute:'2-digit'}"
-              :enable-drag-drop="true"
-              :disable-past="disablePast"
-              :disable-future="disableFuture"
-              :show-event-times="showEventTimes"
-              :display-period-uom="displayPeriodUom"
-              :display-period-count="displayPeriodCount"
-              :starting-day-of-week="startingDayOfWeek"
-              :class="themeClasses"
-              :period-changed-callback="periodChanged"
-              :current-period-label="useTodayIcons ? 'icons' : ''"
-              @drop-on-date="onDrop"
-              @click-date="onClickDay"
-              @click-event="onClickEvent"
-            >
-              <calendar-view-header
-                slot="header"
-                slot-scope="{ headerProps }"
-                :header-props="headerProps"
-                @input="setShowDate"
-              />
-            </calendar-view>
-
-          </el-col>
-          -->
           <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
@@ -132,18 +95,20 @@
 
                       <el-table-column fixed prop="pessoaNome" label="Nome" width="250" sortable></el-table-column>
 
-                      <el-table-column prop="leitoDataEntrada" :formatter="fmtDate" label="Entrada" width="90" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="90" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column prop="pessoaCidadeUfOrigem" label="Cidade Origem" width="200" sortable></el-table-column>
 
-                      <el-table-column prop="utilizacao" width="100" label="Utilização" sortable></el-table-column>
-                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="120" label="Quarto-Leito" sortable></el-table-column>
+                      <el-table-column prop="leitoDataEntrada" :formatter="fmtDate" label="Entrada" width="120" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="120" class-name="wordwrap" sortable></el-table-column>
+
+                      <el-table-column prop="utilizacao" label="Utilização" width="120" sortable></el-table-column>
+                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="140" label="Quarto-Leito" sortable></el-table-column>
                       <el-table-column prop="destinacaoHospedagemDescricao" width="120" label="Destinação" sortable></el-table-column>
 
-                      <el-table-column prop="statusHospedagem" width="120" label="Situação" sortable></el-table-column>
+                      <el-table-column prop="statusHospedagem" label="Situação" width="120" sortable></el-table-column>
 
                       <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="90" class-name="wordwrap" sortable></el-table-column>
-                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="110" sortable></el-table-column>
+                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="120" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="120" sortable></el-table-column>
 
                       <el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>
                       <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
@@ -164,6 +129,39 @@
                 
               </el-tab-pane>
 
+              <el-tab-pane label="Hóspedes por Cidade de Origem" name="cidades">
+                  <el-container :style="styleContainerMapa">
+                    <el-main style="padding-top:0px;">          
+                        <el-collapse accordion>
+                          <el-collapse-item :title="cidade.nome" v-for="(cidade, index) in cidades" :key="index">
+
+                            <div class="flex-container wrap">
+                              <el-card class="flex-item" v-for="(hospedagem, idx) in cidade.hospedagens" :key="idx" shadow="never" style="padding:5px; width:250px; line-height:1.5em;" 
+                              :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
+                              >
+                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}</div>
+                                <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
+                                  <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
+                                </div>                      
+                                <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
+                                
+                                  <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                                    <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
+                                      <i class="fas fa-info"></i>
+                                    </el-button>
+                                  </el-tooltip>
+                          
+                                </div>                      
+                              </el-card>
+                            </div>
+                            
+                          </el-collapse-item>
+                        </el-collapse>  
+                    </el-main>  
+                </el-container>  
+                
+              </el-tab-pane>
+
             </el-tabs>
 
           </el-col>
@@ -177,29 +175,14 @@
 </template>
 
 <script>
-  //import HospedagemInfo from "./HospedagemInfo.vue"  
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
-
-/*
-import {
-  CalendarView,
-	CalendarViewHeader,
-  CalendarMathMixin,
-} from "vue-simple-calendar"
-
-
-require("vue-simple-calendar/static/css/default.css")
-*/
 
 export default {
   name: 'Hospedagens',
 
   components: {
-		//CalendarView,
-    //CalendarViewHeader,
     TelaHospedagem
 	},
-	//mixins: [CalendarMathMixin],  
 
   created(){
   },
@@ -245,6 +228,8 @@ export default {
     },
     dados: [],
     pessoas:[],
+    cidades:[],
+
     dadosPlanilhaGeral:[],
     dadosRankingCidades:[],
     dadosRankingEncaminhamentos:[],
@@ -406,16 +391,29 @@ export default {
     },
 
     getData(data) {
-      console.log("oua")
       var dados = {
         data : data
       }
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
-            console.log(this.dados)
             this.pessoas = response.data.hospedagens
-            this.showEstatisticas()
+
+            var cidades = []
+            for (var c in this.dados.porCidade){
+              var cidade = {
+                nome : c, 
+                hospedagens : []
+              }
+              for (var id in this.dados.porCidade[c]){
+                const identificador = this.dados.porCidade[c][id]
+                var hospedagem = this.getHospedagemById(identificador)
+                cidade.hospedagens.push(hospedagem)
+               }
+              cidades.push(cidade)
+            }
+            this.cidades = cidades
+            //////////////this.showEstatisticas()
         })
         .catch(error => {
 
@@ -550,6 +548,17 @@ export default {
       return 'blue'
     },
 
+    colorStatusItem(status){
+      if (status == 'ABERTA'){
+        return '#FFF9C4' // teal darken-2
+      } else if (status == 'ENCERRADA'){
+        return '#E0E0E0' // blue-grey lighten-1
+      } else if (status == 'VENCIDA'){
+        return '#FFCCBC' // red accent-4
+      }
+      return 'blue'
+    },
+
     calcularAlturaLeito(index){
       var qtd = 0
 
@@ -608,29 +617,6 @@ export default {
       this.refreshMapa()
     },
 
-    /*
-		periodChanged(range, eventSource) {
-			// Demo does nothing with this information, just including the method to demonstrate how
-			// you can listen for changes to the displayed range and react to them (by loading events, etc.)
-      //console.log(eventSource) //watch
-      
-      //var d = range.periodStart
-      //this.dataAtual = moment(d).format("YYYY-MM-DD")
-			//console.log(range.periodStart)
-    },
-    
-    
-		onClickDay(d) {
-
-      this.dataAtual = moment(d).format("YYYY-MM-DD")
-
-    },
-    
-		onClickEvent(e) {
-			this.message = `You clicked: ${e.title}`
-    },
-    */
-    
 		setShowDate(d) {
 			this.message = `Changing calendar view to ${d.toLocaleDateString()}`
       this.showDate = d
@@ -677,6 +663,10 @@ export default {
     display:flex;
     margin-left:10px;
     padding-left:4px;
+  }
+
+  .el-card__header {
+    padding: 5px;
   }
 
   .el-header {
@@ -836,5 +826,29 @@ export default {
   border-radius: 16px;
 }
 
+.flex-container {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  box-orient: horizontal;
+  display: flex;
+  justify-content: start; /*center*/
+}
+
+.wrap    { 
+  flex-wrap: wrap;
+}  
+
+.wrap li {
+  background: gold;
+}
+
+.flex-item {
+  background: #FFF9C4;
+  color: #455A64;
+  padding: 2px;
+  width: 300px;
+  margin: 10px;
+}
 
 </style>

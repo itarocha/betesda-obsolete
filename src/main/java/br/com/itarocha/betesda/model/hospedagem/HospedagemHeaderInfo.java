@@ -13,10 +13,12 @@ public class HospedagemHeaderInfo {
 	private Long destinacaoHospedagemId;
 	private String destinacaoHospedagemDescricao;
 	
-	
 	private Long pessoaId;
 	private String pessoaNome;
-	
+	private String pessoaCidadeOrigem;
+	private String pessoaUfOrigem;
+	private String pessoaCidadeUfOrigem;
+
 	private LocalDate dataEntrada;
 	private LocalDate dataPrevistaSaida;
 	private LocalDate dataEfetivaSaida;
@@ -96,6 +98,30 @@ public class HospedagemHeaderInfo {
 
 	public void setPessoaNome(String pessoaNome) {
 		this.pessoaNome = pessoaNome;
+	}
+
+	public String getPessoaCidadeOrigem() {
+		return pessoaCidadeOrigem;
+	}
+
+	public void setPessoaCidadeOrigem(String pessoaCidadeOrigem) {
+		this.pessoaCidadeOrigem = pessoaCidadeOrigem;
+	}
+
+	public String getPessoaUfOrigem() {
+		return pessoaUfOrigem;
+	}
+
+	public void setPessoaUfOrigem(String pessoaUfOrigem) {
+		this.pessoaUfOrigem = pessoaUfOrigem;
+	}
+	
+	public String getPessoaCidadeUfOrigem() {
+		return pessoaCidadeUfOrigem;
+	}
+
+	public void setPessoaCidadeUfOrigem(String pessoaCidadeUfOrigem) {
+		this.pessoaCidadeUfOrigem = pessoaCidadeUfOrigem;
 	}
 
 	public LocalDate getDataEntrada() {

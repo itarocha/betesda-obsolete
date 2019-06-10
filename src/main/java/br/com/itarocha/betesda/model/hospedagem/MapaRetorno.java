@@ -3,6 +3,8 @@ package br.com.itarocha.betesda.model.hospedagem;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MapaRetorno {
 	
@@ -16,6 +18,9 @@ public class MapaRetorno {
 	
 	private List<HospedagemHeaderInfo> hospedagens = new ArrayList<HospedagemHeaderInfo>();
 	
+	private Map<String, List<String>> porCidade = new TreeMap<>();
+	
+	/*
 	private Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
 	private Integer[] qtdVencidos 			= {0,0,0,0,0,0,0};
 	private Integer[] qtdPendentes 			= {0,0,0,0,0,0,0};
@@ -29,7 +34,7 @@ public class MapaRetorno {
 	private Integer[] qtdLeitosTotais		= {0,0,0,0,0,0,0};
 	private Integer[] qtdLeitosOcupados 	= {0,0,0,0,0,0,0};
 	private Integer[] qtdLeitosLivres 		= {0,0,0,0,0,0,0};
-
+	*/
 	public LocalDate getDataIni() {
 		return dataIni;
 	}
@@ -70,6 +75,15 @@ public class MapaRetorno {
 		this.dias = dias;
 	}
 
+	public Map<String, List<String>> getPorCidade() {
+		return porCidade;
+	}
+
+	public void setPorCidade(Map<String, List<String>> porCidade) {
+		this.porCidade = porCidade;
+	}
+
+	/*
 	public Integer[] getQtdTotais() {
 		return qtdTotais;
 	}
@@ -157,5 +171,5 @@ public class MapaRetorno {
 	public void setQtdLeitosLivres(Integer[] qtdLeitosLivres) {
 		this.qtdLeitosLivres = qtdLeitosLivres;
 	}
-	
+	*/
 }

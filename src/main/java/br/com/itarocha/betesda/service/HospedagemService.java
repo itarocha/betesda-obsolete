@@ -356,6 +356,13 @@ public class HospedagemService {
 				
 				hhi.setPessoaId(p.getId());
 				hhi.setPessoaNome(p.getNome());
+				
+				if (p.getEndereco() != null) {
+					hhi.setPessoaCidadeOrigem(p.getEndereco().getCidade());
+					hhi.setPessoaUfOrigem(p.getEndereco().getUf().toString());
+					hhi.setPessoaCidadeUfOrigem(String.format("%s - %s", hhi.getPessoaCidadeOrigem(), hhi.getPessoaUfOrigem()));
+				}
+				
 				hhi.setStatusHospedagem(statusHospedagem);
 				hhi.setUtilizacao(utilizacao);
 
@@ -449,6 +456,28 @@ public class HospedagemService {
 		// TODO: Criar campo calculado em hospedagens com NOME + ID + TIPO + IDENTIFICADOR ou NOME + ID + DATAENTRADA
 		retorno.getHospedagens().sort((a, b) -> a.getPessoaNome().compareTo(b.getPessoaNome()) );
 		
+		
+		Map<String, List<String>> porCidade = new TreeMap<>();
+		retorno.getHospedagens().forEach(h -> {
+			if (porCidade.get(h.getPessoaCidadeUfOrigem()) == null ) {
+				List<String> lst = new ArrayList<>();
+				lst.add(h.getIdentificador());
+				porCidade.put(h.getPessoaCidadeUfOrigem(), lst);
+			} else {
+				List<String> lst = porCidade.get(h.getPessoaCidadeUfOrigem());
+				lst.add(h.getIdentificador());
+			}
+		});
+		retorno.setPorCidade(porCidade);
+		/*
+		porCidade.keySet().forEach(mapa -> {
+			System.out.println(mapa);
+			porCidade.get(mapa).forEach(id -> {
+				System.out.println("\t"+id);
+			});
+		});
+		*/
+		
 		// Dias
 		LocalDate dtmp = dIni;
 		while (dtmp.compareTo(dFim) != 1) {
@@ -456,8 +485,8 @@ public class HospedagemService {
 			dtmp = dtmp.plusDays(1);
 		}
 		
-		// Dashboard
-		atualizarDashBoard(retorno, leitos.size());
+		//FIXME Dashboard REMOVIDO TEMPORÁRIAMENTE
+		//atualizarDashBoard(retorno, leitos.size());
 		
 		return retorno;
 	}
@@ -730,6 +759,7 @@ public class HospedagemService {
 		return lista;
 	}
 	
+	/*
 	private void atualizarDashBoard(MapaRetorno mapaRetorno, Integer qtdLeitos) {
 		Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
 		Integer[] qtdVencidos 			= {0,0,0,0,0,0,0};
@@ -806,6 +836,7 @@ public class HospedagemService {
 		}
 		mapaRetorno.setQtdLeitosLivres(qtdLeitosLivres);
 	}
+	*/
 	
 	private CellStatusHospedagem resolveStatusHospedagemNew(LocalDate hoje, LocalDate dataPrevistaSaida, LocalDate dataEfetivaSaida) {
 		CellStatusHospedagem status = CellStatusHospedagem.ABERTA;
@@ -1273,12 +1304,6 @@ public class HospedagemService {
 			leito.setKey(makeLeitoKey(hospede.getHospede().getId(), 9999, 9999)); 
 			retorno.add(leito);
 		}
-		/*
-		Map<String, Cell[]> retorno = mapa.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (oldValue, newValue) -> oldValue, LinkedHashMap::new));
-        */                
 		return retorno;
 	}
 	

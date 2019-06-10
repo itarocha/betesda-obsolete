@@ -1,13 +1,17 @@
 package br.com.itarocha.betesda.controller;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -125,6 +129,23 @@ public class HospedagemController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
+	}
+	
+	//https://grokonez.com/spring-framework/spring-boot/excel-file-download-from-springboot-restapi-apache-poi-mysql
+	@GetMapping(value = "/planilha_geral.xlsx")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public ResponseEntity<InputStreamResource> excelCustomersReport() throws IOException {
+		
+		ByteArrayInputStream in = PlanilhaGeralService.toExcel();
+		// return IOUtils.toByteArray(in);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition", "attachment; filename=planilha_geral.xlsx");
+		
+		return ResponseEntity
+				.ok()
+				.headers(headers)
+				.body(new InputStreamResource(in));
 	}
 	
 	@RequestMapping(value="/leitos_ocupados", method = RequestMethod.POST)
