@@ -54,6 +54,9 @@ import br.com.itarocha.betesda.model.hospedagem.HospedagemMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
+import br.com.itarocha.betesda.model.hospedagem.Quadro;
+import br.com.itarocha.betesda.model.hospedagem.QuadroLeito;
+import br.com.itarocha.betesda.model.hospedagem.QuadroQuarto;
 import br.com.itarocha.betesda.report.ChaveValor;
 import br.com.itarocha.betesda.report.CidadeQuantidade;
 import br.com.itarocha.betesda.report.CidadeUF;
@@ -121,6 +124,9 @@ public class HospedagemService {
 	
 	@Autowired
 	private HospedagemTipoServicoRepository hospedagemTipoServicoRepo;
+	
+	@Autowired
+	private QuartoService quartoService;
 
 	DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
@@ -477,6 +483,63 @@ public class HospedagemService {
 			});
 		});
 		*/
+		
+		
+		//TRATATIVA DO QUADRO
+		//System.out.println("QUARTOS");
+		Integer[] minLeito = {Integer.MAX_VALUE};
+		Integer[] maxLeito = {Integer.MIN_VALUE};
+
+		Quadro quadro = new Quadro(); 
+
+		// Busca quartos e leitos do banco
+		List<Quarto> lista = quartoService.findAll();
+		// Cria os quartos e verifica minimo e maximo dos leitos
+		lista.forEach(q -> {
+			quadro.quartos.add(new QuadroQuarto( q.getId(), q.getNumero()));
+			
+			q.getLeitos().forEach(l -> {
+				if (l.getNumero() < minLeito[0]) {
+					minLeito[0] = l.getNumero();
+				} else if (l.getNumero() > maxLeito[0]) {
+					maxLeito[0] = l.getNumero();
+				}
+			});
+		});
+
+		// Adiciona todos os leitos em todos os quartos. Todos os leitos estão com id zerado
+		quadro.quartos.forEach(q -> {
+			for (Integer n = minLeito[0]; n <= maxLeito[0]; n++) {
+				q.leitos.add(new QuadroLeito(0L, n));
+			}
+		});
+		
+		// Varre mais uma vez os quartos do banco e seta os ids correspondentes. Os ids zerados significa que não existem no banco
+		lista.forEach(q -> {
+			q.getLeitos().forEach(leito -> {
+				quadro.setLeitoIdPorNumero(q.getId(), leito.getNumero(), leito.getId());
+			});
+			//System.out.println("");
+		});
+		
+		//System.out.println(String.format("Menor: %d Maior: %d", minLeito[0], maxLeito[0]));
+		
+		quadro.quartos.forEach(q -> {
+			System.out.print(String.format("[%02d] - ", q.numero) );
+			q.leitos.forEach(leito -> {
+				if (leito.id == 0) {
+					//System.out.print("[  ] ");
+				} else {
+					//System.out.print(String.format("[%02d] ", leito.numero) );
+				}
+				
+			});
+			//System.out.println();
+		});
+		
+		
+		
+		
 		
 		// Dias
 		LocalDate dtmp = dIni;
