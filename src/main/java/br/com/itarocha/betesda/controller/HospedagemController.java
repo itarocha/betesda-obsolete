@@ -1,18 +1,31 @@
 package br.com.itarocha.betesda.controller;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -132,18 +145,44 @@ public class HospedagemController {
 	}
 	
 	//https://grokonez.com/spring-framework/spring-boot/excel-file-download-from-springboot-restapi-apache-poi-mysql
-	@GetMapping(value = "/planilha_geral.xlsx")
+	//@GetMapping(value = "/planilha_geral_arquivo")
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
-	public ResponseEntity<InputStreamResource> excelCustomersReport() throws IOException {
+	@RequestMapping(path = "/planilha_geral_arquivo", method = RequestMethod.POST)
+	public ResponseEntity<?>planilhaGeralExcel(@RequestBody PeriodoRequest model) throws IOException {
+		ItaValidator<PeriodoRequest> v = new ItaValidator<PeriodoRequest>(model);
+		v.validate();
 		
-		ByteArrayInputStream in = PlanilhaGeralService.toExcel();
-		// return IOUtils.toByteArray(in);
+		if (model.dataIni == null) {
+			v.addError("dataIni", "Data Inicial deve ser preenchida");
+		}
+		if (model.dataIni == null) {
+			v.addError("dataFim", "Data Final deve ser preenchida");
+		}
+		
+		if (!v.hasErrors() ) {
+			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
+		}
+		
+		RelatorioAtendimentos retorno = null;
+		try {
+			retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			// Gerar planilha
+		} catch(Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		ByteArrayInputStream in = PlanilhaGeralService.toExcel(retorno);
 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Disposition", "attachment; filename=planilha_geral.xlsx");
+		headers.add("Content-Disposition", "attachment; filename=planilha.xlsx");
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+	    headers.add("Pragma", "no-cache");
+	    headers.add("Expires", "0");
 		
 		return ResponseEntity
 				.ok()
+				.contentType(MediaType.APPLICATION_OCTET_STREAM)
+				//.contentLength(file.length())
 				.headers(headers)
 				.body(new InputStreamResource(in));
 	}
@@ -173,7 +212,6 @@ public class HospedagemController {
 			return new ResponseEntity<ResultError>(e.getRe(), HttpStatus.BAD_REQUEST);
 		}
 	}
-	
 	
 	@RequestMapping(value="/mapa/encerramento", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")

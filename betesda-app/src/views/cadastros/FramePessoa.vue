@@ -197,6 +197,9 @@ export default {
   },
   
   watch: {
+    id() {
+      this.load()
+    }
   },
   
   created() {
@@ -265,22 +268,27 @@ export default {
   }),
 
   mounted() {
-    this.resetData();
-
-    if (this.id){
-        this.doGetById(this.id)
-    } else {
-        this.setDefaultData()
-    }
-
-    this.$nextTick(() => {
-        setTimeout(() => this.$refs.edtNome.focus(), 500)
-    })      
-
-
+    this.load()
   },
 
   methods: {
+
+    load(){
+
+      ////console.log("resetando dados do frame-pessoa")
+
+      this.resetData();
+
+      if (this.id){
+          this.doGetById(this.id)
+      } else {
+          this.setDefaultData()
+      }
+
+      this.$nextTick(() => {
+          setTimeout(() => this.$refs.edtNome.focus(), 500)
+      })      
+    },
 
     resetData() {
       this.form = {
