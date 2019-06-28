@@ -95,7 +95,7 @@
           <tab-selecao-leito :config="configTabSelecaoLeito" @select="onSelect" v-if="state == 'leito'"></tab-selecao-leito>
         </el-col>
       </el-row>    
-      [{{form.acomodacao}}] - [{{form.data}}] - [{{form.pessoa}}] - [{{form.tipoHospedeId}}]
+      
       <span slot="footer" class="dialog-footer">
         <el-button @click="doSelecionarTransferencia(false)">Cancelar</el-button>
         <el-button type="primary" :disabled="form.acomodacao == null || form.data == null || form.pessoa == null || form.tipoHospedeId == null" 

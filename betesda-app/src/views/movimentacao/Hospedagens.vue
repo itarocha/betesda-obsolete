@@ -114,13 +114,22 @@
                       <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
                       <el-table-column header-align="left" align="right" prop="pessoaId" label="CODPES" width="100" sortable></el-table-column>
 
-                      <el-table-column label="Ações" fixed="right" align="center" width="80">
+                      <el-table-column label="Ações" fixed="right" align="center" width="120">
                         <template slot-scope="scope">
+                          
                           <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
                             <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(scope.row.hospedagemId)">
                               <i class="fas fa-info"></i>
                             </el-button>
                           </el-tooltip>
+
+                          <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
+                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.pessoaId)">
+                              <i class="fas fa-pencil-alt"></i>
+                            </el-button>
+                          </el-tooltip>
+
+
                         </template>
                       </el-table-column>
                     </el-table>
@@ -139,7 +148,15 @@
                               <el-card class="flex-item" v-for="(hospedagem, idx) in cidade.hospedagens" :key="idx" shadow="never" style="padding:5px; width:250px; line-height:1.5em;" 
                               :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
                               >
-                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}</div>
+                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
+
+                                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
+                                    <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
+                                      <i class="fas fa-pencil-alt"></i>
+                                    </el-button>
+                                  </el-tooltip>
+
+                                </div>
                                 <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
                                   <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
                                 </div>                      
@@ -170,18 +187,33 @@
     </el-container>
 
     <tela-hospedagem v-if="state=='info'" @close="onCloseInfo" :id="hospedagemSelecionada"></tela-hospedagem>
+
+
+    <div>
+      <el-dialog title="Detalhes da Pessoa" :visible.sync="editPessoa" width="800px">
+        <el-row type="flex">
+          <el-col>
+            <frame-pessoa :id="pessoaId" :canSelecionar="false" @cancel="onCancelPessoa" @save="onSavePessoa"></frame-pessoa>      
+          </el-col>
+        </el-row>
+      </el-dialog>
+    </div>
+
   </div>
 
 </template>
 
 <script>
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
+  import FramePessoa from "../cadastros/FramePessoa"
+
 
 export default {
   name: 'Hospedagens',
 
   components: {
-    TelaHospedagem
+    TelaHospedagem,
+    FramePessoa
 	},
 
   created(){
@@ -222,6 +254,8 @@ export default {
     tableHeight : window.innerHeight - 300,
 
     txt : '???',
+    editPessoa : false,
+    pessoaId : 0,
     dataAtual: null,
     form: {
       dataBase: null
@@ -344,6 +378,24 @@ export default {
 
     handleTabClick(tab, event) {
     },
+
+    handleEditPessoa(id) {
+      this.pessoaId = id
+      this.editPessoa = true;
+    },
+
+    onCancelPessoa(id) {
+      this.pessoaId = null
+      this.editPessoa = false
+      //this.doGetAll()
+    },
+
+    onSavePessoa(id) {
+      this.pessoaId = null
+      this.editPessoa = false
+      this.refreshMapa()
+    },
+
 
     selecionarDia(dia, index){
       this.dataAtual = dia;

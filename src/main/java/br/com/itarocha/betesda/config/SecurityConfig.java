@@ -78,6 +78,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                         "/**/*.gif",
                         "/**/*.svg",
                         "/**/*.jpg",
+                        "/**/*.xlsx",
+                        "/**/*.xls",
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js")

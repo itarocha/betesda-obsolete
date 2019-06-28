@@ -525,7 +525,7 @@ public class HospedagemService {
 		//System.out.println(String.format("Menor: %d Maior: %d", minLeito[0], maxLeito[0]));
 		
 		quadro.quartos.forEach(q -> {
-			System.out.print(String.format("[%02d] - ", q.numero) );
+			//////////System.out.print(String.format("[%02d] - ", q.numero) );
 			q.leitos.forEach(leito -> {
 				if (leito.id == 0) {
 					//System.out.print("[  ] ");

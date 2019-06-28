@@ -65,6 +65,24 @@ export default {
       //console.log("==============> ", decode)
     },
 
+    axiosBlobPost(endpoint, data, showPostErrors){
+      showPostErrors = showPostErrors != null ? showPostErrors : true
+      this.resolveToken()
+      return new Promise((resolve, reject) => {
+          axios({ url:`${base_uri}${endpoint}`,
+                  method:'POST',
+                  data: data,
+                  responseType: 'blob',
+          })
+          .then(response => {
+
+            resolve(response)
+          }).catch(error => {
+            this.tratarRequestError(error, reject, showPostErrors)
+          })
+      })
+    },
+
     axiosGet(endpoint, showPostErrors){
       showPostErrors = showPostErrors != null ? showPostErrors : true
       this.resolveToken()
