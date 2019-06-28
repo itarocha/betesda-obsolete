@@ -3,6 +3,7 @@ _bin/
 classes/
 target/
 /target/**
+.mvn/**
 trash.txt
 
 
@@ -39,6 +40,8 @@ hs_err_pid*
 # Editor directories and files
 .idea
 .vscode
+.classpath
+.mvn
 *.suo
 *.ntvs*
 *.njsproj
