@@ -5,14 +5,10 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -20,7 +16,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
-import org.apache.commons.collections4.bag.SynchronizedSortedBag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,7 +73,6 @@ import br.com.itarocha.betesda.repository.TipoServicoRepository;
 import br.com.itarocha.betesda.util.validation.ResultError;
 import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional /* todo (rollbackForClassName)*/
@@ -475,15 +469,8 @@ public class HospedagemService {
 			}
 		});
 		retorno.setPorCidade(porCidade);
-		/*
-		porCidade.keySet().forEach(mapa -> {
-			System.out.println(mapa);
-			porCidade.get(mapa).forEach(id -> {
-				System.out.println("\t"+id);
-			});
-		});
-		*/
 		
+
 		
 		//TRATATIVA DO QUADRO
 		//System.out.println("QUARTOS");
@@ -534,11 +521,9 @@ public class HospedagemService {
 				}
 				
 			});
-			//System.out.println();
 		});
 		
-		
-		
+		retorno.setQuadro(quadro);
 		
 		
 		// Dias

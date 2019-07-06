@@ -20,6 +20,8 @@ public class MapaRetorno {
 	
 	private Map<String, List<String>> porCidade = new TreeMap<>();
 	
+	private Quadro quadro;
+	
 	/*
 	private Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
 	private Integer[] qtdVencidos 			= {0,0,0,0,0,0,0};
@@ -81,6 +83,14 @@ public class MapaRetorno {
 
 	public void setPorCidade(Map<String, List<String>> porCidade) {
 		this.porCidade = porCidade;
+	}
+
+	public void setQuadro(Quadro quadro) {
+		this.quadro = quadro;
+	}
+	
+	public Quadro getQuadro() {
+		return this.quadro;
 	}
 
 	/*

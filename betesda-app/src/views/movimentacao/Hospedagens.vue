@@ -83,8 +83,8 @@
                     </el-main>
                   </el-container>
                 </el-container>
-
               </el-tab-pane>
+
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 <el-row type="flex" justify="center" align="middle">
                   <el-col :sm="24" :md="24" :lg="24">
@@ -129,13 +129,11 @@
                             </el-button>
                           </el-tooltip>
 
-
                         </template>
                       </el-table-column>
                     </el-table>
                   </el-col>
                 </el-row>
-                
               </el-tab-pane>
 
               <el-tab-pane label="Hóspedes por Cidade de Origem" name="cidades">
@@ -176,7 +174,91 @@
                         </el-collapse>  
                     </el-main>  
                 </el-container>  
-                
+              </el-tab-pane>
+
+              <el-tab-pane label="Quadro de Hospedagens" name="quadro">
+                  <el-container :style="styleContainerMapa">
+
+                    <el-header style="line-height:20px; height:54px;">
+                      <el-row type="flex">
+                        <!--
+                        <el-col>
+                          <div class="thebox p4 laranja h60">
+                            <span style="font-size: 12pt; align:center;">Quarto/</span>
+                            <span style="font-size: 12pt; align:center;">Leito</span>
+                          </div>
+                        </el-col>
+                        -->
+                        <el-col v-for="(dia, index) in dados.dias" :key="index" 
+                          :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
+                          <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px" @click="selecionarDia(dia, index)">
+                            <p style="font-size: 9pt">{{diaSemana(dia)}}</p>
+                            <p style="font-size: 12pt">{{formatDate(dia,'DD/MMM')}}</p>
+                          </div>
+                        </el-col>
+                        <!--<div class="w15"></div>-->
+                      </el-row>                      
+                    </el-header>
+
+
+                    <el-main style="padding-top:10px;">
+
+                      <el-row type="flex" v-for="(quarto, index) in quadro.quartos" :key="index">
+                        <!--
+                        <el-col>
+                          <div class="thebox hleito laranja" style="text-align:center;">
+                            {{quarto.numero}}
+                          </div>
+                        </el-col>
+                        -->
+
+                        <el-col v-for="(leito, lid) in quarto.leitos" :key="lid">
+                          <div class="thebox-circular" v-if="leito.id != 0" style="text-align:center;">
+                            {{quarto.numero}}-{{leito.numero}}
+                          </div>
+                          <div class="thebox-circular cinza" v-if="leito.id == 0">
+                            
+                          </div>
+                        </el-col>
+                      </el-row>
+
+                        <!--                     
+                        <el-collapse accordion>
+                          <el-collapse-item :title="cidade.nome" v-for="(cidade, index) in cidades" :key="index">
+
+                            <div class="flex-container wrap">
+                              <el-card class="flex-item" v-for="(hospedagem, idx) in cidade.hospedagens" :key="idx" shadow="never" style="padding:5px; width:250px; line-height:1.5em;" 
+                              :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
+                              >
+                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
+
+                                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
+                                    <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
+                                      <i class="fas fa-pencil-alt"></i>
+                                    </el-button>
+                                  </el-tooltip>
+
+                                </div>
+                                <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
+                                  <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
+                                </div>                      
+                                <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
+                                
+                                  <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                                    <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
+                                      <i class="fas fa-info"></i>
+                                    </el-button>
+                                  </el-tooltip>
+                          
+                                </div>                      
+                              </el-card>
+                            </div>
+                            
+                          </el-collapse-item>
+                        </el-collapse>  
+                        -->
+                    </el-main>  
+                </el-container>  
               </el-tab-pane>
 
             </el-tabs>
@@ -263,6 +345,7 @@ export default {
     dados: [],
     pessoas:[],
     cidades:[],
+    quadro:[],
 
     dadosPlanilhaGeral:[],
     dadosRankingCidades:[],
@@ -465,6 +548,9 @@ export default {
               cidades.push(cidade)
             }
             this.cidades = cidades
+
+            this.quadro = response.data.quadro
+
             //////////////this.showEstatisticas()
         })
         .catch(error => {
@@ -768,6 +854,19 @@ export default {
   border: 1px #bdbdbd solid;
 }
 
+.thebox-circular {
+  box-sizing: border-box;
+  border-radius: 25px;
+  margin: 0px;
+  height: 30px;
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 5px;
+  padding-top:5px;
+  border: 1px #bdbdbd solid;
+  font-size: 11pt;
+}
+
 .h60 {
   height: 54px;
 }
@@ -791,6 +890,11 @@ export default {
 .laranja {
   background-color: #FFECB3;
 }
+
+.cinza {
+  background-color: #ccc;
+}
+
 
 .grafico{
   background-color: #E57373;

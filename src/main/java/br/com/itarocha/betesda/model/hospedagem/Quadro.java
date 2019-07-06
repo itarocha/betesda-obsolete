@@ -11,7 +11,6 @@ public class Quadro {
 			.filter(q -> q.id.equals(quartoId))
 			.findFirst()
 			.ifPresent(q -> {
-				System.out.println(q.numero +" existe. Vai buscar o leito "+leitoNumero);
 				q.setLeitoIdPorNumero(leitoNumero, leitoId);
 			});
 	}

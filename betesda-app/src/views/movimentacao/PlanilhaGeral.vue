@@ -29,7 +29,7 @@
       <el-header>
         <el-row type="flex">  
           <el-button type="primary" @click="handleSelect">Selecionar Período</el-button>
-          <el-button type="primary" @click="excel">Download da Planilha</el-button>
+          <!--<el-button type="primary" @click="excel">Download da Planilha</el-button>-->
           <el-button type="primary" @click="handlePlanilhaGeral">Planilha</el-button>
           <div style="margin-left:10px; line-height:1em;">Período: {{periodoSelecionado()}}</div>
         </el-row>
