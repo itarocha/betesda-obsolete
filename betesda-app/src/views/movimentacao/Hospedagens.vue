@@ -191,9 +191,9 @@
                         -->
                         <el-col v-for="(dia, index) in dados.dias" :key="index" 
                           :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
-                          <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px" @click="selecionarDia(dia, index)">
-                            <p style="font-size: 9pt">{{diaSemana(dia)}}</p>
-                            <p style="font-size: 12pt">{{formatDate(dia,'DD/MMM')}}</p>
+                          <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px; text-align:center; font-size: 10pt;"  @click="selecionarDia(dia, index)">
+                            <p>{{diaSemana(dia)}}</p>
+                            <p>{{formatDate(dia,'DD/MMM')}}</p>
                           </div>
                         </el-col>
                         <!--<div class="w15"></div>-->
@@ -203,60 +203,61 @@
 
                     <el-main style="padding-top:10px;">
 
-                      <el-row type="flex" v-for="(quarto, index) in quadro.quartos" :key="index">
-                        <!--
-                        <el-col>
-                          <div class="thebox hleito laranja" style="text-align:center;">
-                            {{quarto.numero}}
-                          </div>
-                        </el-col>
-                        -->
+                      <el-col :sm="10" :md="10" :lg="10">
 
-                        <el-col v-for="(leito, lid) in quarto.leitos" :key="lid">
-                          <div class="thebox-circular" v-if="leito.id != 0" style="text-align:center;">
-                            {{quarto.numero}}-{{leito.numero}}
-                          </div>
-                          <div class="thebox-circular cinza" v-if="leito.id == 0">
-                            
-                          </div>
-                        </el-col>
-                      </el-row>
-
-                        <!--                     
-                        <el-collapse accordion>
-                          <el-collapse-item :title="cidade.nome" v-for="(cidade, index) in cidades" :key="index">
-
-                            <div class="flex-container wrap">
-                              <el-card class="flex-item" v-for="(hospedagem, idx) in cidade.hospedagens" :key="idx" shadow="never" style="padding:5px; width:250px; line-height:1.5em;" 
-                              :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
-                              >
-                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
-
-                                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                                    <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
-                                      <i class="fas fa-pencil-alt"></i>
-                                    </el-button>
-                                  </el-tooltip>
-
-                                </div>
-                                <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
-                                  <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
-                                </div>                      
-                                <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
-                                
-                                  <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                                    <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
-                                      <i class="fas fa-info"></i>
-                                    </el-button>
-                                  </el-tooltip>
-                          
-                                </div>                      
-                              </el-card>
+                        <el-row type="flex" v-for="(quarto, index) in quadro.quartos" :key="index">
+                          <!--
+                          <el-col>
+                            <div class="thebox hleito laranja" style="text-align:center;">
+                              {{quarto.numero}}
                             </div>
-                            
-                          </el-collapse-item>
-                        </el-collapse>  
-                        -->
+                          </el-col>
+                          -->
+
+                          <el-col v-for="(leito, lid) in quarto.leitos" :key="lid">
+                            <div v-if="leito.id != 0" :class="quadroClass(0, index, lid)"  style="text-align:center; cursor:pointer;" @click="getHospedagensByLeitoId(leito.id)">
+                              {{quarto.numero}}-{{leito.numero}}
+                            </div>
+                            <div class="thebox-circular cinza" v-if="leito.id == 0">
+                              
+                            </div>
+                          </el-col>
+                        </el-row>
+                      </el-col>
+                      <el-col :sm="14" :md="14" :lg="14">
+                          <div class="subtitulo bg-purple">Quarto {{quadroQuartoNumero}} Leito {{quadroLeitoNumero}}</div>
+
+                          <div class="flex-container wrap">
+                            <el-card class="flex-item" v-for="(hospedagem, idx) in hospedagensQuadro" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:250px; line-height:1.5em;" 
+                            :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
+                            >
+                              <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
+
+                                <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
+                                  <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
+                                    <i class="fas fa-pencil-alt"></i>
+                                  </el-button>
+                                </el-tooltip>
+
+                              </div>
+                              <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
+                                <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
+                              </div>                      
+                              <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
+                              
+                                <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                                  <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
+                                    <i class="fas fa-info"></i>
+                                  </el-button>
+                                </el-tooltip>
+                        
+                              </div>                      
+                            </el-card>
+                          </div>
+
+                      </el-col>
+
+
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
@@ -339,6 +340,12 @@ export default {
     editPessoa : false,
     pessoaId : 0,
     dataAtual: null,
+    
+    //diaIndex representa o índice do dia clicado
+    diaIndex: 0,
+    quadroQuartoNumero : null,
+    quadroLeitoNumero : null,
+
     form: {
       dataBase: null
     },
@@ -346,6 +353,7 @@ export default {
     pessoas:[],
     cidades:[],
     quadro:[],
+    hospedagensQuadro: [],
 
     dadosPlanilhaGeral:[],
     dadosRankingCidades:[],
@@ -389,8 +397,13 @@ export default {
   watch: {
 
     dataAtual(){
+      this.hospedagensQuadro = []
+      this.quadroQuartoNumero = null
+      this.quadroLeitoNumero = null
 
       var d = moment(this.dataAtual).toDate()
+      this.diaIndex = petraDateTime.getIndiceData(this.dataAtual)
+      //console.log("diaIndex = " + this.diaIndex)
 
       this.setShowDate(d)
       this.getDadosSemanaAtual()
@@ -481,7 +494,7 @@ export default {
 
 
     selecionarDia(dia, index){
-      this.dataAtual = dia;
+      this.dataAtual = dia
     },
 
     //TODO Somente se dataAtual não estiver na lista de datas da semana. A não ser que force
@@ -550,8 +563,7 @@ export default {
             this.cidades = cidades
 
             this.quadro = response.data.quadro
-
-            //////////////this.showEstatisticas()
+            
         })
         .catch(error => {
 
@@ -610,6 +622,7 @@ export default {
         this.qtdParciaisPendentes = 0
         this.qtdParciaisEncerrados = 0
       }
+
     },
 
     recarregar(){
@@ -630,6 +643,15 @@ export default {
 
     diaSemana(dia){
       return petraDateTime.diaSemana(dia)
+    },
+
+    quadroClass(dia, quarto, leito){
+      var conteudo = this.quadro.quartos[quarto].leitos[leito].dias[this.diaIndex];
+
+      if (conteudo == 1){
+        return "thebox-circular teal-darken-2 fonte-branca";  
+      }
+      return "thebox-circular";
     },
 
     hospedagemClass(id, classe, dias){
@@ -690,7 +712,7 @@ export default {
       if (status == 'ABERTA'){
         return '#FFF9C4' // teal darken-2
       } else if (status == 'ENCERRADA'){
-        return '#E0E0E0' // blue-grey lighten-1
+        return '#d3dce6' //'#E0E0E0' // blue-grey lighten-1
       } else if (status == 'VENCIDA'){
         return '#FFCCBC' // red accent-4
       }
@@ -713,6 +735,40 @@ export default {
 
     getHospedagemById(id){
       return _.find(this.dados.hospedagens,{identificador : id});
+    },
+
+    getHospedagensByLeitoId(id){
+      this.hospedagensQuadro = []
+
+      var obj = _.find(this.dados.leitos,{leitoId : id})
+      
+      if (!obj) return
+      
+      this.quadroQuartoNumero = obj.quartoNumero
+      this.quadroLeitoNumero = obj.leitoNumero
+
+      //console.log(obj)
+      if (obj){
+        //console.log("hospedagens")
+        for (var h in obj.hospedagens){
+          var  dias = obj.hospedagens[h].dias
+          //console.log(dias)
+          //console.log("O índice é "+this.diaIndex)
+
+          if (dias.length >= 0 && this.diaIndex <= dias.length){
+            //console.log(dias[this.diaIndex])
+            const identificador = dias[this.diaIndex].identificador
+
+            if (identificador != "0"){
+              var hospedagem = this.getHospedagemById(identificador)
+              this.hospedagensQuadro.push(hospedagem)
+            }
+          }
+        }
+      }
+      //console.log(this.hospedagensQuadro)
+
+      return obj
     },
 
     getNome(id, completo){
@@ -836,6 +892,10 @@ export default {
   color: blue;
 }
 
+.fonte-branca{
+  color: white;
+}
+
 .grade {
   /*padding: 10px;*/
   width: 100%;
@@ -859,12 +919,12 @@ export default {
   border-radius: 25px;
   margin: 0px;
   height: 30px;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-left: 3px;
+  margin-right: 3px;
   margin-bottom: 5px;
   padding-top:5px;
   border: 1px #bdbdbd solid;
-  font-size: 11pt;
+  font-size: 10pt;
 }
 
 .h60 {
@@ -892,7 +952,7 @@ export default {
 }
 
 .cinza {
-  background-color: #ccc;
+  background-color: #d3dce6;
 }
 
 
@@ -988,7 +1048,7 @@ export default {
   list-style: none;
   box-orient: horizontal;
   display: flex;
-  justify-content: start; /*center*/
+  justify-content: space-around; /*center*/
 }
 
 .wrap    { 
@@ -1006,5 +1066,17 @@ export default {
   width: 300px;
   margin: 10px;
 }
+
+.subtitulo {
+  margin:0 10px;
+  padding:5px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.bg-purple {
+  background: #d3dce6;
+}
+
 
 </style>

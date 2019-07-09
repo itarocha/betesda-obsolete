@@ -1,5 +1,7 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
+import java.time.LocalDate;
+
 public class DiaHospedagem {
 	
 	private Integer index;
@@ -9,8 +11,16 @@ public class DiaHospedagem {
 	private Boolean atendimento;
 	private Boolean possuiContinuidade;
 	private Boolean continuacao;
+	private LocalDate leitoDataSaida;
 	
-	
+	public LocalDate getLeitoDataSaida() {
+		return leitoDataSaida;
+	}
+
+	public void setLeitoDataSaida(LocalDate leitoDataSaida) {
+		this.leitoDataSaida = leitoDataSaida;
+	}
+
 	public DiaHospedagem(Integer index) {
 		this.identificador = "0";
 		this.firstIndex = false;

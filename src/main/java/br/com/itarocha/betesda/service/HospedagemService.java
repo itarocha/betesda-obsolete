@@ -442,6 +442,7 @@ public class HospedagemService {
 						} 
 						dh.setPossuiContinuidade(hhi.getPossuiContinuidade());
 						dh.setContinuacao(hhi.getContinuacao());
+						dh.setLeitoDataSaida(hhi.getLeitoDataSaida());
 					}
 					celulaIndex++;
 					dtmp = dtmp.plusDays(1);
@@ -471,6 +472,18 @@ public class HospedagemService {
 		retorno.setPorCidade(porCidade);
 		
 
+		// Dias
+		LocalDate dtmp = dIni;
+		// Qualquer índice abaixo de indiceDataPassada é data inferior a hoje
+		int[] indiceDataPassada = {-1};
+		while (dtmp.compareTo(dFim) != 1) {
+			if (dtmp.isBefore(hoje)) {
+				indiceDataPassada[0]++;
+			}
+			retorno.getDias().add(dtmp);
+			dtmp = dtmp.plusDays(1);
+		}
+		//System.out.println("Índice de data passada = "+indiceDataPassada);
 		
 		//TRATATIVA DO QUADRO
 		//System.out.println("QUARTOS");
@@ -497,7 +510,7 @@ public class HospedagemService {
 		// Adiciona todos os leitos em todos os quartos. Todos os leitos estão com id zerado
 		quadro.quartos.forEach(q -> {
 			for (Integer n = minLeito[0]; n <= maxLeito[0]; n++) {
-				q.leitos.add(new QuadroLeito(0L, n));
+				q.leitos.add(new QuadroLeito(0L, n, QTD_DIAS));
 			}
 		});
 		
@@ -506,32 +519,52 @@ public class HospedagemService {
 			q.getLeitos().forEach(leito -> {
 				quadro.setLeitoIdPorNumero(q.getId(), leito.getNumero(), leito.getId());
 			});
-			//System.out.println("");
 		});
 		
-		//System.out.println(String.format("Menor: %d Maior: %d", minLeito[0], maxLeito[0]));
-		
 		quadro.quartos.forEach(q -> {
-			//////////System.out.print(String.format("[%02d] - ", q.numero) );
 			q.leitos.forEach(leito -> {
 				if (leito.id == 0) {
 					//System.out.print("[  ] ");
 				} else {
 					//System.out.print(String.format("[%02d] ", leito.numero) );
+					// Busca o array de dias e hospedagens
+					//retorno.getLeitos()
+					Long leitoId = leito.id;
+					
+					retorno.getLeitos().stream()
+						.filter(x -> leitoId.equals(x.getLeitoId()) )
+						.findFirst()
+						.get()
+						.getHospedagens()
+						.forEach(h -> {
+							for (int idx = 0; idx < h.getDias().length; idx++) {
+								
+								DiaHospedagem dh = h.getDias()[idx];
+								
+								LocalDate thisDate = dIni.plusDays(idx);
+								if (!"0".equals(dh.getIdentificador())) {
+
+									boolean dataPassada = thisDate.isBefore(hoje);
+									boolean marcar = dataPassada ? thisDate.isBefore(dh.getLeitoDataSaida()) || thisDate.equals(dh.getLeitoDataSaida())
+																 : thisDate.isBefore(dh.getLeitoDataSaida()) || thisDate.equals(dh.getLeitoDataSaida());
+
+									if ( marcar ) {
+										leito.getDias()[idx] = 1;
+									}
+								}
+							}
+						});
 				}
 				
 			});
 		});
 		
 		retorno.setQuadro(quadro);
+
 		
 		
-		// Dias
-		LocalDate dtmp = dIni;
-		while (dtmp.compareTo(dFim) != 1) {
-			retorno.getDias().add(dtmp);
-			dtmp = dtmp.plusDays(1);
-		}
+		
+		
 		
 		//FIXME Dashboard REMOVIDO TEMPORÁRIAMENTE
 		//atualizarDashBoard(retorno, leitos.size());

@@ -19,7 +19,6 @@ public class QuadroQuarto {
 			.filter(leito -> leito.numero.equals(numero))
 			.findFirst()
 			.ifPresent(leito -> {
-				System.out.println(leito.numero + " existe e o id será "+id);
 				leito.id = id;
 			});
 	}
