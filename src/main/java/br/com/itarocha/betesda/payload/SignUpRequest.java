@@ -10,11 +10,11 @@ public class SignUpRequest {
     private String name;
 
     @NotBlank
-    @Size(min = 3, max = 16)
+    @Size(min = 3, max = 32)
     private String username;
 
     @NotBlank
-    @Size(max = 40)
+    @Size(max = 64)
     @Email
     private String email;
 

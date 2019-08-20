@@ -17,7 +17,7 @@ public class HospedePermanencia {
 	private LocalDate dataEntrada;
 	private LocalDate dataSaida;
 	private String tipoUtilizacao;
-	private Long diasPermanencia;
+	private Integer diasPermanencia;
 	private Pessoa pessoa;
 	private Hospedagem hospedagem;
 	private Hospede hospede;
@@ -92,11 +92,11 @@ public class HospedePermanencia {
 		this.tipoUtilizacao = tipoUtilizacao;
 	}
 
-	public Long getDiasPermanencia() {
+	public Integer getDiasPermanencia() {
 		return diasPermanencia;
 	}
 
-	public void setDiasPermanencia(Long diasPermanencia) {
+	public void setDiasPermanencia(Integer diasPermanencia) {
 		this.diasPermanencia = diasPermanencia;
 	}
 

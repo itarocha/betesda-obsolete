@@ -70,12 +70,21 @@ export default {
     errors : [],
 
     rules: {
+      name: [
+        { required: true, message: "Preencha o Nome",trigger: "blur"},
+        { min: 4, max: 64, message: "O usuário deve ter entre 4 a 64 caracteres",trigger: "blur"}
+      ],
       username: [
         { required: true, message: "Preencha o usuário",trigger: "blur"},
+        { min: 3, max: 32, message: "Usuário deve ter de 3 a 32 caracteres",trigger: "blur"}
+      ],
+      email: [
+        { required: true, message: "Preencha o email",trigger: "blur"},
+        { max: 64, message: "Email deve possuir até 64 caracteres",trigger: "blur"}
       ],
       password: [
         { required: true, message: "Entre com a senha",trigger: "blur"},
-        { min: 8, max: 32, message: "Senha deve haver de 8 a 32 caracteres",trigger: "blur"}
+        { min: 6, max: 16, message: "Senha deve haver de 6 a 16 caracteres",trigger: "blur"}
       ],
     }
 

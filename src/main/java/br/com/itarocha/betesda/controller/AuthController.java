@@ -70,6 +70,7 @@ public class AuthController {
     @RequestMapping(value="/assinar", method = RequestMethod.POST) // novo_usuario
     @PreAuthorize("hasAnyRole('ROOT')")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
+    	System.out.println(signUpRequest);
         if(userRepository.existsByUsername(signUpRequest.getUsername())) {
         	return new ResponseEntity(new ApiResponse(false, "Nome de usuário já cadastrado!"), HttpStatus.BAD_REQUEST);
         }

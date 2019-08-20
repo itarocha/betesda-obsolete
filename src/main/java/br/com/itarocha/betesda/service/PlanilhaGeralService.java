@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -16,6 +17,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import br.com.itarocha.betesda.report.ChaveValor;
 import br.com.itarocha.betesda.report.RelatorioAtendimentos;
 
 public class PlanilhaGeralService {
@@ -25,10 +27,15 @@ public class PlanilhaGeralService {
 		String[] colsPlanilhaGeral = {	"Atendimento", "Pessoa", "Nome", "Endereço", "Nascimento", "Idade", "Faixa Etária", 
 										"Tipo", "Encaminhador", "CPF", "RG", "Telefone", "Endereço", "Cidade de Origem", "UF Origem",
 										"Tipo de Hospedagem", "Dt. Ingresso", "Dt. Desligamento", "Dias"};
+		
+		
+		String[] colsPessoas = {"Id", "Nome", "Faixa Etária", "Cidade Origem", "UF", "Encaminhador", "Tipo Utilização", "Tipo de Hóspede"};
 
 		String[] colsCidades = { "Cidade", "UF", "Quantidade"};
 
 		String[] colsEncaminhadores = { "Nome", "Quantidade"};
+
+		String[] colsAtividades = { "Descrição", "Quantidade"};
 		
 		try(
 				Workbook workbook = new XSSFWorkbook();
@@ -52,8 +59,17 @@ public class PlanilhaGeralService {
 			headerFont.setColor(IndexedColors.GREEN.getIndex());
 
 			CellStyle headerCellStyle = workbook.createCellStyle();
-			headerCellStyle.setFont(headerFont);
 			headerCellStyle.setFillBackgroundColor(IndexedColors.GREY_80_PERCENT.getIndex());
+			headerCellStyle.setFont(headerFont);
+			
+			Font fontNegrito = workbook.createFont();
+			fontNegrito.setBold(true);
+			fontNegrito.setColor(IndexedColors.BLACK.getIndex());
+
+			CellStyle headerNegritoStyle = workbook.createCellStyle();
+			headerNegritoStyle.setFont(fontNegrito);
+			//headerNegritoStyle.setFillBackgroundColor(IndexedColors.GREY_80_PERCENT.getIndex());
+			
 			
 			// Planilha Geral
 			Sheet sheetPlanilhaGeral = workbook.createSheet("Planilha Geral");
@@ -116,6 +132,42 @@ public class PlanilhaGeralService {
 				sheetPlanilhaGeral.autoSizeColumn(col);
 			}
 
+			///// PESSOAS
+			Sheet sheetPessoas = workbook.createSheet("Pessoas Atendidas");
+
+			Row rowHeaderPessoas = sheetPessoas.createRow(0);
+
+			// Header
+			for (int col = 0; col < colsPessoas.length; col++) {
+				Cell cell = rowHeaderPessoas.createCell(col);
+				cell.setCellValue(colsPessoas[col]);
+				cell.setCellStyle(headerCellStyle);
+			}
+
+
+			int[] rowPessoa = {1};
+			dados.getListaPessoas().forEach(h -> {
+				Row row = sheetPessoas.createRow(rowPessoa[0]++);
+
+				//String[] colsPessoas = {"Id", "Nome", "Faixa Etária", "Cidade Origem", "UF", "Encaminhador", "Tipo Utilização", "Tipo de Hóspede"};
+				
+				row.createCell(0).setCellValue(h.getId());
+				row.createCell(1).setCellValue(h.getNome());
+				row.createCell(2).setCellValue(h.getFaixaEtaria());
+				row.createCell(3).setCellValue(h.getCidadeOrigem());
+				row.createCell(4).setCellValue(h.getCidadeOrigemUf());
+				row.createCell(5).setCellValue(h.getEncaminhadorNome());
+				row.createCell(6).setCellValue(h.getTipoUtilizacaoDescricao());
+				row.createCell(7).setCellValue(h.getTipoHospede());
+			});
+			
+			for (int col = 0; col < colsPessoas.length; col++) {
+				sheetPessoas.autoSizeColumn(col);
+			}
+			//////
+			
+			
+			
 			// Ranking de Cidades
 			Sheet sheetCidades = workbook.createSheet("Ranking de Cidades");
 
@@ -169,6 +221,73 @@ public class PlanilhaGeralService {
 				sheetEncaminhadores.autoSizeColumn(col);
 			}
 			
+			
+			// Relatório de Atividades/Hospedagens
+			Sheet sheetAtividades = workbook.createSheet("Atividades e Hospedagens");
+			
+			Row hrAtividades = sheetAtividades.createRow(0);
+
+			// Header
+			for (int col = 0; col < colsAtividades.length; col++) {
+				Cell cell = hrAtividades.createCell(col);
+				cell.setCellValue(colsAtividades[col]);
+				cell.setCellStyle(headerNegritoStyle);
+			}
+			
+			int[] rowAtividades = {1};
+			
+			dados.getAtividadesHospedagem().forEach(a -> {
+				
+				String titulo = a.getTitulo();
+				
+				List<ChaveValor> lista = a.getLista();
+				
+				// Cabeçalho
+				Row rSubTit = sheetAtividades.createRow(rowAtividades[0]++);
+				Cell cell = rSubTit.createCell(0);  
+				cell.setCellStyle(headerNegritoStyle);
+				cell.getCellStyle().setFillBackgroundColor(IndexedColors.BLUE_GREY.getIndex());
+				cell.setCellValue(titulo);
+				//Setar para negrito
+				
+				lista.forEach(item -> {
+					Row row = sheetAtividades.createRow(rowAtividades[0]++);
+					row.createCell(0).setCellValue(item.getNome() );
+					row.createCell(1).setCellValue(item.getQuantidade());
+				});
+				Row rEnd = sheetAtividades.createRow(rowAtividades[0]++);
+				
+			});
+			for (int col = 0; col < colsAtividades.length; col++) {
+				sheetAtividades.autoSizeColumn(col);
+			}
+
+			
+			
+			/*
+			dados.getMapAtividadesHospedagem().keySet().forEach(titulo -> {
+				
+				List<ChaveValor> lista = dados.getMapAtividadesHospedagem().get(titulo);
+				
+				// Cabeçalho
+				Row rSubTit = sheetAtividades.createRow(rowAtividades[0]++);
+				Cell cell = rSubTit.createCell(0);  
+				cell.setCellStyle(headerNegritoStyle);
+				cell.getCellStyle().setFillBackgroundColor(IndexedColors.GREY_50_PERCENT.getIndex());
+				cell.setCellValue(titulo);
+				//Setar para negrito
+				
+				lista.forEach(item -> {
+					Row row = sheetAtividades.createRow(rowAtividades[0]++);
+					row.createCell(0).setCellValue(item.getNome() );
+					row.createCell(1).setCellValue(item.getQuantidade());
+				});
+				Row rEnd = sheetAtividades.createRow(rowAtividades[0]++);
+				
+			});
+			*/
+			
+			// Finalmente...
 			workbook.write(out);
 
 			/*

@@ -4,9 +4,9 @@ public class CidadeQuantidade {
 	
 	private String cidade;
 	private String uf;
-	private Long quantidade;
+	private Integer quantidade;
 	
-	public CidadeQuantidade(String cidade, String uf, Long quantidade) {
+	public CidadeQuantidade(String cidade, String uf, Integer quantidade) {
 		super();
 		this.cidade = cidade;
 		this.uf = uf;
@@ -29,11 +29,11 @@ public class CidadeQuantidade {
 		this.uf = uf;
 	}
 
-	public Long getQuantidade() {
+	public Integer getQuantidade() {
 		return quantidade;
 	}
 
-	public void setQuantidade(Long quantidade) {
+	public void setQuantidade(Integer quantidade) {
 		this.quantidade = quantidade;
 	}
 	

@@ -30,7 +30,7 @@ public class PlanilhaGeral {
 	private String tipoUtilizacao;
 	private String tipoUtilizacaoDescricao;
 	private String tipoHospede;
-	private Long diasPermanencia;
+	private Integer diasPermanencia;
 
 	public Long getPessoaId() {
 		return pessoaId;
@@ -144,10 +144,10 @@ public class PlanilhaGeral {
 	public void setTipoHospede(String tipoHospede) {
 		this.tipoHospede = tipoHospede;
 	}
-	public Long getDiasPermanencia() {
+	public Integer getDiasPermanencia() {
 		return diasPermanencia;
 	}
-	public void setDiasPermanencia(Long diasPermanencia) {
+	public void setDiasPermanencia(Integer diasPermanencia) {
 		this.diasPermanencia = diasPermanencia;
 	}
 	

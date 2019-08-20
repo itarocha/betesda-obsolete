@@ -40,6 +40,7 @@ import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
 import br.com.itarocha.betesda.report.RelatorioAtendimentos;
 import br.com.itarocha.betesda.service.HospedagemService;
 import br.com.itarocha.betesda.service.PlanilhaGeralService;
+import br.com.itarocha.betesda.service.RelatorioGeralService;
 import br.com.itarocha.betesda.util.validation.ItaValidator;
 import br.com.itarocha.betesda.util.validation.ResultError;
 
@@ -49,6 +50,9 @@ public class HospedagemController {
 
 	@Autowired
 	private HospedagemService service;
+	
+	@Autowired
+	private RelatorioGeralService relatorioService;
 	
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
@@ -136,7 +140,7 @@ public class HospedagemController {
 		}
 
 		try {
-			RelatorioAtendimentos retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			RelatorioAtendimentos retorno = relatorioService.buildPlanilhaGeral(model.dataIni, model.dataFim);
 			return new ResponseEntity<RelatorioAtendimentos>(retorno, HttpStatus.OK);
 		} catch(Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -165,7 +169,7 @@ public class HospedagemController {
 		
 		RelatorioAtendimentos retorno = null;
 		try {
-			retorno = service.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			retorno = relatorioService.buildPlanilhaGeral(model.dataIni, model.dataFim);
 			// Gerar planilha
 		} catch(Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
