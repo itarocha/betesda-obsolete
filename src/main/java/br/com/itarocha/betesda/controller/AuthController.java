@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,7 +50,13 @@ public class AuthController {
     @Autowired
     JwtTokenProvider tokenProvider;
 
-    @PostMapping("/login")// login
+    @RequestMapping(value="/hello", method = RequestMethod.GET) 
+    public ResponseEntity<?> hello() {
+
+        return ResponseEntity.ok(new Hello("Hello Mundo"));
+    }
+    
+    @RequestMapping(value="/login", method = RequestMethod.POST) 
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
@@ -96,5 +101,23 @@ public class AuthController {
                 .buildAndExpand(result.getUsername()).toUri();
 
         return ResponseEntity.created(location).body(new ApiResponse(true, "Usuário registrado com sucesso!"));
+    }
+    
+    private class Hello {
+    	private String mensagem;
+    	
+    	public Hello(String mensagem) {
+    		this.mensagem = mensagem;
+    	}
+
+		public String getMensagem() {
+			return mensagem;
+		}
+
+		public void setMensagem(String mensagem) {
+			this.mensagem = mensagem;
+		}
+    	
+    	
     }
 }

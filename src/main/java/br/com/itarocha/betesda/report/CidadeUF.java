@@ -74,10 +74,4 @@ public class CidadeUF implements Serializable, Comparable<CidadeUF> {
 		return o.toString().compareTo(this.toString());
 	}
 	
-	/*
-	@Override
-	public int compareTo(CidadeUF outra) {
-		return outra.toString().compareTo(this.toString());
-	}
-	*/	
 }

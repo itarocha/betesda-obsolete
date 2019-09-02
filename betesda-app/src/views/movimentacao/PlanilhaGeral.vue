@@ -29,9 +29,8 @@
       <el-header>
         <el-row type="flex">  
           <el-button type="primary" @click="handleSelect">Selecionar Período</el-button>
-          <!--<el-button type="primary" @click="excel">Download da Planilha</el-button>-->
-          <el-button type="primary" @click="handlePlanilhaGeral">Planilha</el-button>
-          <div style="margin-left:10px; line-height:1em;">Período: {{periodoSelecionado()}}</div>
+          <el-button type="primary" @click="handlePlanilhaGeral">Baixar Planilha</el-button>
+          <div style="margin-left:10px; line-height:1em;">Período: {{periodoSelecionado()}} </div>
         </el-row>
       </el-header>
       <el-main>
@@ -41,67 +40,38 @@
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
 
               <el-tab-pane label="Movimentação" name="movimentacao">
-                <el-table :data="dadosPlanilhaGeral" 
+                <el-table :data="dadosResumo" 
                   style="width: 100%" border size="small" 
                   :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
                   :height="tableHeight">
 
                   <el-table-column prop="hospedagemId" label="Atendimento" fixed align="right" width="90" ></el-table-column>
-
-                  <el-table-column prop="pessoaId" label="Pessoa" fixed width="100" align="right" sortable></el-table-column>
-                  <el-table-column prop="pessoaNome" label="Nome" fixed width="300" sortable></el-table-column>
-
-                  <el-table-column prop="pessoaDataNascimento" :formatter="fmtDateFull" label="Nascimento" width="120"></el-table-column>
-                  <el-table-column prop="pessoaIdade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
-                  <el-table-column prop="pessoaFaixaEtaria" label="Faixa Etária" width="120"></el-table-column>
-
-                  <el-table-column prop="tipoUtilizacaoDescricao" label="Tipo" width="120" ></el-table-column>
-
-                  <el-table-column prop="encaminhadorNome" label="Encaminhador" sortable width="300" ></el-table-column>
-
-
-                  <el-table-column prop="pessoaCPF" label="CPF" width="140"></el-table-column>
-                  <el-table-column prop="pessoaRG" label="RG" width="140"></el-table-column>
-
-                  <el-table-column prop="pessoaTelefone" label="Telefone" width="140"></el-table-column>
-
-                  <el-table-column prop="pessoaEndereco" label="Endereço" width="500"></el-table-column>
-                  <el-table-column prop="pessoaCidadeOrigem" label="Cidade de Origem" width="200"></el-table-column>
-                  <el-table-column prop="pessoaCidadeOrigemUF" label="UF Origem" width="80"></el-table-column>
-
-                  <el-table-column prop="tipoHospede" label="Tipo de Hospedagem" width="140" ></el-table-column>
-
-                  <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Dt. Ingresso" width="140" header-align="left" sortable></el-table-column>
-                  <el-table-column prop="dataSaida" :formatter="fmtDate" label="Dt. Desligamento" width="140" class-name="wordwrap" sortable></el-table-column>
-
-                  <el-table-column prop="diasPermanencia" label="Dias" align="right" width="90" ></el-table-column>
+                  <el-table-column prop="pessoa.id" label="Pessoa" fixed width="100" align="right" sortable></el-table-column>
+                  <el-table-column prop="pessoa.nome" label="Nome" fixed width="300" sortable></el-table-column>
+                  <el-table-column prop="pessoa.dataNascimento" :formatter="fmtDateFull" label="Nascimento" width="120"></el-table-column>
+                  <el-table-column prop="pessoa.idade" label="Idade" align="right" width="80" header-align="left"></el-table-column>
+                  <el-table-column prop="pessoa.faixaEtaria" label="Faixa Etária" width="120"></el-table-column>
+                  <el-table-column prop="tipoUtilizacao" label="Tipo" width="120" ></el-table-column>
+                  <el-table-column prop="entidadeNome" label="Encaminhador" sortable width="300" ></el-table-column>
+                  <el-table-column prop="pessoa.cidade" label="Cidade de Origem" width="200"></el-table-column>
+                  <el-table-column prop="pessoa.uf" label="UF Origem" width="80"></el-table-column>
+                  <el-table-column prop="tipoHospedeDescricao" label="Tipo de Hospedagem" width="140" ></el-table-column>
+                  <el-table-column prop="dataIni" :formatter="fmtDate" label="Dt. Ingresso" width="140" header-align="left" sortable></el-table-column>
+                  <el-table-column prop="dataFim" :formatter="fmtDate" label="Dt. Desligamento" width="140" class-name="wordwrap" sortable></el-table-column>
+                  <el-table-column prop="dias" label="Dias" align="right" width="90" ></el-table-column>
                 </el-table>
               </el-tab-pane>
 
-              <el-tab-pane label="Ranking de Cidades" name="cidades">
-                <el-table :data="dadosRankingCidades" 
+              <el-tab-pane v-for="(planilha, index) in planilhas" :key="index" :label="planilha.titulo">
+                <el-table :data="planilha.lista" 
                   style="width: 100%" border size="small" 
                   :default-sort="{prop: 'quantidade', order: 'descending'}"
                   :height="tableHeight">
-
-                  <el-table-column prop="cidade" label="Cidade" sortable width="300"></el-table-column>
-                  <el-table-column prop="uf" label="UF" width="80"></el-table-column>
-                  <el-table-column prop="quantidade" label="Atendimentos" align="right" sortable width="150" ></el-table-column>
+                  <el-table-column prop="nome" :label="planilha.labelChave" sortable width="300"></el-table-column>
+                  <el-table-column prop="quantidade" label="Quantidade" align="right" sortable width="150" ></el-table-column>
                 </el-table>
-              </el-tab-pane>
+              </el-tab-pane>  
 
-              <el-tab-pane label="Ranking de Encaminhadores" name="encaminhadores">
-
-                <el-table :data="dadosRankingEncaminhamentos" 
-                  style="width: 100%" border size="small" 
-                  :default-sort="{prop: 'quantidade', order: 'descending'}"
-                  :height="tableHeight">
-
-                  <el-table-column prop="nome" label="Encaminhador" sortable width="400"></el-table-column>
-                  <el-table-column prop="quantidade" label="Atendimentos" sortable align="right" width="150" ></el-table-column>
-                </el-table>
-
-              </el-tab-pane>
             </el-tabs>
 
           </el-col>
@@ -114,10 +84,6 @@
 </template>
 
 <script>
-
-import XLSX from 'xlsx'
-//import { saveAs } from '../../FileSaver';
-
 
 export default {
 
@@ -151,15 +117,13 @@ export default {
 
     activeTabName: 'movimentacao',
 
-    //dialogExclusaoVisible : false,
-
-    //idToDelete : null,
-    //textToDelete : null,
-
     form : {
       dataInicial : null,
       dataFinal : null
     },
+
+    dadosResumo: [],
+    planilhas: [],
 
     dadosPlanilhaGeral:[],
     dadosRankingCidades:[],
@@ -183,9 +147,6 @@ export default {
 
   watch: {
     windowHeight(newHeight, oldHeight) {
-      //this.txt = `mudou de ${oldHeight} para ${newHeight}`
-      //this.styleGrid = `max-height: ${newHeight - 272}px`
-      //this.styleContainerMapa = `height: ${newHeight-270}px`
       this.tableHeight = `${newHeight-270}`
     }    
   },  
@@ -193,10 +154,15 @@ export default {
   methods: {
 
     resetData(){
+
+      this.form.dataInicial = petraDateTime.primeiroDiaMesAnterior()
+      this.form.dataFinal = petraDateTime.ultimoDiaMesAnterior()
+      /*
       this.form = {
         dataInicial : null,
         dataFinal : null
       }
+      */
       this.erros = []
     },
 
@@ -239,6 +205,12 @@ export default {
       return dataInicial + " até " + dataFinal
     },
 
+    getFileName(){
+      const dataInicial = petraDateTime.formatDate(this.form.dataInicial, "YYYY-MM-DD"); 
+      const dataFinal = petraDateTime.formatDate(this.form.dataFinal, "YYYY-MM-DD"); 
+      return `planilhaGeral${dataInicial}_${dataFinal}.xls`
+    },
+
     handleSave(){
       this.doSave()
     },
@@ -254,11 +226,13 @@ export default {
       }
       petra.axiosPost("/app/hospedagem/planilha_geral", dados)
         .then(response => {
-          this.dadosPlanilhaGeral = response.data.planilhaGeral
-          this.dadosRankingCidades = response.data.rankingCidades;
-          this.dadosRankingEncaminhamentos = response.data.rankingEncaminhamentos;
+          console.log(response.data)
+          this.dadosResumo = response.data.resumoHospedagens
+          this.planilhas = response.data.planilhas
+          //this.dadosPlanilhaGeral = response.data.planilhaGeral
+          //this.dadosRankingCidades = response.data.rankingCidades;
+          //this.dadosRankingEncaminhamentos = response.data.rankingEncaminhamentos;
 
-          //console.log(response.data)
           this.state="browse"
         })
         .catch(error => {
@@ -271,97 +245,26 @@ export default {
         dataIni : this.form.dataInicial,
         dataFim : this.form.dataFinal
       }
-      //const download = require('js-file-download');
+
       petra.axiosBlobPost("/app/hospedagem/planilha_geral_arquivo", dados)
         .then(response => {
-            // download(res.data, 'Detail_Blast.xls');
-
             
             var blob = new Blob([response.data], {
               type: 'application/xls'
             });
-            /*
-            var url = window.URL.createObjectURL(blob)
-            window.open(url);
-            */
 
-
-             //var blob = new Blob(response.data, {type:"application/xlsx"});
              var FileSaver = require('file-saver');
-             FileSaver.saveAs(blob, "planilhaExcel.xls");
+             
+             var fileName = this.getFileName();
 
-            //var blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
-            //FileSaver.saveAs(blob, "hello_world.txt");    
-
-            //var FileSaver = require('file-saver'); 
-            //FileSaver.saveAs(new Blob([response.data]));
-
-
-            //var fileDownload = require('js-file-download');
-            //fileDownload(response.data, 'planilha.xlsx');
-            
-            //////const url = window.URL.createObjectURL(reponse.data);
-            
-            //const url = window.URL.createObjectURL(new Blob([response.data]));
-            //const link = document.createElement('a');
-            //link.href = url;
-            //link.setAttribute('download', 'arquivo.xlsx'); //or any other extension
-            //document.body.appendChild(link);
-            //link.click();
-
-
-
-          //this.dadosPlanilhaGeral = response.data.planilhaGeral
-          //this.dadosRankingCidades = response.data.rankingCidades;
-          //this.dadosRankingEncaminhamentos = response.data.rankingEncaminhamentos;
-
-          //console.log(response.data)
-          //this.state="browse"
+             FileSaver.saveAs(blob, fileName);
         })
         .catch(error => {
+          console.log("ERRO")
+          console.log(error)
           this.erros = petra.tratarErros(error)
         })
-    },
-
-    excel() { // On Click Excel download button
-      /*
-      var animals = [
-                  {"name": "cat", "category": "animal"}
-                  ,{"name": "dog", "category": "animal"}
-                  ,{"name": "pig", "category": "animal"}
-                ]
-
-      var pokemons = [
-                  {"name": "pikachu", "category": "pokemon"}
-                  ,{"name": "Arbok", "category": "pokemon"}
-                  ,{"name": "Eevee", "category": "pokemon"}
-                ]
-      */
-    
-      // export json to Worksheet of Excel
-      // only array possible
-      var dadosPlanilhaGeralWS = XLSX.utils.json_to_sheet(this.dadosPlanilhaGeral) 
-      var dadosRankingCidadesWS = XLSX.utils.json_to_sheet(this.dadosRankingCidades) 
-      var dadosRankingEncaminhamentosWS = XLSX.utils.json_to_sheet(this.dadosRankingEncaminhamentos) 
-
-
-
-
-      //var animalWS = XLSX.utils.json_to_sheet(animals) 
-      //var pokemonWS = XLSX.utils.json_to_sheet(pokemons) 
-
-      // A workbook is the name given to an Excel file
-      var wb = XLSX.utils.book_new() // make Workbook of Excel
-
-      // add Worksheet to Workbook
-      // Workbook contains one or more worksheets
-      XLSX.utils.book_append_sheet(wb, dadosPlanilhaGeralWS, 'Movimentacao') // sheetAName is name of Worksheet
-      XLSX.utils.book_append_sheet(wb, dadosRankingCidadesWS, 'Ranking de Cidades') // sheetAName is name of Worksheet
-      XLSX.utils.book_append_sheet(wb, dadosRankingEncaminhamentosWS, 'Ranking de Encaminhadores')   
-
-      // export Excel file
-      XLSX.writeFile(wb, 'atendimentosNoMes.xlsx') // name of the file is 'book.xlsx'
-    },
+    }
 
 
   }

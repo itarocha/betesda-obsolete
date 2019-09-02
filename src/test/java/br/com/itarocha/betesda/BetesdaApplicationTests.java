@@ -15,5 +15,4 @@ public class BetesdaApplicationTests {
 	public void contextLoads() {
 		assertEquals(5, 5);
 	}
-
 }

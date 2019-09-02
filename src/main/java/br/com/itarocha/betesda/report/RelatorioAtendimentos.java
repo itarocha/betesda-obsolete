@@ -1,44 +1,18 @@
 package br.com.itarocha.betesda.report;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class RelatorioAtendimentos {
 	
-	private List<PlanilhaGeral> planilhaGeral;
-	private List<CidadeQuantidade> rankingCidades;
-	private List<ChaveValor> rankingEncaminhamentos;
+	private List<ResumoHospedagem> resumoHospedagens;
 	private List<AtividadeHospedagem> atividadesHospedagem;
-	private List<PessoaEstatistica> listaPessoas;
-
+	private List<AtividadeHospedagem> planilhas;
+	
 	public RelatorioAtendimentos() {
 		this.atividadesHospedagem = new ArrayList<>();
-		this.listaPessoas = new ArrayList<>();
-	}
-	
-	public List<PlanilhaGeral> getPlanilhaGeral() {
-		return planilhaGeral;
-	}
-	
-	public void setPlanilhaGeral(List<PlanilhaGeral> planilhaGeral) {
-		this.planilhaGeral = planilhaGeral;
-	}
-	
-	public List<CidadeQuantidade> getRankingCidades() {
-		return rankingCidades;
-	}
-	
-	public void setRankingCidades(List<CidadeQuantidade> rankingCidades) {
-		this.rankingCidades = rankingCidades;
-	}
-	
-	public List<ChaveValor> getRankingEncaminhamentos() {
-		return rankingEncaminhamentos;
-	}
-	
-	public void setRankingEncaminhamentos(List<ChaveValor> rankingEncaminhamentos) {
-		this.rankingEncaminhamentos = rankingEncaminhamentos;
+		this.planilhas = new ArrayList<>();
+		this.resumoHospedagens = new ArrayList<>();
 	}
 
 	public void addAtividadeHospedagem(String titulo, List<ChaveValor> lista) {
@@ -53,23 +27,23 @@ public class RelatorioAtendimentos {
 		this.atividadesHospedagem = atividadesHospedagem;
 	}
 
-	public Collection<PessoaEstatistica> getListaPessoas() {
-		return listaPessoas;
+	public void addPlanilha(String titulo, String labelChave, List<ChaveValor> lista) {
+		this.planilhas.add(new AtividadeHospedagem(titulo, labelChave, lista));
 	}
 	
-	public void setListaPessoas(List<PessoaEstatistica> listaPessoas) {
-		
-		/*
-		listaPessoas.sort( (a, b) -> {
-			if(a.getPessoaId().equals(b.getPessoaId())) {
-				return a.getDataEntrada().compareTo(b.getDataEntrada());
-			}
-			return a.getPessoaId().compareTo(b.getPessoaId());
-		});
-	*/
-		
-		
-		this.listaPessoas = listaPessoas;
+	public List<AtividadeHospedagem> getPlanilhas() {
+		return planilhas;
 	}
-	
+
+	public void setPlanilhas(List<AtividadeHospedagem> planilhas) {
+		this.planilhas = planilhas;
+	}
+
+	public List<ResumoHospedagem> getResumoHospedagens() {
+		return resumoHospedagens;
+	}
+
+	public void setResumoHospedagens(List<ResumoHospedagem> resumoHospedagens) {
+		this.resumoHospedagens = resumoHospedagens;
+	}
 }

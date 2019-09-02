@@ -67,7 +67,7 @@ import br.com.itarocha.betesda.utils.LocalDateUtils;
 import br.com.itarocha.betesda.utils.StrUtil;
 
 @Service
-@Transactional /* todo (rollbackForClassName)*/
+@Transactional
 public class HospedagemService {
 
 	private static final int QTD_DIAS = 7;
@@ -551,10 +551,6 @@ public class HospedagemService {
 		});
 		
 		retorno.setQuadro(quadro);
-
-		
-		
-		
 		
 		
 		//FIXME Dashboard REMOVIDO TEMPORÁRIAMENTE
@@ -723,6 +719,7 @@ public class HospedagemService {
 	}
 	*/
 	
+	/*
 	private Map<Long, Pessoa> getPessoasPorPeriodo(LocalDate dataIni, LocalDate dataFim) {
 		Map<Long, Pessoa> mapa = new HashMap<>();
 		
@@ -754,7 +751,8 @@ public class HospedagemService {
 		
 		return mapa;
 	}
-
+	*/
+	/*
 	private Map<Long, Hospedagem> getHospedagensPorPeriodo(LocalDate dataIni, LocalDate dataFim) {
 		Map<Long, Hospedagem> mapa = new HashMap<>();
 		
@@ -786,7 +784,7 @@ public class HospedagemService {
 		
 		return mapa;
 	}
-	
+	*/
 	public List<OcupacaoLeito> getLeitosOcupadosNoPeriodo(Long hospedagemId, LocalDate dataIni, LocalDate dataFim){
 		
 		List<BigInteger> todosLeitosNoPeriodo = hospedeLeitoRepo.leitosNoPeriodo(dataIni, dataFim);
@@ -1219,8 +1217,6 @@ public class HospedagemService {
 		
 		//TODO Hóspede não pode já estar hospedado em algum outro leito no período 
 		
-		
-		
 		Quarto q = leitoOpt.get().getQuarto();
 
 		Hospede hospede = new Hospede();
@@ -1240,7 +1236,6 @@ public class HospedagemService {
 		
 		hospedagem.getHospedes().add(hospede);
 		hospedagem = hospedagemRepo.save(hospedagem);
-		
 	} 
 	
 	//TODO Implementar renovarHospedagem

@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Workbook;
@@ -139,8 +141,11 @@ public class HospedagemController {
 			return new ResponseEntity<>(v.getErrors(), HttpStatus.BAD_REQUEST);
 		}
 
+		//relatorioService.teste(model.dataIni,  model.dataFim);
+		
 		try {
-			RelatorioAtendimentos retorno = relatorioService.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			//RelatorioAtendimentos retorno = relatorioService.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			RelatorioAtendimentos retorno = relatorioService.buildNovaPlanilha(model.dataIni, model.dataFim);
 			return new ResponseEntity<RelatorioAtendimentos>(retorno, HttpStatus.OK);
 		} catch(Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -169,13 +174,18 @@ public class HospedagemController {
 		
 		RelatorioAtendimentos retorno = null;
 		try {
-			retorno = relatorioService.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			//System.out.println(String.format("Iniciando geração do relatório - %s", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
+			//retorno = relatorioService.buildPlanilhaGeral(model.dataIni, model.dataFim);
+			retorno = relatorioService.buildNovaPlanilha(model.dataIni, model.dataFim);
+			//System.out.println(String.format("Finalizando geração do relatório - %s", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
 			// Gerar planilha
 		} catch(Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
+		//System.out.println(String.format("Gerando planilha - %s", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
 		ByteArrayInputStream in = PlanilhaGeralService.toExcel(retorno);
+		//System.out.println(String.format("Planilha gerada - %s", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)));
 		
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Disposition", "attachment; filename=planilha.xlsx");
