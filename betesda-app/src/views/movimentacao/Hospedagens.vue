@@ -546,7 +546,6 @@ export default {
         .then(response => {
             this.dados = response.data
             this.pessoas = response.data.hospedagens
-
             var cidades = []
             for (var c in this.dados.porCidade){
               var cidade = {

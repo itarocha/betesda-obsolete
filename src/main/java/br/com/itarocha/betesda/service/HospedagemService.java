@@ -2,6 +2,7 @@ package br.com.itarocha.betesda.service;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,6 +51,8 @@ import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
 import br.com.itarocha.betesda.model.hospedagem.Quadro;
 import br.com.itarocha.betesda.model.hospedagem.QuadroLeito;
 import br.com.itarocha.betesda.model.hospedagem.QuadroQuarto;
+import br.com.itarocha.betesda.report.PessoaAtendida;
+import br.com.itarocha.betesda.report.PessoaEncaminhamento;
 import br.com.itarocha.betesda.repository.DestinacaoHospedagemRepository;
 import br.com.itarocha.betesda.repository.EncaminhadorRepository;
 import br.com.itarocha.betesda.repository.EntidadeRepository;
@@ -221,6 +224,19 @@ public class HospedagemService {
 		return hospedagem;
 	}
 	
+	
+	private List<LeitoHeader> buildLeitoHeader() {
+		StringBuilder sb = StrUtil.loadFile("/sql/leitos_header_native.sql");
+		Query q = em.createNativeQuery(sb.toString());
+		List<Object[]> rec =  q.getResultList();
+		List<LeitoHeader> lst = new ArrayList<>();
+		rec.stream().forEach(record -> {
+			lst.add(new LeitoHeader(((BigInteger)record[0]).longValue(), (Integer)record[1], ((BigInteger)record[2]).longValue(), (Integer)record[3]));
+		});
+		return lst;
+	}
+	
+	
 	public MapaRetorno buildMapaRetorno(LocalDate dataBase) {
 		MapaRetorno retorno = new MapaRetorno();
 
@@ -230,10 +246,16 @@ public class HospedagemService {
 		retorno.setDataIni(dIni);
 		retorno.setDataFim(dFim);
 		
-		// Monta lista de leitos 
-		StringBuilder sbLeitos = StrUtil.loadFile("/sql/leitos_header.sql");
-		TypedQuery<LeitoHeader> qLeitos = em.createQuery(sbLeitos.toString(), LeitoHeader.class);
-		List<LeitoHeader> leitos =  qLeitos.getResultList();
+		// Monta lista de leitos
+		List<LeitoHeader> leitos = buildLeitoHeader();
+		
+		//TODO: /sql/hospede_leito_native.sql possui tudo que é necessário para montar 
+		// * mapa de hospedagem (total e parcial)
+		// * hóspedes na semana
+		// * hóspedes por cidade de origem
+		// * quadro de hospedagem 
+		// Vai substituir hospede_leito.sql e hospedes_parciais.sql
+		
 		
 		// Hóspedes totais
 		StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
