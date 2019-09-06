@@ -11,8 +11,8 @@ SELECT  hospedagem.tipo_utilizacao
       , COALESCE(hospedagem.data_efetiva_saida, hospedagem.data_prevista_saida) AS data_saida_hospedagem 
       , tb.data_entrada_leito
       , tb.data_saida_leito
-      , tb.data_ini
-      , tb.data_fim
+      , tb.data_ini AS data_ini_no_periodo
+      , tb.data_fim AS data_fim_no_periodo
       , hospede.hospedagem_id
       , tb.hospede_id
       , hospede.tipo_hospede_id

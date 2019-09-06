@@ -45,6 +45,7 @@ import br.com.itarocha.betesda.model.hospedagem.CellUtilizacao;
 import br.com.itarocha.betesda.model.hospedagem.DiaHospedagem;
 import br.com.itarocha.betesda.model.hospedagem.HospedagemHeaderInfo;
 import br.com.itarocha.betesda.model.hospedagem.HospedagemMapa;
+import br.com.itarocha.betesda.model.hospedagem.HospedeLeitoMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
@@ -236,7 +237,65 @@ public class HospedagemService {
 		return lst;
 	}
 	
+	private List<HospedeLeitoMapa> buildHospedeLeito(LocalDate dIni, LocalDate dFim) {
+		StringBuilder sb = StrUtil.loadFile("/sql/hospede_leito_native.sql");
+		Query q = em.createNativeQuery(sb.toString())
+					.setParameter("DATA_INI", dIni )
+					.setParameter("DATA_FIM", dFim );
+
+		List<Object[]> rec =  q.getResultList();
+		List<HospedeLeitoMapa> lst = new ArrayList<>();
+		rec.stream().forEach(record -> {
+			HospedeLeitoMapa h = new HospedeLeitoMapa();
+			h.setTipoUtilizacao(recordToString(record[0]));
+			h.setQuartoId(recordBigIntegerToLong(record[1]));
+			h.setQuartoNumero(recordToInteger(record[2]));
+			h.setLeitoId(recordBigIntegerToLong(record[3]));
+			h.setLeitoNumero(recordToInteger(record[4]));
+			h.setPessoaId(recordBigIntegerToLong(record[5]));
+			h.setPessoaNome(recordToString(record[6]));
+			h.setCidade(recordToString(record[7]));
+			h.setUf(recordToString(record[8]));
+			h.setDataEntradaHospedagem(recordSqlSqlDateToLocalDate(record[9]));
+			h.setDataSaidaHospedagem(recordSqlSqlDateToLocalDate(record[10]));
+			h.setDataEntradaLeito(recordSqlSqlDateToLocalDate(record[11]));
+			h.setDataSaidaLeito(recordSqlSqlDateToLocalDate(record[12]));
+			h.setDataIniNoPeriodo(LocalDate.parse(((String)record[13])));
+			h.setDataFimNoPeriodo(LocalDate.parse(((String)record[14])));
+			h.setHospedagemId(((BigInteger)record[15]).longValue());
+			h.setHospedeId(((BigInteger)record[16]).longValue());
+			h.setTipoHospedeId(((BigInteger)record[17]).longValue());
+			h.setBaixado("S".equals(recordToString(record[18])));
+			h.setTipoHospedeDescricao(recordToString(record[19]));
+			h.setDestinacaoHospedagemId(recordBigIntegerToLong(record[20]));
+			h.setDestinacaoHospedagemDescricao(recordToString(record[21]));
+			
+			lst.add(h);
+		});
+		return lst;
+	}
 	
+	private String recordToString(Object value) {
+		return (String) value;
+	}
+	
+	private Long recordBigIntegerToLong(Object value) {
+		return ((BigInteger) value).longValue();
+	}
+	
+	private Integer recordToInteger(Object value) {
+		return (Integer) value;
+	}
+
+	private LocalDate recordStringToLocalDate(Object value) {
+		return LocalDate.parse((String) value);
+	}
+
+	private LocalDate recordSqlSqlDateToLocalDate(Object value) {
+		java.sql.Date dt = ((java.sql.Date)value);
+		return dt.toLocalDate();
+	}
+
 	public MapaRetorno buildMapaRetorno(LocalDate dataBase) {
 		MapaRetorno retorno = new MapaRetorno();
 
@@ -249,7 +308,9 @@ public class HospedagemService {
 		// Monta lista de leitos
 		List<LeitoHeader> leitos = buildLeitoHeader();
 		
+		
 		//TODO: /sql/hospede_leito_native.sql possui tudo que é necessário para montar 
+		List<HospedeLeitoMapa> listaHospedeLeito = buildHospedeLeito(dIni, dFim);
 		// * mapa de hospedagem (total e parcial)
 		// * hóspedes na semana
 		// * hóspedes por cidade de origem
@@ -581,232 +642,6 @@ public class HospedagemService {
 		return retorno;
 	}
 
-	/*
-	public RelatorioAtendimentos buildPlanilhaGeral(LocalDate dataIni, LocalDate dataFim){
-		
-		RelatorioAtendimentos relatorio = new RelatorioAtendimentos();
-		
-		// Hóspedagens Totais
-		StringBuilder sbHPTotal = StrUtil.loadFile("/sql/hospede_permanencia_total.sql");
-		TypedQuery<HospedePermanencia> qHPTotal = em.createQuery(sbHPTotal.toString(), HospedePermanencia.class)
-				.setParameter("DATA_INI", dataIni )
-				.setParameter("DATA_FIM", dataFim );
-		List<HospedePermanencia> listaHPTotal = qHPTotal.getResultList();
-
-		// Hóspedagens Totais
-		StringBuilder sbHPParcial = StrUtil.loadFile("/sql/hospede_permanencia_parcial.sql");
-		TypedQuery<HospedePermanencia> qHPParcial = em.createQuery(sbHPParcial.toString(), HospedePermanencia.class)
-				.setParameter("DATA_INI", dataIni )
-				.setParameter("DATA_FIM", dataFim )
-				.setParameter("TIPO_UTILIZACAO", TipoUtilizacaoHospedagem.P);
-		
-		List<HospedePermanencia> listaHPParcial = qHPParcial.getResultList();
-		
-		listaHPTotal.addAll(listaHPParcial);
-		
-		
-		List<HospedePermanencia> listaOutros = new ArrayList<>();
-		
-		Map<String, HospedePermanencia> map = new HashMap<>();
-		
-		for (HospedePermanencia hp : listaHPTotal) {
-			
-			String key = String.format("%06d-%06d", hp.getPessoaId(), hp.getHospedagemId());
-			
-			if (!map.containsKey(key)) {
-				map.put(key, hp);
-			} else {
-				HospedePermanencia hpOld = map.get(key);
-				long dias = java.time.temporal.ChronoUnit.DAYS.between(hpOld.getDataSaida(), hp.getDataEntrada());
-				
-				if (dias > 1) {
-					listaOutros.add(hpOld);
-					
-					map.put(key, hp);
-				} else {
-					if (hpOld.getDataEntrada().isBefore(hp.getDataEntrada())) {
-						hp.setDataEntrada(hpOld.getDataEntrada());
-					}
-					if (hpOld.getDataSaida().isAfter(hp.getDataSaida())) {
-						hp.setDataSaida(hpOld.getDataSaida());
-					}
-					map.put(key, hp);
-				}
-			}
-			
-		}
-		
-		List<HospedePermanencia> lstHospedePerm = new ArrayList(map.values());
-		
-		for(HospedePermanencia o : listaOutros) {
-			lstHospedePerm.add(o);
-		}
-		
-		//TODO ordenar a planilha
-		lstHospedePerm.sort( (a, b) -> {
-			if(a.getPessoaId().equals(b.getPessoaId())) {
-				return a.getDataEntrada().compareTo(b.getDataEntrada());
-			}
-			return a.getPessoaId().compareTo(b.getPessoaId());
-		});
-		
-		for(HospedePermanencia o : lstHospedePerm) {
-			if (o.getDataEntrada().isBefore(dataIni)) {
-				o.setDataEntrada(dataIni);
-			}
-			if (o.getDataSaida().isAfter(dataFim)) {
-				o.setDataSaida(dataFim);
-			}
-			
-			long dias = java.time.temporal.ChronoUnit.DAYS.between(o.getDataEntrada(), o.getDataSaida());
-			o.setDiasPermanencia(dias+1);
-			
-		}
-		
-		List<PlanilhaGeral> planilha = lstHospedePerm.stream().map( temp -> {
-			PlanilhaGeral pg = new PlanilhaGeral();
-
-			pg.setPessoaId(temp.getPessoaId());
-			pg.setPessoaNome(temp.getPessoa().getNome());
-			pg.setPessoaCPF(temp.getPessoa().getCpf());
-			pg.setPessoaRG(temp.getPessoa().getRg());
-			pg.setPessoaEndereco(temp.getPessoa().getEndereco() == null ? "" : temp.getPessoa().getEndereco().semCidadeToString());
-			pg.setPessoaTelefone(temp.getPessoa().getTelefone());
-			
-			pg.setPessoaDataNascimento(temp.getPessoa().getDataNascimento());
-			
-			pg.setCidadeOrigem(new CidadeUF(temp.getPessoa().getEndereco().getCidade(), temp.getPessoa().getEndereco().getUf().toString()));
-			
-			pg.setDataEntrada(temp.getDataEntrada());
-			pg.setDataSaida(temp.getDataSaida());
-			pg.setDiasPermanencia(temp.getDiasPermanencia());
-			pg.setEncaminhadorId(temp.getEncaminhadorId());
-			pg.setEncaminhadorNome(temp.getHospedagem().getEntidade() == null ? null : temp.getHospedagem().getEntidade().getNome());
-			pg.setHospedagemId(temp.getHospedagemId());
-			
-			pg.setTipoUtilizacao(temp.getTipoUtilizacao());
-			pg.setTipoHospede(temp.getHospede() == null ? null : temp.getHospede().getTipoHospede().getDescricao() );
-			
-			
-			int idade = Period.between(pg.getPessoaDataNascimento(), pg.getDataEntrada()).getYears();
-			pg.setPessoaIdade(idade);
-			
-			return pg;
-		}).collect(Collectors.toList());
-
-		
-		// Ranking de cidades
-		Map<CidadeUF, Long> mapaCidades = new TreeMap<>();
-		
-		for (PlanilhaGeral p : planilha) {
-			if (mapaCidades.containsKey(p.getCidadeOrigem())) {
-				Long dias = mapaCidades.get(p.getCidadeOrigem());
-				mapaCidades.put(p.getCidadeOrigem(), p.getDiasPermanencia() + dias );
-			} else {
-				mapaCidades.put(p.getCidadeOrigem(), p.getDiasPermanencia());
-			}
-		}
-		
-		List<CidadeQuantidade> rankingCidades = mapaCidades.entrySet().stream().map(temp -> {
-			return new CidadeQuantidade(temp.getKey().getCidade(), temp.getKey().getUf(), temp.getValue());
-		}).collect(Collectors.toList());
-		
-		rankingCidades.sort((a, b) -> b.getQuantidade().compareTo(a.getQuantidade()));
-		
-		
-		// Ranking de Encaminhadores
-		Map<String, Long> mapaEncaminhadores = new TreeMap<>();
-		
-		for (PlanilhaGeral p : planilha) {
-			if (mapaEncaminhadores.containsKey(p.getEncaminhadorNome())) {
-				Long dias = mapaEncaminhadores.get(p.getEncaminhadorNome());
-				mapaEncaminhadores.put(p.getEncaminhadorNome(), p.getDiasPermanencia() + dias );
-			} else {
-				mapaEncaminhadores.put(p.getEncaminhadorNome(), p.getDiasPermanencia());
-			}
-		}
-		
-		List<ChaveValor> rankingEncaminhamentos = mapaEncaminhadores.entrySet().stream().map(temp -> {
-			return new ChaveValor(temp.getKey(), temp.getValue());
-		}).collect(Collectors.toList());
-		
-		rankingEncaminhamentos.sort((a, b) -> b.getQuantidade().compareTo(a.getQuantidade()));
-		
-		relatorio.setPlanilhaGeral(planilha);
-		relatorio.setRankingCidades(rankingCidades);
-		relatorio.setRankingEncaminhamentos(rankingEncaminhamentos);
-		
-		
-		return relatorio;
-	}
-	*/
-	
-	/*
-	private Map<Long, Pessoa> getPessoasPorPeriodo(LocalDate dataIni, LocalDate dataFim) {
-		Map<Long, Pessoa> mapa = new HashMap<>();
-		
-		// Pessoas Totais
-		StringBuilder sbPTotal = StrUtil.loadFile("/sql/pessoa_permanencia_total.sql");
-		TypedQuery<Pessoa> qPTotal = em.createQuery(sbPTotal.toString(), Pessoa.class)
-				.setParameter("DATA_INI", dataIni )
-				.setParameter("DATA_FIM", dataFim );
-		List<Pessoa> listaPTotal = qPTotal.getResultList();
-		
-		// Pessoas Parciais
-		StringBuilder sbPParcial = StrUtil.loadFile("/sql/pessoa_permanencia_parcial.sql");
-		TypedQuery<Pessoa> qPParcial = em.createQuery(sbPParcial.toString(), Pessoa.class)
-				.setParameter("DATA_INI", dataIni )
-				.setParameter("DATA_FIM", dataFim )
-				.setParameter("TIPO_UTILIZACAO", TipoUtilizacaoHospedagem.P);
-		List<Pessoa> listaPParcial = qPParcial.getResultList();
-
-		for(Pessoa p : listaPTotal) {
-			if (!mapa.containsKey(p.getId())) {
-				mapa.put(p.getId(), p);
-			}
-		}
-		for(Pessoa p : listaPParcial) {
-			if (!mapa.containsKey(p.getId())) {
-				mapa.put(p.getId(), p);
-			}
-		}
-		
-		return mapa;
-	}
-	*/
-	/*
-	private Map<Long, Hospedagem> getHospedagensPorPeriodo(LocalDate dataIni, LocalDate dataFim) {
-		Map<Long, Hospedagem> mapa = new HashMap<>();
-		
-		// Hospedagens Totais
-		StringBuilder sbPTotal = StrUtil.loadFile("/sql/hospedagem_permanencia_total.sql");
-		TypedQuery<Hospedagem> qPTotal = em.createQuery(sbPTotal.toString(), Hospedagem.class)
-				.setParameter("DATA_INI", dataIni )
-				.setParameter("DATA_FIM", dataFim );
-		List<Hospedagem> listaPTotal = qPTotal.getResultList();
-		
-		// Hospedagens Parciais
-		StringBuilder sbPParcial = StrUtil.loadFile("/sql/hospedagem_permanencia_parcial.sql");
-		TypedQuery<Hospedagem> qPParcial = em.createQuery(sbPParcial.toString(), Hospedagem.class)
-				.setParameter("DATA_INI", dataIni )
-				.setParameter("DATA_FIM", dataFim )
-				.setParameter("TIPO_UTILIZACAO", TipoUtilizacaoHospedagem.P);
-		List<Hospedagem> listaPParcial = qPParcial.getResultList();
-
-		for(Hospedagem p : listaPTotal) {
-			if (!mapa.containsKey(p.getId())) {
-				mapa.put(p.getId(), p);
-			}
-		}
-		for(Hospedagem p : listaPParcial) {
-			if (!mapa.containsKey(p.getId())) {
-				mapa.put(p.getId(), p);
-			}
-		}
-		
-		return mapa;
-	}
-	*/
 	public List<OcupacaoLeito> getLeitosOcupadosNoPeriodo(Long hospedagemId, LocalDate dataIni, LocalDate dataFim){
 		
 		List<BigInteger> todosLeitosNoPeriodo = hospedeLeitoRepo.leitosNoPeriodo(dataIni, dataFim);
