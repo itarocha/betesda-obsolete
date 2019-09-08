@@ -19,9 +19,10 @@
           <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
-              <el-tab-pane label="Mapa de Hospedagem" name="mapa">
+              <el-tab-pane label="Old Mapa de Hospedagem" name="mapa">
 
                 <el-container style="margin:2px;">
+                  <!--
                   <el-container :style="styleContainerMapa">
 
                     <el-header style="line-height:20px; height:54px;">
@@ -82,9 +83,63 @@
 
                     </el-main>
                   </el-container>
+                  -->
                 </el-container>
               </el-tab-pane>
 
+
+              <el-tab-pane label="New Mapa de Hospedagem" name="new-mapa">
+
+                <el-container style="margin:2px;">
+                  <el-container :style="styleContainerMapa">
+
+                    <el-header style="line-height:20px; height:54px;">
+                      <el-row type="flex">
+                        <el-col>
+                          <div class="thebox p4 laranja h60">
+                            <span style="font-size: 12pt; align:center;">Quarto/</span>
+                            <span style="font-size: 12pt; align:center;">Leito</span>
+                          </div>
+                        </el-col>
+
+                        <el-col v-for="(dia, index) in dados.dias" :key="index" 
+                          :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
+                          <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px" @click="selecionarDia(dia, index)">
+                            <p style="font-size: 9pt">{{diaSemana(dia)}}</p>
+                            <p style="font-size: 12pt">{{formatDate(dia,'DD/MMM')}}</p>
+                          </div>
+                        </el-col>
+                        <div class="w15"></div>
+                      </el-row>                      
+                    </el-header>
+                    
+                    <el-main style="padding-top:0px;">
+
+                      <div :style="styleGrid" class="scroll-y p0">
+                        <div class="container-mapa" v-for="(celula, index) in linhas" :key="index">
+                          <div class="titulo">
+                              <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                              <center v-if="celula.quartoNumero == '9999'">Parcial</center>
+                          </div> 
+                          <div>
+                            <div class="container-linha" v-for="(h, idx) in celula.hospedagens" :key="idx">
+                              <div v-for="(classe, idxClasses) in h.classes" :key="idxClasses" style="border: 1px solid grey;">
+                                <div slot="reference" :class="newHospedagemClass(classe)" style="{backgroundColor: red;}"
+                                      @click="showHospedagemInfoByIdentificador(-1)">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>  
+                      </div>
+
+                    </el-main>
+                  </el-container>
+                </el-container>
+              </el-tab-pane>
+
+
+              <!--
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 <el-row type="flex" justify="center" align="middle">
                   <el-col :sm="24" :md="24" :lg="24">
@@ -181,14 +236,6 @@
 
                     <el-header style="line-height:20px; height:54px;">
                       <el-row type="flex">
-                        <!--
-                        <el-col>
-                          <div class="thebox p4 laranja h60">
-                            <span style="font-size: 12pt; align:center;">Quarto/</span>
-                            <span style="font-size: 12pt; align:center;">Leito</span>
-                          </div>
-                        </el-col>
-                        -->
                         <el-col v-for="(dia, index) in dados.dias" :key="index" 
                           :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
                           <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px; text-align:center; font-size: 10pt;"  @click="selecionarDia(dia, index)">
@@ -196,24 +243,14 @@
                             <p>{{formatDate(dia,'DD/MMM')}}</p>
                           </div>
                         </el-col>
-                        <!--<div class="w15"></div>-->
                       </el-row>                      
                     </el-header>
-
 
                     <el-main style="padding-top:10px;">
 
                       <el-col :sm="10" :md="10" :lg="10">
 
                         <el-row type="flex" v-for="(quarto, index) in quadro.quartos" :key="index">
-                          <!--
-                          <el-col>
-                            <div class="thebox hleito laranja" style="text-align:center;">
-                              {{quarto.numero}}
-                            </div>
-                          </el-col>
-                          -->
-
                           <el-col v-for="(leito, lid) in quarto.leitos" :key="lid">
                             <div v-if="leito.id != 0" :class="quadroClass(0, index, lid)"  style="text-align:center; cursor:pointer;" @click="getHospedagensByLeitoId(leito.id)">
                               {{quarto.numero}}-{{leito.numero}}
@@ -257,11 +294,10 @@
 
                       </el-col>
 
-
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
-
+              -->
             </el-tabs>
 
           </el-col>
@@ -270,7 +306,6 @@
     </el-container>
 
     <tela-hospedagem v-if="state=='info'" @close="onCloseInfo" :id="hospedagemSelecionada"></tela-hospedagem>
-
 
     <div>
       <el-dialog title="Detalhes da Pessoa" :visible.sync="editPessoa" width="800px">
@@ -292,7 +327,7 @@
 
 
 export default {
-  name: 'Hospedagens',
+  name: 'NewHospedagens',
 
   components: {
     TelaHospedagem,
@@ -303,7 +338,7 @@ export default {
   },
 
   mounted(){
-    this.$store.dispatch('setAcao','Hospedagens')
+    this.$store.dispatch('setAcao','New Hospedagens')
 
     this.windowHeight = window.innerHeight
 
@@ -329,7 +364,6 @@ export default {
     state : "browse",
     hospedagemSelecionada : null,
 
-
     windowHeight: 0,
     styleGrid : 'max-height: 337px',
     styleContainerMapa : 'height:300px',
@@ -354,6 +388,9 @@ export default {
     cidades:[],
     quadro:[],
     hospedagensQuadro: [],
+
+    //VALENDO!!!!
+    linhas:[],
 
     dadosPlanilhaGeral:[],
     dadosRankingCidades:[],
@@ -403,7 +440,6 @@ export default {
 
       var d = moment(this.dataAtual).toDate()
       this.diaIndex = petraDateTime.getIndiceData(this.dataAtual)
-      //console.log("diaIndex = " + this.diaIndex)
 
       this.setShowDate(d)
       this.getDadosSemanaAtual()
@@ -449,7 +485,7 @@ export default {
         case 'md': return 'max-height: 337px'
         
         case 'lg': return 'max-height: 337px'
-        case 'xl': return 'max-height: 673px' //613
+        case 'xl': return 'max-height: 673px'
       }
     },
     
@@ -481,7 +517,6 @@ export default {
     onCancelPessoa(id) {
       this.pessoaId = null
       this.editPessoa = false
-      //this.doGetAll()
     },
 
     onSavePessoa(id) {
@@ -540,10 +575,11 @@ export default {
       var dados = {
         data : data
       }
-      petra.axiosPost("/app/hospedagem/mapa", dados)
+      petra.axiosPost("/app/hospedagem/mapa_new", dados)
         .then(response => {
             this.dados = response.data
-            console.log(this.dados)
+            this.linhas = response.data.linhas;
+            console.log(this.linhas)
             this.pessoas = response.data.hospedagens
             var cidades = []
             for (var c in this.dados.porCidade){
@@ -652,6 +688,7 @@ export default {
       return "thebox-circular";
     },
 
+    // Deprecated
     hospedagemClass(id, classe, dias){
       var hospedagem = this.getHospedagemById(id);
 
@@ -662,10 +699,10 @@ export default {
           if (classe == "INICIO") {
             return 'grafico grafico_inicio'
           } else 
-          if (classe == "INICIO_FIM") {
+          if (classe == "INICIOFIM") {
             return 'grafico grafico_inicio grafico_fim'
           } else 
-          if (classe == "INICIO_INDO") {
+          if (classe == "INICIOINDO") {
             return 'grafico grafico_inicio_indo' // grafico_indo grafico_inicio
           } else 
           if (classe == "DURANTE") {
@@ -680,12 +717,58 @@ export default {
           if (classe == "VINDO") {
             return 'grafico grafico_vindo'
           } else
-          if (classe == "INDO_VINDO") {
+          if (classe == "INDOVINDO") {
             return 'grafico grafico_indo grafico_vindo'
           } else
-          if (classe == "VINDO_FIM") {
+          if (classe == "VINDOFIM") {
             return 'grafico grafico_vindo grafico_fim'
           }
+      }
+      return ''
+    },  
+
+    /*
+    buildHospedagemClass(index, idxIni, idxFim, classeIni, classeFim){
+      var classe = "";
+      var classeA = (idxIni == index-1) ? classeIni : "";
+      var classeB = (index > idxIni+1 && index < idxFim+1) ? "DURANTE" : "";
+      var classeC = (idxFim == index-1) ? classeFim : "";
+
+      return classeA + classeB + classeC;
+    },
+    */                          
+
+    // NOVO
+    newHospedagemClass(classe){
+      if (classe == "BAIXADO"){
+        return 'grafico grafico_fim_baixado'
+      } else
+      if (classe == "INICIO") {
+        return 'grafico grafico_inicio'
+      } else 
+      if (classe == "INICIOFIM") {
+        return 'grafico grafico_inicio grafico_fim'
+      } else 
+      if (classe == "INICIOINDO") {
+        return 'grafico grafico_inicio_indo' // grafico_indo grafico_inicio
+      } else 
+      if (classe == "DURANTE") {
+        return 'grafico grafico_durante'
+      } else 
+      if (classe == "FIM") {
+        return 'grafico grafico_fim'
+      } else
+      if (classe == "INDO") {
+        return 'grafico grafico_indo'
+      } else      
+      if (classe == "VINDO") {
+        return 'grafico grafico_vindo'
+      } else
+      if (classe == "INDOVINDO") {
+        return 'grafico grafico_indo grafico_vindo'
+      } else
+      if (classe == "VINDOFIM") {
+        return 'grafico grafico_vindo grafico_fim'
       }
       return ''
     },  
@@ -731,6 +814,14 @@ export default {
       }
     },
 
+    newCalcularAlturaLeito(qtd){
+      if (qtd <= 1) {
+        return '28px'
+      } else {
+        return  (qtd*28)+'px'
+      }
+    },
+
     getHospedagemById(id){
       return _.find(this.dados.hospedagens,{identificador : id});
     },
@@ -745,16 +836,11 @@ export default {
       this.quadroQuartoNumero = obj.quartoNumero
       this.quadroLeitoNumero = obj.leitoNumero
 
-      //console.log(obj)
       if (obj){
-        //console.log("hospedagens")
         for (var h in obj.hospedagens){
           var  dias = obj.hospedagens[h].dias
-          //console.log(dias)
-          //console.log("O índice é "+this.diaIndex)
 
           if (dias.length >= 0 && this.diaIndex <= dias.length){
-            //console.log(dias[this.diaIndex])
             const identificador = dias[this.diaIndex].identificador
 
             if (identificador != "0"){
@@ -764,7 +850,6 @@ export default {
           }
         }
       }
-      //console.log(this.hospedagensQuadro)
 
       return obj
     },
@@ -775,7 +860,6 @@ export default {
         if (completo)  {
           return hospedagem.pessoaNome
         } else {
-          //var nome = hospedagem.pessoaNome.split(" ")[0]
           var nome = hospedagem.pessoaNome
   
           if (nome.length > 10){
@@ -798,8 +882,6 @@ export default {
       this.state = "info"
       this.hospedagemSelecionada = id;
       this.showTelaHospedagem = true;
-
-      //this.$refs.hospedagemInfo.openDialog(id);
     },
 
     onCloseInfo(){
@@ -817,33 +899,10 @@ export default {
     
 		onDrop(event, date) {
 			this.message = `You dropped ${event.id} on ${date.toLocaleDateString()}`
-			// Determine the delta between the old start date and the date chosen,
-			// and apply that delta to both the start and end date to move the event.
 			const eLength = this.dayDiff(event.startDate, date)
 			event.originalEvent.startDate = this.addDays(event.startDate, eLength)
 			event.originalEvent.endDate = this.addDays(event.endDate, eLength)
 		},
-
-    exemplosMoment(){
-      /* 
-
-      https://tableless.com.br/trabalhando-com-moment/
-
-      const dia = moment("2018-25-02")
-      moment("abcxyz").isValid() // false
-      moment("2018-02-24").add(2, "days") // 2018-02-26
-      moment("2018-02-24").add(1, "year").subtract("1", "days") // 2019-02-23
-
-      moment().format("dd/MM/yyyy HH-mm") // 25/02/2018 13-35
-      moment("abcxyz").format('YYYY MM DD') // "Invalid date"
-
-      moment('2017-10-20').isBefore('2017-10-21'); // true
-      moment('2017-10-20').isBefore('2010-12-31', 'year'); // false
-      moment('2017-10-20').isBefore('2018-01-01', 'year'); // true
-
-      moment('2010-10-20').isBetween('2010-10-19', '2010-10-25'); // true
-      */      
-    }    
 
   }
 }
@@ -895,7 +954,6 @@ export default {
 }
 
 .grade {
-  /*padding: 10px;*/
   width: 100%;
 }
 
@@ -955,11 +1013,13 @@ export default {
 
 
 .grafico{
+  margin-top: 1px;
+  margin-bottom:1px;
   background-color: #E57373;
   margin-left:-1px;
   margin-right:-1px;
-  margin-top: 1px;
-  height: calc(100% - 2px);
+  margin-top: 0px;
+  /*height: calc(100% - 4px);*/
   cursor:pointer;
   padding: 0px;
 }
@@ -1017,13 +1077,7 @@ export default {
 .amber-lighten-4{
     background-color:#FFECB3;
 }
-/*
-.chip {
-  cursor:pointer;
-  margin:0px;
-  padding:1px;
-}
-*/
+
 .chip{
   font-size:8pt;
   margin-left:4px;
@@ -1046,7 +1100,7 @@ export default {
   list-style: none;
   box-orient: horizontal;
   display: flex;
-  justify-content: space-around; /*center*/
+  justify-content: space-around;
 }
 
 .wrap    { 
@@ -1076,5 +1130,33 @@ export default {
   background: #d3dce6;
 }
 
+td:nth-child(1) { background: hsl(130, 30%, 60%); }
+td:nth-child(2) { background: hsl(140, 40%, 60%); }
+td:nth-child(3) { background: hsl(150, 50%, 60%); }
+td:nth-child(4) { background: hsl(160, 60%, 60%); }
+td:nth-child(5) { background: hsl(170, 70%, 60%); }
+td:nth-child(6) { background: hsl(180, 80%, 60%); }
+td:nth-child(7) { background: hsl(190, 90%, 60%); }
+td:nth-child(8) { background: hsl(200, 99%, 60%); }
+
+.container-mapa {
+  display: grid;
+  grid-template-columns: 1fr 7fr;
+}
+
+.container-linha {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 8pt;
+}
+
+.container-mapa .container-linha div{
+  height: 28px;
+}
+
+.container-mapa div.titulo {
+  display:grid;
+  border: 1px solid #bbb;
+}
 
 </style>

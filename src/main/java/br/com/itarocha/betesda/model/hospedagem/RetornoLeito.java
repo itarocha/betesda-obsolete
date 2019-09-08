@@ -3,37 +3,23 @@ package br.com.itarocha.betesda.model.hospedagem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LeitoHeader {
-	
-	private String key;
+public class RetornoLeito {
 	
 	private Long leitoId;
-	
 	private Integer leitoNumero;
-
 	private Long quartoId;
-
 	private Integer quartoNumero;
+	private List<RetornoHospedagem> hospedagens = new ArrayList<>();
 	
-	private List<HospedagemMapa> hospedagens = new ArrayList<HospedagemMapa>();
-	
-	public LeitoHeader() {
+	public RetornoLeito() {
 		
 	}
-	
-	public LeitoHeader(Long leitoId, Integer leitoNumero, Long quartoId, Integer quartoNumero) {
+
+	public RetornoLeito(Long leitoId, Integer leitoNumero, Long quartoId, Integer quartoNumero) {
 		this.leitoId = leitoId;
 		this.leitoNumero = leitoNumero;
 		this.quartoId = quartoId;
 		this.quartoNumero = quartoNumero;
-	}
-	
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
 	}
 
 	public Long getLeitoId() {
@@ -68,11 +54,12 @@ public class LeitoHeader {
 		this.quartoNumero = quartoNumero;
 	}
 
-	public List<HospedagemMapa> getHospedagens() {
+	public List<RetornoHospedagem> getHospedagens() {
 		return hospedagens;
 	}
 
-	public void setHospedagens(List<HospedagemMapa> hospedagens) {
+	public void setHospedagens(List<RetornoHospedagem> hospedagens) {
 		this.hospedagens = hospedagens;
 	}
+
 }
