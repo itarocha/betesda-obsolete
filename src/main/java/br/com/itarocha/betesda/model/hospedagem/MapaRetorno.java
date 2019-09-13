@@ -23,7 +23,7 @@ public class MapaRetorno {
 	private Quadro quadro;
 	
 	//TODO: Breve será chamado de leitos
-	private List<RetornoLeito> linhas = new ArrayList<>();
+	private List<MicroLeito> linhas = new ArrayList<>();
 	
 	/*
 	private Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
@@ -96,11 +96,11 @@ public class MapaRetorno {
 		return this.quadro;
 	}
 
-	public List<RetornoLeito> getLinhas() {
+	public List<MicroLeito> getLinhas() {
 		return linhas;
 	}
 
-	public void setLinhas(List<RetornoLeito> linhas) {
+	public void setLinhas(List<MicroLeito> linhas) {
 		this.linhas = linhas;
 	}
 

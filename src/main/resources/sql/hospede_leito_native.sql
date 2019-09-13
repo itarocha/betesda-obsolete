@@ -22,6 +22,8 @@ SELECT  hospedagem.tipo_utilizacao
       , th.descricao tipo_hospede_descricao
       , hospedagem.destinacao_hospedagem_id
       , dh.descricao destinacao_hospedagem_descricao
+      , hospedagem.data_prevista_saida
+      , hospedagem.data_efetiva_saida
 FROM    (
 			SELECT  hl.hospede_id
 			      , quarto.id AS quarto_id

@@ -19,10 +19,10 @@
           <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
+                  <!--
               <el-tab-pane label="Old Mapa de Hospedagem" name="mapa">
 
                 <el-container style="margin:2px;">
-                  <!--
                   <el-container :style="styleContainerMapa">
 
                     <el-header style="line-height:20px; height:54px;">
@@ -83,12 +83,12 @@
 
                     </el-main>
                   </el-container>
-                  -->
                 </el-container>
               </el-tab-pane>
+                  -->
 
 
-              <el-tab-pane label="New Mapa de Hospedagem" name="new-mapa">
+              <el-tab-pane label="New Mapa de Hospedagem" name="mapa">
 
                 <el-container style="margin:2px;">
                   <el-container :style="styleContainerMapa">
@@ -123,9 +123,10 @@
                           </div> 
                           <div>
                             <div class="container-linha" v-for="(h, idx) in celula.hospedagens" :key="idx">
-                              <div v-for="(classe, idxClasses) in h.classes" :key="idxClasses" style="border: 1px solid grey;">
-                                <div slot="reference" :class="newHospedagemClass(classe)" style="{backgroundColor: red;}"
-                                      @click="showHospedagemInfoByIdentificador(-1)">
+                              <div v-for="(classe, idxClasses) in h.classes" :key="idxClasses" class="celula-borda-cinza">
+                                <div v-if="h.hospedagem != null" slot="reference" :class="newHospedagemClass(classe, h.hospedagem.statusHospedagem)" 
+                                      @click="showHospedagemInfo(h.hospedagem.hospedagemId)">
+                                       <div class="chip" v-if="idxClasses == h.idxIni"><p>{{getPrimeiroNome(h.hospedagem.pessoaNome)}}</p></div>
                                 </div>
                               </div>
                             </div>
@@ -689,6 +690,7 @@ export default {
     },
 
     // Deprecated
+    /*
     hospedagemClass(id, classe, dias){
       var hospedagem = this.getHospedagemById(id);
 
@@ -726,7 +728,7 @@ export default {
       }
       return ''
     },  
-
+    */
     /*
     buildHospedagemClass(index, idxIni, idxFim, classeIni, classeFim){
       var classe = "";
@@ -739,36 +741,61 @@ export default {
     */                          
 
     // NOVO
-    newHospedagemClass(classe){
+    newHospedagemClass(classe, status){
+
+      var classeStatus =  this.newColorStatusItem(status)
+      var retorno = 'grafico ' + classeStatus + ' ';
+      
       if (classe == "BAIXADO"){
-        return 'grafico grafico_fim_baixado'
+        return retorno + 'grafico_fim_baixado'
       } else
       if (classe == "INICIO") {
-        return 'grafico grafico_inicio'
+        return retorno + 'grafico_inicio'
       } else 
       if (classe == "INICIOFIM") {
-        return 'grafico grafico_inicio grafico_fim'
+        return retorno + 'grafico_inicio grafico_fim'
       } else 
       if (classe == "INICIOINDO") {
-        return 'grafico grafico_inicio_indo' // grafico_indo grafico_inicio
+        return retorno + 'grafico_inicio_indo'
+      } else 
+      if (classe == "INICIODURANTE") {
+        return retorno + 'grafico_inicio_durante'
+      } else 
+      if (classe == "INICIOBAIXADO") {
+        return retorno + 'grafico_inicio_baixado'
       } else 
       if (classe == "DURANTE") {
-        return 'grafico grafico_durante'
+        return retorno + 'grafico_durante'
+      } else 
+      if (classe == "DURANTEINDO") {
+        return retorno + 'grafico_durante_indo'
+      } else 
+      if (classe == "DURANTEBAIXADO") {
+        return retorno + 'grafico_durante_baixado'
+      } else 
+      if (classe == "DURANTEFIM") {
+        return retorno + 'grafico_fim'
       } else 
       if (classe == "FIM") {
-        return 'grafico grafico_fim'
+        return retorno + 'grafico_fim'
       } else
       if (classe == "INDO") {
-        return 'grafico grafico_indo'
+        return retorno + 'grafico_indo'
       } else      
       if (classe == "VINDO") {
-        return 'grafico grafico_vindo'
+        return retorno + 'grafico_vindo'
       } else
       if (classe == "INDOVINDO") {
-        return 'grafico grafico_indo grafico_vindo'
+        return retorno + 'grafico_indo grafico_vindo'
+      } else
+      if (classe == "VINDOINDO") {
+        return retorno + 'grafico_vindo_indo'
       } else
       if (classe == "VINDOFIM") {
-        return 'grafico grafico_vindo grafico_fim'
+        return retorno + 'grafico_vindo grafico_fim'
+      } else
+      if (classe == "VINDODURANTE") {
+        return retorno + 'grafico_vindo_durante'
       }
       return ''
     },  
@@ -785,6 +812,17 @@ export default {
         } else if (hospedagem.baixado) {
           return '#4DB6AC'
         }
+      }
+      return 'blue'
+    },
+
+    newColorStatusItem(status){
+      if (status == 'ABERTA'){
+        return 'bg-aberta' // '#FFF9C4' teal darken-2
+      } else if (status == 'ENCERRADA'){
+        return 'bg-encerrada' //'#d3dce6' // blue-grey lighten-1
+      } else if (status == 'VENCIDA'){
+        return 'bg-vencida' // '#FFCCBC' red accent-4
       }
       return 'blue'
     },
@@ -854,6 +892,14 @@ export default {
       return obj
     },
 
+    getPrimeiroNome(nome){
+      if (nome.length > 10){
+        nome = nome.substr(0,10) + "..."
+      }
+      return nome;
+    },
+
+    //Deprecated
     getNome(id, completo){
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
@@ -871,6 +917,7 @@ export default {
       return '???';
     },
 
+    // Deprecated
     showHospedagemInfoByIdentificador(id){
       var hospedagem = this.getHospedagemById(id);
       if (hospedagem){
@@ -970,6 +1017,14 @@ export default {
   border: 1px #bdbdbd solid;
 }
 
+.thebox2 {
+  box-sizing: border-box;
+  border-radius: 0px;
+  margin: 0px;
+  height: 30px;
+  border: 1px #bdbdbd dashed;
+}
+
 .thebox-circular {
   box-sizing: border-box;
   border-radius: 25px;
@@ -1015,16 +1070,21 @@ export default {
 .grafico{
   margin-top: 1px;
   margin-bottom:1px;
-  background-color: #E57373;
   margin-left:-1px;
   margin-right:-1px;
   margin-top: 0px;
-  /*height: calc(100% - 4px);*/
   cursor:pointer;
   padding: 0px;
 }
 
 .grafico_inicio {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  width: calc(100% - 2px);
+  margin-left: 3px;
+}
+
+.grafico_inicio_durante {
   border-top-left-radius: 20px;
   border-bottom-left-radius: 20px;
   width: calc(100% - 2px);
@@ -1049,7 +1109,30 @@ export default {
   border-width: 0px 4px 0px 0px;
 }
 
+.grafico_inicio_baixado {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  width: calc(100% - 6px);
+  margin-left: 3px;
+
+  border-color:green;
+  border-style: dotted;
+  border-width: 0px 4px 0px 0px;
+}
+
 .grafico_indo {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 0px;
+}
+
+.grafico_vindo_indo {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 4px;
+}
+
+.grafico_durante_indo{
   border-color:#000;
   border-style: dotted;
   border-width: 0px 4px 0px 0px;
@@ -1061,7 +1144,19 @@ export default {
   border-width: 0px 4px 0px 0px;
 }
 
+.grafico_durante_baixado {
+  border-color:#000;
+  border-style: solid;
+  border-width: 0px 4px 0px 0px;
+}
+
 .grafico_vindo {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 0px 0px 4px;
+}
+
+.grafico_vindo_durante {
   border-color:#000;
   border-style: dotted;
   border-width: 0px 0px 0px 4px;
@@ -1084,14 +1179,13 @@ export default {
   background-color:white;
   width:88px;
   text-align:center;
-  text-transform:uppercase;
-  line-height:1em;
-  margin-top:1px;
-  height: 10px;
-  padding-top:8px;
-  padding-bottom: 4px;
   border: 1px solid #bbb;
   border-radius: 16px;
+}
+
+.chip p{
+  margin:0;
+  padding-top:4px;
 }
 
 .flex-container {
@@ -1130,6 +1224,19 @@ export default {
   background: #d3dce6;
 }
 
+
+.bg-aberta{
+    background: #26a69a;
+}
+
+.bg-encerrada {
+  background: #b0bec5;
+}
+
+.bg-vencida {
+  background: #ef5350;
+}
+
 td:nth-child(1) { background: hsl(130, 30%, 60%); }
 td:nth-child(2) { background: hsl(140, 40%, 60%); }
 td:nth-child(3) { background: hsl(150, 50%, 60%); }
@@ -1157,6 +1264,10 @@ td:nth-child(8) { background: hsl(200, 99%, 60%); }
 .container-mapa div.titulo {
   display:grid;
   border: 1px solid #bbb;
+}
+
+.celula-borda-cinza {
+  border: 1px solid #90a4ae;
 }
 
 </style>
