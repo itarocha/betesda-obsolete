@@ -19,75 +19,6 @@
           <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
-                  <!--
-              <el-tab-pane label="Old Mapa de Hospedagem" name="mapa">
-
-                <el-container style="margin:2px;">
-                  <el-container :style="styleContainerMapa">
-
-                    <el-header style="line-height:20px; height:54px;">
-                      <el-row type="flex">
-                        <el-col>
-                          <div class="thebox p4 laranja h60">
-                            <span style="font-size: 12pt; align:center;">Quarto/</span>
-                            <span style="font-size: 12pt; align:center;">Leito</span>
-                          </div>
-                        </el-col>
-
-                        <el-col v-for="(dia, index) in dados.dias" :key="index" 
-                          :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
-                          <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px" @click="selecionarDia(dia, index)">
-                            <p style="font-size: 9pt">{{diaSemana(dia)}}</p>
-                            <p style="font-size: 12pt">{{formatDate(dia,'DD/MMM')}}</p>
-                          </div>
-                        </el-col>
-                        <div class="w15"></div>
-                      </el-row>                      
-                    </el-header>
-                    
-                    <el-main style="padding-top:0px;">
-
-                      <div :style="styleGrid" class="scroll-y p0">
-                        <el-row type="flex" v-for="(celula, index) in dados.leitos" :key="index">
-                          <el-col>
-                            <div class="thebox p4 laranja hleito" :style="{height:calcularAlturaLeito(index)}">
-                              <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
-                              <center v-if="celula.quartoNumero == '9999'">Parcial</center>
-                            </div>
-                          </el-col>
-
-                          <el-col sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey-lighten-2':isIndiceDataAtual(indice)}">
-                            <div class="thebox hleito" v-if="celula.hospedagens.length == 0"></div>
-                            <div class="thebox hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
-
-                            <el-popover
-                                placement="top-start"
-                                width="300"
-                                :title="hospedagem.dias[indice].identificador"
-                                trigger="hover"
-                                :open-delay="1000"
-                                :content="getNome(hospedagem.dias[indice].identificador, true)">
-
-                                <div slot="reference" :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe, hospedagem.dias[indice])" 
-                                      v-if="hospedagem.dias[indice].identificador != '0'"
-                                      :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
-                                      @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
-                                  <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
-                                </div>
-                            </el-popover>                                
-
-                            </div>
-                          </el-col>
-                        </el-row>
-                      </div>
-
-                    </el-main>
-                  </el-container>
-                </el-container>
-              </el-tab-pane>
-                  -->
-
-
               <el-tab-pane label="New Mapa de Hospedagem" name="mapa">
 
                 <el-container style="margin:2px;">
@@ -118,16 +49,27 @@
                       <div :style="styleGrid" class="scroll-y p0">
                         <div class="container-mapa" v-for="(celula, index) in linhas" :key="index">
                           <div class="titulo">
-                              <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
-                              <center v-if="celula.quartoNumero == '9999'">Parcial</center>
+                              <center v-if="celula.quartoNumero != '0'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                              <center v-if="celula.quartoNumero == '0'">Parcial</center>
                           </div> 
                           <div>
                             <div class="container-linha" v-for="(h, idx) in celula.hospedagens" :key="idx">
                               <div v-for="(classe, idxClasses) in h.classes" :key="idxClasses" class="celula-borda-cinza">
-                                <div v-if="h.hospedagem != null" slot="reference" :class="newHospedagemClass(classe, h.hospedagem.statusHospedagem)" 
-                                      @click="showHospedagemInfo(h.hospedagem.hospedagemId)">
-                                       <div class="chip" v-if="idxClasses == h.idxIni"><p>{{getPrimeiroNome(h.hospedagem.pessoaNome)}}</p></div>
-                                </div>
+
+                                <el-popover
+                                    v-if="h.identificador != null && classe != ''"
+                                    placement="top-start"
+                                    width="300"
+                                    :title="'HPD: '+ h.identificador"
+                                    trigger="hover"
+                                    :open-delay="1000"
+                                    :content="h.nome">
+                                    <div slot="reference" :class="newHospedagemClass(classe, h.statusHospedagem)" 
+                                          @click="showHospedagemInfo(h.hospedagemId)">
+                                          <p v-if="idxClasses == h.idxIni" class="texto-linha">{{getPrimeiroNome(h.nome)}}</p>
+                                    </div>
+                                </el-popover>
+
                               </div>
                             </div>
                           </div>
@@ -139,59 +81,57 @@
                 </el-container>
               </el-tab-pane>
 
-
-              <!--
+              <!-- :row-class-name="tableRowClassName"  -->
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 <el-row type="flex" justify="center" align="middle">
                   <el-col :sm="24" :md="24" :lg="24">
-                    <el-table :data="pessoas" 
-                       style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
-                      :height="tableHeight"
-                      :row-class-name="tableRowClassName">
 
-                      <el-table-column fixed prop="pessoaNome" label="Nome" width="250" sortable></el-table-column>
+                  <table>
+                      <thead>
+                        <tr>
+                          <th>Nome</th>
+                          <th>Cidade</th>
+                          <th>Utilização</th>
+                          <th>Status Hosped.</th>
+                          <th>Entrada</th>
+                          <th>Prev.Saída</th>
+                          <th>Dt. Saída</th>
+                          <th>Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <tr v-for="(h, idxHpd) in hospedes" :key="idxHpd">
+                            <td>{{h.pessoaNome}}</td>
+                            <td>{{h.pessoaCidadeUfOrigem}}</td>
+                            <td>{{h.tipoUtilizacaoDescricao}}</td>
+                            <td>{{h.statusHospedagem}}</td>
+                            <td>{{formatDate(h.dataPrimeiraEntrada,'DD/MM')}}</td>
+                            <td>{{formatDate(h.dataPrevistaSaida,'DD/MM')}}</td>
+                            <td>{{formatDate(h.dataEfetivaSaida,'DD/MM')}}</td>
+                            <td>
 
-                      <el-table-column prop="pessoaCidadeUfOrigem" label="Cidade Origem" width="200" sortable></el-table-column>
+                            <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                              <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(h.hospedagemId)">
+                                <i class="fas fa-info"></i>
+                              </el-button>
+                            </el-tooltip>
 
-                      <el-table-column prop="leitoDataEntrada" :formatter="fmtDate" label="Entrada" width="120" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="120" class-name="wordwrap" sortable></el-table-column>
+                            <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
+                              <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(h.pessoaId)">
+                                <i class="fas fa-pencil-alt"></i>
+                              </el-button>
+                            </el-tooltip>
 
-                      <el-table-column prop="utilizacao" label="Utilização" width="120" sortable></el-table-column>
-                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="140" label="Quarto-Leito" sortable></el-table-column>
-                      <el-table-column prop="destinacaoHospedagemDescricao" width="120" label="Destinação" sortable></el-table-column>
 
-                      <el-table-column prop="statusHospedagem" label="Situação" width="120" sortable></el-table-column>
-
-                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="120" class-name="wordwrap" sortable></el-table-column>
-                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="120" sortable></el-table-column>
-
-                      <el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>
-                      <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
-                      <el-table-column header-align="left" align="right" prop="pessoaId" label="CODPES" width="100" sortable></el-table-column>
-
-                      <el-table-column label="Ações" fixed="right" align="center" width="120">
-                        <template slot-scope="scope">
-                          
-                          <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                            <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(scope.row.hospedagemId)">
-                              <i class="fas fa-info"></i>
-                            </el-button>
-                          </el-tooltip>
-
-                          <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
-                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.pessoaId)">
-                              <i class="fas fa-pencil-alt"></i>
-                            </el-button>
-                          </el-tooltip>
-
-                        </template>
-                      </el-table-column>
-                    </el-table>
+                            </td>
+                          </tr>
+                      </tbody>
+                    </table>                    
                   </el-col>
                 </el-row>
               </el-tab-pane>
 
+              <!--
               <el-tab-pane label="Hóspedes por Cidade de Origem" name="cidades">
                   <el-container :style="styleContainerMapa">
                     <el-main style="padding-top:0px;">          
@@ -231,7 +171,7 @@
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
-
+              -->
               <el-tab-pane label="Quadro de Hospedagens" name="quadro">
                   <el-container :style="styleContainerMapa">
 
@@ -266,25 +206,28 @@
                           <div class="subtitulo bg-purple">Quarto {{quadroQuartoNumero}} Leito {{quadroLeitoNumero}}</div>
 
                           <div class="flex-container wrap">
-                            <el-card class="flex-item" v-for="(hospedagem, idx) in hospedagensQuadro" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:250px; line-height:1.5em;" 
-                            :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
+                            <!-- COMPONENTIZAR!!!! -->
+                            <el-card class="flex-item" v-for="(hq, idx) in hospedagensQuadro" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:350px; line-height:1.5em;" 
+                            :style="{backgroundColor: colorStatusItem(hq.statusHospedagem)}"
                             >
-                              <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
+                              <div style="font-weight:bold; font-size:1.1em;">{{hq.pessoaNome}}
 
                                 <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                                  <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
+                                  <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hq.pessoaId)">
                                     <i class="fas fa-pencil-alt"></i>
                                   </el-button>
                                 </el-tooltip>
 
                               </div>
-                              <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
-                                <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
+                              <div>Cidade de Origem: <span style="font-weight:bold;">{{hq.pessoaCidadeUfOrigem}}</span></div>
+                              <div>Fone: <span style="font-weight:bold;">9999-9999</span></div>
+                              <div>Utilização: <span style="font-weight:bold;">{{hq.tipoUtilizacaoDescricao}}</span>
+                                <span v-if="hq.tipoUtilizacao == 'T'">Leito: <span style="font-weight:bold;">{{hq.hospedagem.quartoNumero}}-{{hq.hospedagem.leitoNumero}}</span></span> 
                               </div>                      
-                              <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
+                              <div>Status: <span style="font-weight:bold;">{{hq.statusHospedagem}}</span>
                               
                                 <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                                  <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
+                                  <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hq.hospedagemId)">
                                     <i class="fas fa-info"></i>
                                   </el-button>
                                 </el-tooltip>
@@ -298,7 +241,6 @@
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
-              -->
             </el-tabs>
 
           </el-col>
@@ -389,46 +331,26 @@ export default {
     cidades:[],
     quadro:[],
     hospedagensQuadro: [],
+    hospedes:[],
 
     //VALENDO!!!!
     linhas:[],
-
-    dadosPlanilhaGeral:[],
-    dadosRankingCidades:[],
-    dadosRankingEncaminhamentos:[],
-
-		qtdLeitosTotais : 0,
-		qtdLeitosOcupados : 0,
-    qtdLeitosLivres : 0,
-
-		qtdTotais : 0,
-		qtdVencidos : 0,
-		qtdPendentes : 0,
-		qtdEncerrados : 0,
-
-		qtdParciaisTotais : 0,
-		qtdParciaisVencidos : 0,
-		qtdParciaisPendentes : 0,
-		qtdParciaisEncerrados : 0,
 
     colorCache: {},
 
     toolTipDelay: 500,
 
-			showDate: null, 
-			message: "",
-			startingDayOfWeek: 0,
-			disablePast: false,
-			disableFuture: false,
-			displayPeriodUom: "month",
-			displayPeriodCount: 1,
-			showEventTimes: true,
-			newEventTitle: "",
-			newEventStartDate: "",
-			newEventEndDate: "",
-			useDefaultTheme: true,
-			useHolidayTheme: true,
-			useTodayIcons: false,    
+    showDate: null, 
+    message: "",
+    startingDayOfWeek: 0,
+    disablePast: false,
+    disableFuture: false,
+    displayPeriodUom: "month",
+    displayPeriodCount: 1,
+    showEventTimes: true,
+    useDefaultTheme: true,
+    useHolidayTheme: true,
+    useTodayIcons: false,    
 
   }),
 
@@ -444,11 +366,6 @@ export default {
 
       this.setShowDate(d)
       this.getDadosSemanaAtual()
-      this.showEstatisticas()
-    },
-
-    estatisticaLeitos(){
-      this.showEstatisticas()
     },
 
     windowHeight(newHeight, oldHeight) {
@@ -464,10 +381,6 @@ export default {
   },
 
   computed: {
-
-    estatisticaLeitos(){
-      return this.dados.qtdLeitos
-    },
 
     imageHeight () {
       switch (this.$vuetify.breakpoint.name) {
@@ -580,7 +493,10 @@ export default {
         .then(response => {
             this.dados = response.data
             this.linhas = response.data.linhas;
-            console.log(this.linhas)
+            this.hospedes = response.data.pessoas;
+
+            //console.log(this.dados)
+
             this.pessoas = response.data.hospedagens
             var cidades = []
             for (var c in this.dados.porCidade){
@@ -625,41 +541,6 @@ export default {
       return (row.leitoId != 0 ? row.quartoNumero + "-" + row.leitoNumero : "")
     },
 
-    showEstatisticas(){
-      var index = petraDateTime.getIndiceData(this.dataAtual) || 0
-
-      if (this.dados && this.dados.qtdLeitosTotais){
-        this.qtdLeitosTotais = this.dados.qtdLeitosTotais[index]
-        this.qtdLeitosOcupados = this.dados.qtdLeitosOcupados[index]
-        this.qtdLeitosLivres = this.dados.qtdLeitosLivres[index]
-
-        this.qtdTotais = this.dados.qtdTotais[index]
-        this.qtdVencidos = this.dados.qtdVencidos[index]
-        this.qtdPendentes = this.dados.qtdPendentes[index]
-        this.qtdEncerrados = this.dados.qtdEncerrados[index]
-
-        this.qtdParciaisTotais = this.dados.qtdParciaisTotais[index]
-        this.qtdParciaisVencidos = this.dados.qtdParciaisVencidos[index]
-        this.qtdParciaisPendentes = this.dados.qtdParciaisPendentes[index]
-        this.qtdParciaisEncerrados = this.dados.qtdParciaisEncerrados[index]
-      } else {
-        this.qtdLeitosTotais = 0
-        this.qtdLeitosOcupados = 0
-        this.qtdLeitosLivres = 0
-
-        this.qtdTotais = 0
-        this.qtdVencidos = 0
-        this.qtdPendentes = 0
-        this.qtdEncerrados = 0
-
-        this.qtdParciaisTotais = 0
-        this.qtdParciaisVencidos = 0
-        this.qtdParciaisPendentes = 0
-        this.qtdParciaisEncerrados = 0
-      }
-
-    },
-
     recarregar(){
       this.getDadosSemanaAtual()
     },
@@ -688,57 +569,6 @@ export default {
       }
       return "thebox-circular";
     },
-
-    // Deprecated
-    /*
-    hospedagemClass(id, classe, dias){
-      var hospedagem = this.getHospedagemById(id);
-
-      if (hospedagem){
-          if (classe == "BAIXADO"){
-            return 'grafico grafico_fim_baixado'
-          } else
-          if (classe == "INICIO") {
-            return 'grafico grafico_inicio'
-          } else 
-          if (classe == "INICIOFIM") {
-            return 'grafico grafico_inicio grafico_fim'
-          } else 
-          if (classe == "INICIOINDO") {
-            return 'grafico grafico_inicio_indo' // grafico_indo grafico_inicio
-          } else 
-          if (classe == "DURANTE") {
-            return 'grafico grafico_durante'
-          } else 
-          if (classe == "FIM") {
-            return 'grafico grafico_fim'
-          } else
-          if (classe == "INDO") {
-            return 'grafico grafico_indo'
-          } else      
-          if (classe == "VINDO") {
-            return 'grafico grafico_vindo'
-          } else
-          if (classe == "INDOVINDO") {
-            return 'grafico grafico_indo grafico_vindo'
-          } else
-          if (classe == "VINDOFIM") {
-            return 'grafico grafico_vindo grafico_fim'
-          }
-      }
-      return ''
-    },  
-    */
-    /*
-    buildHospedagemClass(index, idxIni, idxFim, classeIni, classeFim){
-      var classe = "";
-      var classeA = (idxIni == index-1) ? classeIni : "";
-      var classeB = (index > idxIni+1 && index < idxFim+1) ? "DURANTE" : "";
-      var classeC = (idxFim == index-1) ? classeFim : "";
-
-      return classeA + classeB + classeC;
-    },
-    */                          
 
     // NOVO
     newHospedagemClass(classe, status){
@@ -792,7 +622,8 @@ export default {
         return retorno + 'grafico_vindo_indo'
       } else
       if (classe == "VINDOFIM") {
-        return retorno + 'grafico_vindo grafico_fim'
+        //return retorno + 'grafico_vindo grafico_fim'
+        return retorno + 'grafico_vindo_fim'
       } else
       if (classe == "VINDODURANTE") {
         return retorno + 'grafico_vindo_durante'
@@ -865,31 +696,41 @@ export default {
     },
 
     getHospedagensByLeitoId(id){
-      this.hospedagensQuadro = []
+      var hospedagensQuadro = []
+      var quadroQuartoNumero = null
+      var quadroLeitoNumero = null
 
-      var obj = _.find(this.dados.leitos,{leitoId : id})
-      
-      if (!obj) return
-      
-      this.quadroQuartoNumero = obj.quartoNumero
-      this.quadroLeitoNumero = obj.leitoNumero
+      var diaIndex = this.diaIndex
 
-      if (obj){
-        for (var h in obj.hospedagens){
-          var  dias = obj.hospedagens[h].dias
+      _.forEach(this.dados.pessoas, function(v, k){
+        var lst = _.filter(v.leitos, {leitoId : id})
 
-          if (dias.length >= 0 && this.diaIndex <= dias.length){
-            const identificador = dias[this.diaIndex].identificador
+        for (var i = 0; i < lst.length; i++){
+          var hospedagem = lst[i];
 
-            if (identificador != "0"){
-              var hospedagem = this.getHospedagemById(identificador)
-              this.hospedagensQuadro.push(hospedagem)
-            }
+          //TODO OTIMIZAR. DEVE PROCURAR PELA LISTA DE LEITOS
+
+          const zeroOuUm = hospedagem.dias[diaIndex]
+          if (zeroOuUm == 1){
+            var retorno = v
+            ///////////retorno.leitos = undefined
+            retorno.hospedagem = hospedagem
+
+            quadroQuartoNumero = hospedagem.quartoNumero
+            quadroLeitoNumero = hospedagem.leitoNumero
+
+            hospedagensQuadro.push(retorno)
           }
         }
-      }
 
-      return obj
+        //console.log(v)
+      })
+      this.hospedagensQuadro = hospedagensQuadro
+      this.quadroQuartoNumero = quadroQuartoNumero
+      this.quadroLeitoNumero = quadroLeitoNumero
+
+      //console.log(this.hospedagensQuadro)
+      return this.hospedagensQuadro
     },
 
     getPrimeiroNome(nome){
@@ -897,32 +738,6 @@ export default {
         nome = nome.substr(0,10) + "..."
       }
       return nome;
-    },
-
-    //Deprecated
-    getNome(id, completo){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        if (completo)  {
-          return hospedagem.pessoaNome
-        } else {
-          var nome = hospedagem.pessoaNome
-  
-          if (nome.length > 10){
-            nome = nome.substr(0,10) + "..."
-          }
-          return nome;
-        }
-      }
-      return '???';
-    },
-
-    // Deprecated
-    showHospedagemInfoByIdentificador(id){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        this.showHospedagemInfo(hospedagem.hospedagemId)
-      }
     },
 
     showHospedagemInfo(id){
@@ -1017,6 +832,7 @@ export default {
   border: 1px #bdbdbd solid;
 }
 
+/*
 .thebox2 {
   box-sizing: border-box;
   border-radius: 0px;
@@ -1024,6 +840,7 @@ export default {
   height: 30px;
   border: 1px #bdbdbd dashed;
 }
+*/
 
 .thebox-circular {
   box-sizing: border-box;
@@ -1032,11 +849,12 @@ export default {
   height: 30px;
   margin-left: 3px;
   margin-right: 3px;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   padding-top:5px;
   border: 1px #bdbdbd solid;
   font-size: 10pt;
 }
+
 
 .h60 {
   height: 54px;
@@ -1066,7 +884,6 @@ export default {
   background-color: #d3dce6;
 }
 
-
 .grafico{
   margin-top: 1px;
   margin-bottom:1px;
@@ -1078,29 +895,29 @@ export default {
 }
 
 .grafico_inicio {
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   width: calc(100% - 2px);
   margin-left: 3px;
 }
 
 .grafico_inicio_durante {
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   width: calc(100% - 2px);
   margin-left: 3px;
 }
 
 .grafico_fim {
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
   width: calc(100% - 3px);
 }
 
 /*  https://css-tricks.com/the-shapes-of-css/ */
 .grafico_inicio_indo {
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   width: calc(100% - 6px);
   margin-left: 3px;
 
@@ -1110,8 +927,8 @@ export default {
 }
 
 .grafico_inicio_baixado {
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   width: calc(100% - 6px);
   margin-left: 3px;
 
@@ -1161,6 +978,18 @@ export default {
   border-style: dotted;
   border-width: 0px 0px 0px 4px;
 }
+
+.grafico_vindo_fim {
+  border-color:#000;
+  border-style: dotted;
+
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  width: calc(100% - 6px);
+
+  border-width: 0px 0px 0px 4px;
+}
+
 
 .teal-darken-2 {
   background-color: #00796B;
@@ -1213,6 +1042,10 @@ export default {
   margin: 10px;
 }
 
+.texto-pq{
+  font-size: 10pt;
+}
+
 .subtitulo {
   margin:0 10px;
   padding:5px;
@@ -1224,27 +1057,17 @@ export default {
   background: #d3dce6;
 }
 
-
 .bg-aberta{
-    background: #26a69a;
+    background: #4DB6AC;
 }
 
 .bg-encerrada {
-  background: #b0bec5;
+  background: #B0BEC5; /*#b0bec5;*/
 }
 
 .bg-vencida {
-  background: #ef5350;
+  background: #FF8A80;
 }
-
-td:nth-child(1) { background: hsl(130, 30%, 60%); }
-td:nth-child(2) { background: hsl(140, 40%, 60%); }
-td:nth-child(3) { background: hsl(150, 50%, 60%); }
-td:nth-child(4) { background: hsl(160, 60%, 60%); }
-td:nth-child(5) { background: hsl(170, 70%, 60%); }
-td:nth-child(6) { background: hsl(180, 80%, 60%); }
-td:nth-child(7) { background: hsl(190, 90%, 60%); }
-td:nth-child(8) { background: hsl(200, 99%, 60%); }
 
 .container-mapa {
   display: grid;
@@ -1263,11 +1086,82 @@ td:nth-child(8) { background: hsl(200, 99%, 60%); }
 
 .container-mapa div.titulo {
   display:grid;
-  border: 1px solid #bbb;
+  border: 1px solid #CFD8DC;
 }
 
 .celula-borda-cinza {
-  border: 1px solid #90a4ae;
+  border: 1px solid #CFD8DC;
 }
+
+.texto-linha{
+  margin:0; 
+  padding: 5px 10px;
+  color:#263238; 
+  font-size:9pt;
+}
+
+
+/* ------------------------------------------------------------- */
+
+table {
+  font-size: 9pt;
+  border: 1px solid #CFD8DC;
+  border-radius: 3px;
+  background-color: #fff;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #42b983;
+  color: rgba(255,255,255,0.66);
+  border: 1px solid #CFD8DC;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+td {
+  background-color: #f9f9f9;
+  border: 1px solid #CFD8DC;
+}
+
+th, td {
+  padding: 8px 10px;
+}
+
+th.active {
+  color: #fff;
+}
+
+th.active .arrow {
+  opacity: 1;
+}
+
+.arrow {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  opacity: 0.66;
+}
+
+.arrow.asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #fff;
+}
+
+.arrow.dsc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #fff;
+}
+
+
+
+
 
 </style>

@@ -1,4 +1,5 @@
-SELECT  hospedagem.tipo_utilizacao  
+SELECT  tb.identificador
+      , hospedagem.tipo_utilizacao  
       , tb.quarto_id
       , tb.quarto_numero
       , tb.leito_id
@@ -26,6 +27,7 @@ SELECT  hospedagem.tipo_utilizacao
       , hospedagem.data_efetiva_saida
 FROM    (
 			SELECT  hl.hospede_id
+                  , hl.id AS identificador					
 			      , quarto.id AS quarto_id
 			      , quarto.numero AS quarto_numero
 			      , leito.id AS leito_id
@@ -47,9 +49,10 @@ FROM    (
 			OR    ((hl.data_entrada <= :DATA_INI) and (hl.data_saida >= :DATA_FIM)) 
 			UNION ALL
 			SELECT  h.id AS hospede_id
-			      , 0 AS quarto_id
+			      , h.id AS identificador 
+			      , 99999 AS quarto_id
 			      , 0 AS quarto_numero
-			      , 0 AS leito_id
+			      , 99999 AS leito_id
 			      , 0 AS leito_numero
 			      , 1 AS tipo
 			      , hpd.data_entrada AS data_entrada_leito

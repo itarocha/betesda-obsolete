@@ -8,7 +8,7 @@
           <el-button type="primary" @click="handleLimpar">Limpar</el-button>
         </el-tooltip>
         <el-tooltip content="Insere nova Hospedagem com as informações" placement="bottom" :open-delay="toolTipDelay">
-          <el-button type="primary" @click="handleLancarHospedagem">Lançar Hospedagem</el-button>
+          <el-button type="primary" @click="handleLancarHospedagem" :disabled="btLancarHospedagemClicked">Lançar Hospedagem</el-button>
         </el-tooltip>
       </el-header>
 
@@ -252,6 +252,8 @@ export default {
 
     state: "insert",
 
+    btLancarHospedagemClicked : false,
+
     hospedes: [],
 
     itensDestinacaoHospedagem : [],
@@ -445,6 +447,9 @@ export default {
      },
 
     handleLancarHospedagem(){
+      if (this.btLancarHospedagemClicked) {
+        return
+      }
       this.postarHospedagem()
     },
 
@@ -519,6 +524,8 @@ export default {
     },
 
     postarHospedagem() {
+      this.btLancarHospedagemClicked = true
+
       this.errors = []
 
       var toSave = {
@@ -560,8 +567,10 @@ export default {
         .then(response => {
           this.handleLimpar()
           this.doShowHospedagemGravada(response.data.id)
+          this.btLancarHospedagemClicked = false
         })
         .catch(error => {
+          this.btLancarHospedagemClicked = false
           this.errors = petra.tratarErros(error)
         })
     },

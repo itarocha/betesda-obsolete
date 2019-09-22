@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -49,6 +50,8 @@ import br.com.itarocha.betesda.model.hospedagem.HospedeLeitoMapa;
 import br.com.itarocha.betesda.model.hospedagem.LeitoHeader;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
+import br.com.itarocha.betesda.model.hospedagem.PessoaHospedagem;
+import br.com.itarocha.betesda.model.hospedagem.PessoaLeito;
 import br.com.itarocha.betesda.model.hospedagem.Quadro;
 import br.com.itarocha.betesda.model.hospedagem.QuadroLeito;
 import br.com.itarocha.betesda.model.hospedagem.QuadroQuarto;
@@ -234,12 +237,13 @@ public class HospedagemService {
 		rec.stream().forEach(record -> {
 			lst.add(new LeitoHeader(((BigInteger)record[0]).longValue(), (Integer)record[1], ((BigInteger)record[2]).longValue(), (Integer)record[3]));
 		});
+		//lst.add(new LeitoHeader(888L, 888, 888L, 888));
 		return lst;
 	}
 	
 	private Map<Long, MicroLeito> buildListaLeitos() {
 		
-		Map<Long, MicroLeito> _mapLeitos = new HashMap<>();
+		Map<Long, MicroLeito> _mapLeitos = new TreeMap<>();
 		
 		StringBuilder sb = StrUtil.loadFile("/sql/leitos_header_native.sql");
 		Query q = em.createNativeQuery(sb.toString());
@@ -248,10 +252,13 @@ public class HospedagemService {
 			Long leitoId = ((BigInteger)record[0]).longValue();
 			_mapLeitos.put(leitoId, new MicroLeito(leitoId, (Integer)record[1], ((BigInteger)record[2]).longValue(), (Integer)record[3]));
 		});
+		_mapLeitos.put(99999L, new MicroLeito(9999L, 0, 9999L, 0));
 		return _mapLeitos;
 	}
 	
 	private List<HospedeLeitoMapa> buildHospedeLeito(LocalDate dIni, LocalDate dFim) {
+		LocalDate hoje = LocalDate.now();
+		
 		StringBuilder sb = StrUtil.loadFile("/sql/hospede_leito_native.sql");
 		Query q = em.createNativeQuery(sb.toString())
 					.setParameter("DATA_INI", dIni )
@@ -260,41 +267,50 @@ public class HospedagemService {
 		List<Object[]> rec =  q.getResultList();
 		List<HospedeLeitoMapa> lst = new ArrayList<>();
 		
-		LocalDate hoje = LocalDate.now();
 		
 		
 		rec.stream().forEach(record -> {
 			HospedeLeitoMapa h = new HospedeLeitoMapa();
-			h.setTipoUtilizacao(recordToString(record[0]));
-			h.setQuartoId(recordBigIntegerToLong(record[1]));
-			h.setQuartoNumero(recordToInteger(record[2]));
-			h.setLeitoId(recordBigIntegerToLong(record[3]));
-			h.setLeitoNumero(recordToInteger(record[4]));
-			h.setPessoaId(recordBigIntegerToLong(record[5]));
-			h.setPessoaNome(recordToString(record[6]));
-			h.setCidade(recordToString(record[7]));
-			h.setUf(recordToString(record[8]));
-			h.setDataEntradaHospedagem(recordSqlSqlDateToLocalDate(record[9]));
-			h.setDataSaidaHospedagem(recordSqlSqlDateToLocalDate(record[10]));
-			
-			h.setDataPrimeiraEntrada(recordSqlSqlDateToLocalDate(record[11]));
-			h.setDataUltimaEntrada(recordSqlSqlDateToLocalDate(record[12]));
 			
 			
-			h.setDataEntradaLeito(recordSqlSqlDateToLocalDate(record[13]));
-			h.setDataSaidaLeito(recordSqlSqlDateToLocalDate(record[14]));
-			h.setDataIniNoPeriodo(LocalDate.parse(((String)record[15])));
-			h.setDataFimNoPeriodo(LocalDate.parse(((String)record[16])));
-			h.setHospedagemId(((BigInteger)record[17]).longValue());
-			h.setHospedeId(((BigInteger)record[18]).longValue());
-			h.setTipoHospedeId(((BigInteger)record[19]).longValue());
-			h.setBaixado("S".equals(recordToString(record[20])));
-			h.setTipoHospedeDescricao(recordToString(record[21]));
-			h.setDestinacaoHospedagemId(recordBigIntegerToLong(record[22]));
-			h.setDestinacaoHospedagemDescricao(recordToString(record[23]));
+			Long id = recordBigIntegerToLong(record[0]);
+			String tipoUtilizacao = recordToString(record[1]);
+			String identificador =  String.format("%s%06d", tipoUtilizacao, id); // T000000 Total
 			
-			h.setDataPrevistaSaida(recordSqlSqlDateToLocalDate(record[24]));
-			h.setDataEfetivaSaida(recordSqlSqlDateToLocalDate(record[25]));
+			h.setIdentificador(identificador);
+			h.setTipoUtilizacao(tipoUtilizacao);
+			h.setTipoUtilizacaoDescricao("T".equalsIgnoreCase(tipoUtilizacao) ? "Total" : "Parcial");
+			h.setQuartoId(recordBigIntegerToLong(record[2]));
+			h.setQuartoNumero(recordToInteger(record[3]));
+			h.setLeitoId(recordBigIntegerToLong(record[4]));
+			h.setLeitoNumero(recordToInteger(record[5]));
+			h.setPessoaId(recordBigIntegerToLong(record[6]));
+			h.setPessoaNome(recordToString(record[7]));
+			h.setCidade(recordToString(record[8]));
+			h.setUf(recordToString(record[9]));
+			
+			h.setPessoaCidadeUfOrigem(String.format("%s - %s", h.getCidade(), h.getUf()));
+			
+			h.setDataEntradaHospedagem(recordSqlSqlDateToLocalDate(record[10]));
+			h.setDataSaidaHospedagem(recordSqlSqlDateToLocalDate(record[11]));
+			
+			h.setDataPrimeiraEntrada(recordSqlSqlDateToLocalDate(record[12]));
+			h.setDataUltimaEntrada(recordSqlSqlDateToLocalDate(record[13]));
+			
+			h.setDataEntradaLeito(recordSqlSqlDateToLocalDate(record[14]));
+			h.setDataSaidaLeito(recordSqlSqlDateToLocalDate(record[15]));
+			h.setDataIniNoPeriodo(LocalDate.parse(((String)record[16])));
+			h.setDataFimNoPeriodo(LocalDate.parse(((String)record[17])));
+			h.setHospedagemId(((BigInteger)record[18]).longValue());
+			h.setHospedeId(((BigInteger)record[19]).longValue());
+			h.setTipoHospedeId(((BigInteger)record[20]).longValue());
+			h.setBaixado("S".equals(recordToString(record[21])));
+			h.setTipoHospedeDescricao(recordToString(record[22]));
+			h.setDestinacaoHospedagemId(recordBigIntegerToLong(record[23]));
+			h.setDestinacaoHospedagemDescricao(recordToString(record[24]));
+			
+			h.setDataPrevistaSaida(recordSqlSqlDateToLocalDate(record[25]));
+			h.setDataEfetivaSaida(recordSqlSqlDateToLocalDate(record[26]));
 		
 			CellStatusHospedagem statusHospedagem = resolveStatusHospedagemNew(hoje, h.getDataPrevistaSaida(), h.getDataEfetivaSaida());
 			h.setStatusHospedagem(statusHospedagem);
@@ -337,20 +353,20 @@ public class HospedagemService {
 		
 		retorno.setDataIni(dIni);
 		retorno.setDataFim(dFim);
-		
+
+		//1 - MAPA DE HOSPEDAGENS
 		// Monta lista de leitos
 		List<LeitoHeader> leitos = buildLeitoHeader();
 		//List<MicroLeito> listaLeitos = buildListaLeitos();
 		
-		//TODO: /sql/hospede_leito_native.sql possui tudo que é necessário para montar 
 		List<HospedeLeitoMapa> listaHospedeLeito = buildHospedeLeito(dIni, dFim);
-		// * mapa de hospedagem (total e parcial)
-		// * hóspedes na semana
-		// * hóspedes por cidade de origem
-		// * quadro de hospedagem 
-		// Vai substituir hospede_leito.sql e hospedes_parciais.sql
+
 		Map<Long, MicroLeito> _mapLeitos = buildListaLeitos();
 		Map<Long, ArrayList<LinhaHospedagem>>  _mapHospedagens = new HashMap<>(); 
+		
+		LinhaHospedagem linhaVazia = new LinhaHospedagem();
+		linhaVazia.setClasses(new String[QTD_DIAS]);
+		linhaVazia.setDias(new Integer[QTD_DIAS]);
 		
 		listaHospedeLeito.forEach(hospedeLeito -> {
 			int idxIni = Period.between(dIni, hospedeLeito.getDataIniNoPeriodo()).getDays();
@@ -358,7 +374,7 @@ public class HospedagemService {
 			String classeIni = "???";
 			if (hospedeLeito.getDataEntradaLeito().equals(hospedeLeito.getDataIniNoPeriodo()) && hospedeLeito.getDataEntradaLeito().isAfter(hospedeLeito.getDataPrimeiraEntrada())) {
 				classeIni = "VINDO";
-			} else if (hospedeLeito.getDataEntradaLeito().equals(hospedeLeito.getDataIniNoPeriodo())/* && hm.getDataEntradaLeito().equals(hm.getDataEntradaHospedagem())*/) {
+			} else if (hospedeLeito.getDataEntradaLeito().equals(hospedeLeito.getDataIniNoPeriodo())) {
 				classeIni = "INICIO";
 			} else if (hospedeLeito.getDataEntradaLeito().isBefore(hospedeLeito.getDataIniNoPeriodo())) {
 				classeIni = "DURANTE";
@@ -373,20 +389,9 @@ public class HospedagemService {
 			} else if (hospedeLeito.getDataSaidaLeito().isAfter(hospedeLeito.getDataFimNoPeriodo())) {
 				classeFim = "DURANTE";
 			}
-			/*
-			System.out.println(String.format("[%03d] %s - %s (%s > %s) => [%d] - [%d] [%s] [%s] - %s",
-					hospedeLeito.getQuartoId(),
-					hospedeLeito.getDataIniNoPeriodo(), 
-					hospedeLeito.getDataFimNoPeriodo(),
-					hospedeLeito.getDataEntradaLeito(),
-					hospedeLeito.getDataPrimeiraEntrada(),
-					idxIni, 
-					idxFim, 
-					classeIni, 
-					classeFim,
-					hospedeLeito.getPessoaNome()));
-			*/
+
 			String[] classes = new String[QTD_DIAS];
+			Integer[] dias = new Integer[QTD_DIAS];
 			for (int i = 0; i < QTD_DIAS; i++) {
 				StringBuilder sb = new StringBuilder();
 				if (idxIni == i) {
@@ -398,41 +403,39 @@ public class HospedagemService {
 				if (idxFim == i) {
 					sb.append(classeFim);
 				}
-				classes[i] = sb.toString();
-				if (	"VINDODURANTE".equals(classes[i]) || 
-						"DURANTEFIM".equals(classes[i]) || 
-						"INICIOBAIXADO".equals(classes[i]) || 
-						"INICIODURANTE".equals(classes[i]) || 
-						"VINDOBAIXADO".equals(classes[i])) 
-				{
-					System.out.println("*************************** " + hospedeLeito.getPessoaNome() + " " + classes[i]);
-				}
+				classes[i] = !sb.toString().isEmpty() ? sb.toString() : null;
+				dias[i] = !sb.toString().isEmpty() ? 1 : 0;
 			}
 			
 			LinhaHospedagem linhaHospedagem = new LinhaHospedagem();
-			linhaHospedagem.setHospedagem(hospedeLeito);
+			
+			linhaHospedagem.setIdentificador(hospedeLeito.getIdentificador());
+			linhaHospedagem.setHospedagemId(hospedeLeito.getHospedagemId());
+			linhaHospedagem.setStatusHospedagem(hospedeLeito.getStatusHospedagem().toString());
+			
 			linhaHospedagem.setNome(hospedeLeito.getPessoaNome());
+			linhaHospedagem.setClasses(classes);
+			linhaHospedagem.setDias(dias);
 			linhaHospedagem.setIdxIni(idxIni);
+			hospedeLeito.setDias(dias);
+
+			//TODO: Não precisa disso
+			/*
 			linhaHospedagem.setIdxFim(idxFim);
 			linhaHospedagem.setClasseIni(classeIni.trim());
 			linhaHospedagem.setClasseFim(classeFim.trim());
-			linhaHospedagem.setClasses(classes);
-
-			if (!new Long(0).equals(hospedeLeito.getLeitoId()) ) {
-				if (_mapHospedagens.containsKey(hospedeLeito.getLeitoId())) {
-					_mapHospedagens.get(hospedeLeito.getLeitoId()).add(linhaHospedagem);
-				} else {
-					ArrayList<LinhaHospedagem> lst = new ArrayList<>();
-					lst.add(linhaHospedagem);
-					_mapHospedagens.put(hospedeLeito.getLeitoId(), lst);
-				}
+			*/
+			
+			if (_mapHospedagens.containsKey(hospedeLeito.getLeitoId())) {
+				_mapHospedagens.get(hospedeLeito.getLeitoId()).add(linhaHospedagem);
+			} else {
+				ArrayList<LinhaHospedagem> lst = new ArrayList<>();
+				lst.add(linhaHospedagem);
+				_mapHospedagens.put(hospedeLeito.getLeitoId(), lst);
 			}
 			
 		});
 		
-		LinhaHospedagem linhaVazia = new LinhaHospedagem();
-		
-		linhaVazia.setClasses(new String[QTD_DIAS]);
 		_mapLeitos.entrySet().forEach(m -> {
 			Long leitoId = m.getKey();
 			MicroLeito leito = m.getValue();
@@ -444,8 +447,85 @@ public class HospedagemService {
 			}
 			retorno.getLinhas().add(leito);
 		});
+
+		Map<String, PessoaHospedagem> pessoas = new HashMap<>();
+		listaHospedeLeito.forEach(h -> {
+			String key = String.format("H%09dP%09d", h.getHospedagemId(), h.getPessoaId());
+			if (pessoas.containsKey(key)) {
+
+				PessoaLeito pl = new PessoaLeito();
+				pl.setIdentificador(h.getIdentificador());
+				pl.setQuartoId(h.getQuartoId());
+				pl.setQuartoNumero(h.getQuartoNumero());
+				pl.setLeitoId(h.getLeitoId());
+				pl.setLeitoNumero(h.getLeitoNumero());
+				pl.setDataEntradaLeito(h.getDataEntradaLeito());
+				pl.setDataSaidaLeito(h.getDataSaidaLeito());
+				pl.setDataIniNoPeriodo(h.getDataIniNoPeriodo());
+				pl.setDataFimNoPeriodo(h.getDataFimNoPeriodo());
+				pl.setDias(h.getDias());
+
+				pessoas.get(key).getLeitos().add(pl);
+			} else {
+
+				PessoaHospedagem ph = new PessoaHospedagem();
+				ph.setPessoaId(h.getPessoaId());
+				ph.setPessoaNome(h.getPessoaNome());
+				ph.setCidade(h.getCidade());
+				ph.setUf(h.getUf());
+				ph.setPessoaCidadeUfOrigem(h.getPessoaCidadeUfOrigem());
+				ph.setHospedagemId(h.getHospedagemId());
+				ph.setHospedeId(h.getHospedeId());
+				ph.setTipoHospedeId(h.getTipoHospedeId());
+				ph.setTipoHospedeDescricao(h.getTipoHospedeDescricao());
+				ph.setStatusHospedagem(h.getStatusHospedagem());
+				ph.setBaixado(h.getBaixado());
+				ph.setDestinacaoHospedagemId(h.getDestinacaoHospedagemId());
+				ph.setDestinacaoHospedagemDescricao(h.getDestinacaoHospedagemDescricao());
+				ph.setTipoUtilizacao(h.getTipoUtilizacao());
+				ph.setTipoUtilizacaoDescricao(h.getTipoUtilizacaoDescricao());
+				ph.setDataEntradaHospedagem(h.getDataEntradaHospedagem());
+				ph.setDataPrevistaSaida(h.getDataPrevistaSaida());
+				ph.setDataEfetivaSaida(h.getDataEfetivaSaida());
+				ph.setDataSaidaHospedagem(h.getDataSaidaHospedagem());
+				ph.setDataPrimeiraEntrada(h.getDataPrimeiraEntrada());
+				ph.setDataUltimaEntrada(h.getDataUltimaEntrada());
+
+				//Código repetido D.R.Y
+				PessoaLeito pl = new PessoaLeito();
+				pl.setIdentificador(h.getIdentificador());
+				pl.setQuartoId(h.getQuartoId());
+				pl.setQuartoNumero(h.getQuartoNumero());
+				pl.setLeitoId(h.getLeitoId());
+				pl.setLeitoNumero(h.getLeitoNumero());
+				pl.setDataEntradaLeito(h.getDataEntradaLeito());
+				pl.setDataSaidaLeito(h.getDataSaidaLeito());
+				pl.setDataIniNoPeriodo(h.getDataIniNoPeriodo());
+				pl.setDataFimNoPeriodo(h.getDataFimNoPeriodo());
+				pl.setDias(h.getDias());
+
+				ph.getLeitos().add(pl);
+				
+				pessoas.put(key, ph);
+			}
+		});
+		List<PessoaHospedagem> lstPessoaHospedagem = pessoas.values().stream().collect(Collectors.toList());
+		lstPessoaHospedagem.sort((a,b) -> a.getPessoaNome().compareTo(b.getPessoaNome()));
+		
+		retorno.setPessoas(lstPessoaHospedagem);
+		
+		// 2 - HÓSPEDES
+		//TODO Criar estrutura pessoa+hospedagem, detalhes
+		retorno.setHospedes(listaHospedeLeito);
+		retorno.getHospedes().sort((a, b) -> a.getPessoaNome().compareTo(b.getPessoaNome()) );
 		
 		
+		
+		LocalDate hoje = LocalDate.now();
+
+		
+		//INÍCIO
+		/*
 		// Hóspedes totais
 		StringBuilder sbHospedeLeitos = StrUtil.loadFile("/sql/hospede_leito.sql");
 		TypedQuery<HospedeLeitoVO> qHospedeLeito = em.createQuery(sbHospedeLeitos.toString(), HospedeLeitoVO.class)
@@ -484,7 +564,6 @@ public class HospedagemService {
 			listaHospedes.add(hospede);
 		}
 		
-		LocalDate hoje = LocalDate.now();
 		// Popula os leitos ocupados no mapa
 		for(HospedeLeitoVO hl : listaHospedes) {
 			Hospedagem hospedagem = hl.getHospedagem(); 
@@ -653,7 +732,7 @@ public class HospedagemService {
 				lh.getHospedagens().add(hm);	
 			}
 		}
-		
+		*/
 		//List<HospedagemHeaderInfo> hospedagens = retorno.getHospedagens(); 
 		// TODO: Criar campo calculado em hospedagens com NOME + ID + TIPO + IDENTIFICADOR ou NOME + ID + DATAENTRADA
 		retorno.getHospedagens().sort((a, b) -> a.getPessoaNome().compareTo(b.getPessoaNome()) );
@@ -694,9 +773,9 @@ public class HospedagemService {
 		Quadro quadro = new Quadro(); 
 
 		// Busca quartos e leitos do banco
-		List<Quarto> lista = quartoService.findAll();
+		List<Quarto> listQuartos = quartoService.findAll();
 		// Cria os quartos e verifica minimo e maximo dos leitos
-		lista.forEach(q -> {
+		listQuartos.forEach(q -> {
 			quadro.quartos.add(new QuadroQuarto( q.getId(), q.getNumero()));
 			
 			q.getLeitos().forEach(l -> {
@@ -716,45 +795,38 @@ public class HospedagemService {
 		});
 		
 		// Varre mais uma vez os quartos do banco e seta os ids correspondentes. Os ids zerados significa que não existem no banco
-		lista.forEach(q -> {
+		listQuartos.forEach(q -> {
 			q.getLeitos().forEach(leito -> {
 				quadro.setLeitoIdPorNumero(q.getId(), leito.getNumero(), leito.getId());
 			});
 		});
+
 		
 		quadro.quartos.forEach(q -> {
 			q.leitos.forEach(leito -> {
 				if (leito.id == 0) {
 					//System.out.print("[  ] ");
 				} else {
-					//System.out.print(String.format("[%02d] ", leito.numero) );
-					// Busca o array de dias e hospedagens
-					//retorno.getLeitos()
+					// Busca o array de linhas de hospedagens.
+					// Cada quarto contém um array 
 					Long leitoId = leito.id;
-					
-					retorno.getLeitos().stream()
-						.filter(x -> leitoId.equals(x.getLeitoId()) )
-						.findFirst()
-						.get()
-						.getHospedagens()
-						.forEach(h -> {
-							for (int idx = 0; idx < h.getDias().length; idx++) {
-								
-								DiaHospedagem dh = h.getDias()[idx];
-								
-								LocalDate thisDate = dIni.plusDays(idx);
-								if (!"0".equals(dh.getIdentificador())) {
 
-									boolean dataPassada = thisDate.isBefore(hoje);
-									boolean marcar = dataPassada ? thisDate.isBefore(dh.getLeitoDataSaida()) || thisDate.equals(dh.getLeitoDataSaida())
-																 : thisDate.isBefore(dh.getLeitoDataSaida()) || thisDate.equals(dh.getLeitoDataSaida());
+					retorno.getLinhas()
+					.stream()
+					.filter(_leito -> _leito.getLeitoId().equals( leitoId )) // theLeito.getId().equals
+					.findFirst()
+					.ifPresent(theLeito -> {
 
-									if ( marcar ) {
-										leito.getDias()[idx] = 1;
-									}
+						theLeito.getHospedagens().forEach(linhaHpd -> {
+							// Quando um índice não vazio, significa que há hospedagem nesse dia da semana
+							for (int i = 0; i < QTD_DIAS; i++) {
+								boolean marcar = linhaHpd.getClasses()[i] != null;
+								if ( marcar ) {
+									leito.getDias()[i] = 1;
 								}
 							}
 						});
+					});
 				}
 				
 			});

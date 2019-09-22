@@ -4,7 +4,9 @@ import java.time.LocalDate;
 
 public class HospedeLeitoMapa {
 
+	private String identificador;
 	private String tipoUtilizacao;
+	private String tipoUtilizacaoDescricao;
 	private Long quartoId;
 	private Integer quartoNumero;
 	private Long leitoId;
@@ -13,6 +15,7 @@ public class HospedeLeitoMapa {
 	private String pessoaNome;
 	private String cidade;
 	private String uf;
+	private String pessoaCidadeUfOrigem;
 	private LocalDate dataEntradaHospedagem;
 	private LocalDate dataSaidaHospedagem;
 
@@ -33,17 +36,34 @@ public class HospedeLeitoMapa {
 	private String tipoHospedeDescricao;
 	private Long destinacaoHospedagemId;
 	private String	destinacaoHospedagemDescricao;
+	private Integer[] dias;
 	
 	private CellStatusHospedagem statusHospedagem;
 	
 	public HospedeLeitoMapa() {}
 	
+	public String getIdentificador() {
+		return identificador;
+	}
+
+	public void setIdentificador(String identificador) {
+		this.identificador = identificador;
+	}
+
 	public String getTipoUtilizacao() {
 		return tipoUtilizacao;
 	}
 	public void setTipoUtilizacao(String tipoUtilizacao) {
 		this.tipoUtilizacao = tipoUtilizacao;
 	}
+	public String getTipoUtilizacaoDescricao() {
+		return tipoUtilizacaoDescricao;
+	}
+
+	public void setTipoUtilizacaoDescricao(String tipoUtilizacaoDescricao) {
+		this.tipoUtilizacaoDescricao = tipoUtilizacaoDescricao;
+	}
+
 	public Long getQuartoId() {
 		return quartoId;
 	}
@@ -92,6 +112,14 @@ public class HospedeLeitoMapa {
 	public void setUf(String uf) {
 		this.uf = uf;
 	}
+	public String getPessoaCidadeUfOrigem() {
+		return pessoaCidadeUfOrigem;
+	}
+
+	public void setPessoaCidadeUfOrigem(String pessoaCidadeUfOrigem) {
+		this.pessoaCidadeUfOrigem = pessoaCidadeUfOrigem;
+	}
+
 	public LocalDate getDataEntradaHospedagem() {
 		return dataEntradaHospedagem;
 	}
@@ -209,5 +237,13 @@ public class HospedeLeitoMapa {
 
 	public void setStatusHospedagem(CellStatusHospedagem statusHospedagem) {
 		this.statusHospedagem = statusHospedagem;
+	}
+
+	public Integer[] getDias() {
+		return dias;
+	}
+
+	public void setDias(Integer[] dias) {
+		this.dias = dias;
 	}
 }

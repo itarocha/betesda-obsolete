@@ -800,9 +800,7 @@ export default {
   padding: 0;
   margin: 0;
   list-style: none;
-  /*border: 1px solid silver;*/
   box-orient: horizontal;
-  /*-ms-box-orient: horizontal;*/
   display: flex;
   justify-content: start; /*center*/
 }
@@ -816,21 +814,11 @@ export default {
 }
 
 .flex-item {
-  /*background: #FFF8E1;*/
   background: #FFF9C4;
   color: #455A64;
   padding: 2px;
   width: 300px;
-  /*height: 100px;*/
   margin: 10px;
-  
-  /*
-  line-height: 100px;
-  color: white;
-  font-weight: bold;
-  font-size: 2em;
-  text-align: center;
-  */
 }
 
 </style>

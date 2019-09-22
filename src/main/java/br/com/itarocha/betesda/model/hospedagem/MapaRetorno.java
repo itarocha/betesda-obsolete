@@ -2,6 +2,7 @@ package br.com.itarocha.betesda.model.hospedagem;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,10 +21,14 @@ public class MapaRetorno {
 	
 	private Map<String, List<String>> porCidade = new TreeMap<>();
 	
+	private List<PessoaHospedagem> pessoas = new ArrayList<>();
+	
 	private Quadro quadro;
 	
 	//TODO: Breve será chamado de leitos
 	private List<MicroLeito> linhas = new ArrayList<>();
+	
+	private List<HospedeLeitoMapa> hospedes = new ArrayList<>();
 	
 	/*
 	private Integer[] qtdTotais 			= {0,0,0,0,0,0,0};
@@ -102,6 +107,22 @@ public class MapaRetorno {
 
 	public void setLinhas(List<MicroLeito> linhas) {
 		this.linhas = linhas;
+	}
+
+	public List<HospedeLeitoMapa> getHospedes() {
+		return hospedes;
+	}
+
+	public void setHospedes(List<HospedeLeitoMapa> hospedes) {
+		this.hospedes = hospedes;
+	}
+
+	public List<PessoaHospedagem> getPessoas() {
+		return pessoas;
+	}
+
+	public void setPessoas(List<PessoaHospedagem> pessoas) {
+		this.pessoas = pessoas;
 	}
 
 	/*
