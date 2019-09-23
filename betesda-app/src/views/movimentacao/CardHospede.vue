@@ -3,7 +3,7 @@
 
         <div class="fw-bold titulo">{{hospede.nome}}
             <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                <el-button type="primary" plain size="mini" circle @click="onEditPessoa">
+                <el-button type="primary" plain size="mini" circle @click="onEditPessoa(hospede.pessoaId)">
                 <i class="fas fa-pencil-alt"></i>
                 </el-button>
             </el-tooltip>
@@ -14,10 +14,10 @@
         <div>Utilização: <span class="fw-bold">{{hospede.tipoUtilizacaoDescricao}}</span>
         <span v-if="hospede.tipoUtilizacao == 'T'">Leito: <span class="fw-bold">{{hospede.quartoNumero}}-{{hospede.leitoNumero}}</span></span> 
         </div>                      
-        <div>Status: <span class="fw-bold">{{hq.statusHospedagem}}</span>
+        <div>Status: <span class="fw-bold">{{hospede.statusHospedagem}}</span>
         
             <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="toolTipDelay">
-                <el-button type="primary" plain size="mini" circle @click="onShowHospedagemInfo">
+                <el-button type="primary" plain size="mini" circle @click="onShowHospedagemInfo(hospede.hospedagemId)">
                 <i class="fas fa-info"></i>
                 </el-button>
             </el-tooltip>
@@ -73,12 +73,12 @@ export default {
             return 'blue'
         },
 
-        onEditPessoa(){
-            this.$emit('editPessoa', hospede.pessoaId)
+        onEditPessoa(pessoaId){
+            this.$emit('editPessoa', pessoaId)
         }, 
 
-        onShowHospedagemInfo(){
-            this.$emit('showHospedagemInfo', hq.hospedagemId)
+        onShowHospedagemInfo(hospedagemId){
+            this.$emit('showHospedagemInfo', hospedagemId)
         }
 
     },
