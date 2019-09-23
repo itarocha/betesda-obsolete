@@ -101,8 +101,8 @@
                       </thead>
                       <tbody>
                           <tr v-for="(h, idxHpd) in hospedes" :key="idxHpd">
-                            <td>{{h.pessoaNome}}</td>
-                            <td>{{h.pessoaCidadeUfOrigem}}</td>
+                            <td>{{h.nome}}</td>
+                            <td>{{h.cidadeUf}}</td>
                             <td>{{h.tipoUtilizacaoDescricao}}</td>
                             <td>{{h.statusHospedagem}}</td>
                             <td>{{formatDate(h.dataPrimeiraEntrada,'DD/MM')}}</td>
@@ -122,7 +122,6 @@
                               </el-button>
                             </el-tooltip>
 
-
                             </td>
                           </tr>
                       </tbody>
@@ -131,47 +130,55 @@
                 </el-row>
               </el-tab-pane>
 
-              <!--
               <el-tab-pane label="Hóspedes por Cidade de Origem" name="cidades">
                   <el-container :style="styleContainerMapa">
                     <el-main style="padding-top:0px;">          
-                        <el-collapse accordion>
-                          <el-collapse-item :title="cidade.nome" v-for="(cidade, index) in cidades" :key="index">
+                        <el-row :gutter="10">
+                          <el-col :span="12">
+                              <el-select v-model="formCidade" style="width:100%">
+                                <el-option v-for="(cidade, idxCidade) in cidades" :key="idxCidade" :label="cidade.nome" :value="cidade.nome"></el-option>
+                              </el-select>
+                          </el-col>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="24">
+                          <div class="flex-container wrap">
+                            <!-- COMPONENTIZAR!!!! -->
+                            <el-card class="flex-item" v-for="(hq, idx) in hospedagensCidade" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:350px; line-height:1.5em;" 
+                            :style="{backgroundColor: colorStatusItem(hq.statusHospedagem)}"
+                            >
+                              <div style="font-weight:bold; font-size:1.1em;">{{hq.nome}}
 
-                            <div class="flex-container wrap">
-                              <el-card class="flex-item" v-for="(hospedagem, idx) in cidade.hospedagens" :key="idx" shadow="never" style="padding:5px; width:250px; line-height:1.5em;" 
-                              :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
-                              >
-                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
+                                <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
+                                  <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hq.pessoaId)">
+                                    <i class="fas fa-pencil-alt"></i>
+                                  </el-button>
+                                </el-tooltip>
 
-                                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                                    <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
-                                      <i class="fas fa-pencil-alt"></i>
-                                    </el-button>
-                                  </el-tooltip>
+                              </div>
+                              <div>Cidade de Origem: <span style="font-weight:bold;">{{hq.cidadeUf}}</span></div>
+                              <div>Fone: <span style="font-weight:bold;">9999-9999</span></div>
+                              <div>Utilização: <span style="font-weight:bold;">{{hq.tipoUtilizacaoDescricao}}</span>
+                                <span v-if="hq.tipoUtilizacao == 'T'">Leito: <span style="font-weight:bold;">{{hq.hospedagem.quartoNumero}}-{{hq.hospedagem.leitoNumero}}</span></span> 
+                              </div>                      
+                              <div>Status: <span style="font-weight:bold;">{{hq.statusHospedagem}}</span>
+                              
+                                <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                                  <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hq.hospedagemId)">
+                                    <i class="fas fa-info"></i>
+                                  </el-button>
+                                </el-tooltip>
+                        
+                              </div>                      
+                            </el-card>
+                          </div>
 
-                                </div>
-                                <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
-                                  <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
-                                </div>                      
-                                <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
-                                
-                                  <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                                    <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
-                                      <i class="fas fa-info"></i>
-                                    </el-button>
-                                  </el-tooltip>
-                          
-                                </div>                      
-                              </el-card>
-                            </div>
-                            
-                          </el-collapse-item>
-                        </el-collapse>  
+                          </el-col>    
+                        </el-row>
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
-              -->
+
               <el-tab-pane label="Quadro de Hospedagens" name="quadro">
                   <el-container :style="styleContainerMapa">
 
@@ -210,7 +217,7 @@
                             <el-card class="flex-item" v-for="(hq, idx) in hospedagensQuadro" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:350px; line-height:1.5em;" 
                             :style="{backgroundColor: colorStatusItem(hq.statusHospedagem)}"
                             >
-                              <div style="font-weight:bold; font-size:1.1em;">{{hq.pessoaNome}}
+                              <div style="font-weight:bold; font-size:1.1em;">{{hq.nome}}
 
                                 <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
                                   <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hq.pessoaId)">
@@ -219,7 +226,7 @@
                                 </el-tooltip>
 
                               </div>
-                              <div>Cidade de Origem: <span style="font-weight:bold;">{{hq.pessoaCidadeUfOrigem}}</span></div>
+                              <div>Cidade de Origem: <span style="font-weight:bold;">{{hq.cidadeUf}}</span></div>
                               <div>Fone: <span style="font-weight:bold;">9999-9999</span></div>
                               <div>Utilização: <span style="font-weight:bold;">{{hq.tipoUtilizacaoDescricao}}</span>
                                 <span v-if="hq.tipoUtilizacao == 'T'">Leito: <span style="font-weight:bold;">{{hq.hospedagem.quartoNumero}}-{{hq.hospedagem.leitoNumero}}</span></span> 
@@ -270,7 +277,7 @@
 
 
 export default {
-  name: 'NewHospedagens',
+  name: 'Hospedagens',
 
   components: {
     TelaHospedagem,
@@ -281,7 +288,7 @@ export default {
   },
 
   mounted(){
-    this.$store.dispatch('setAcao','New Hospedagens')
+    this.$store.dispatch('setAcao','Hospedagens')
 
     this.windowHeight = window.innerHeight
 
@@ -300,6 +307,8 @@ export default {
     dados: [],
 
     erros: [],
+
+    formCidade: null,
 
     activeTabName: 'mapa',
 
@@ -330,10 +339,10 @@ export default {
     pessoas:[],
     cidades:[],
     quadro:[],
+    hospedagensCidade: [],
     hospedagensQuadro: [],
     hospedes:[],
 
-    //VALENDO!!!!
     linhas:[],
 
     colorCache: {},
@@ -341,16 +350,6 @@ export default {
     toolTipDelay: 500,
 
     showDate: null, 
-    message: "",
-    startingDayOfWeek: 0,
-    disablePast: false,
-    disableFuture: false,
-    displayPeriodUom: "month",
-    displayPeriodCount: 1,
-    showEventTimes: true,
-    useDefaultTheme: true,
-    useHolidayTheme: true,
-    useTodayIcons: false,    
 
   }),
 
@@ -358,14 +357,20 @@ export default {
 
     dataAtual(){
       this.hospedagensQuadro = []
+      this.hospedagensCidade = []
       this.quadroQuartoNumero = null
       this.quadroLeitoNumero = null
+      this.formCidade = null
 
       var d = moment(this.dataAtual).toDate()
       this.diaIndex = petraDateTime.getIndiceData(this.dataAtual)
 
       this.setShowDate(d)
       this.getDadosSemanaAtual()
+    },
+
+    formCidade(){
+      this.getHospedagensByCidade(this.formCidade)
     },
 
     windowHeight(newHeight, oldHeight) {
@@ -495,23 +500,13 @@ export default {
             this.linhas = response.data.linhas;
             this.hospedes = response.data.pessoas;
 
-            //console.log(this.dados)
+            this.cidades = response.data.cidades;
+
+            if (this.cidades.length > 0){
+              this.formCidade = this.cidades[0].nome
+            }
 
             this.pessoas = response.data.hospedagens
-            var cidades = []
-            for (var c in this.dados.porCidade){
-              var cidade = {
-                nome : c, 
-                hospedagens : []
-              }
-              for (var id in this.dados.porCidade[c]){
-                const identificador = this.dados.porCidade[c][id]
-                var hospedagem = this.getHospedagemById(identificador)
-                cidade.hospedagens.push(hospedagem)
-               }
-              cidades.push(cidade)
-            }
-            this.cidades = cidades
 
             this.quadro = response.data.quadro
             
@@ -576,76 +571,12 @@ export default {
       var classeStatus =  this.newColorStatusItem(status)
       var retorno = 'grafico ' + classeStatus + ' ';
       
-      if (classe == "BAIXADO"){
-        return retorno + 'grafico_fim_baixado'
-      } else
-      if (classe == "INICIO") {
-        return retorno + 'grafico_inicio'
-      } else 
-      if (classe == "INICIOFIM") {
-        return retorno + 'grafico_inicio grafico_fim'
-      } else 
-      if (classe == "INICIOINDO") {
-        return retorno + 'grafico_inicio_indo'
-      } else 
-      if (classe == "INICIODURANTE") {
-        return retorno + 'grafico_inicio_durante'
-      } else 
-      if (classe == "INICIOBAIXADO") {
-        return retorno + 'grafico_inicio_baixado'
-      } else 
-      if (classe == "DURANTE") {
-        return retorno + 'grafico_durante'
-      } else 
-      if (classe == "DURANTEINDO") {
-        return retorno + 'grafico_durante_indo'
-      } else 
-      if (classe == "DURANTEBAIXADO") {
-        return retorno + 'grafico_durante_baixado'
-      } else 
-      if (classe == "DURANTEFIM") {
-        return retorno + 'grafico_fim'
-      } else 
-      if (classe == "FIM") {
-        return retorno + 'grafico_fim'
-      } else
-      if (classe == "INDO") {
-        return retorno + 'grafico_indo'
-      } else      
-      if (classe == "VINDO") {
-        return retorno + 'grafico_vindo'
-      } else
-      if (classe == "INDOVINDO") {
-        return retorno + 'grafico_indo grafico_vindo'
-      } else
-      if (classe == "VINDOINDO") {
-        return retorno + 'grafico_vindo_indo'
-      } else
-      if (classe == "VINDOFIM") {
-        //return retorno + 'grafico_vindo grafico_fim'
-        return retorno + 'grafico_vindo_fim'
-      } else
-      if (classe == "VINDODURANTE") {
-        return retorno + 'grafico_vindo_durante'
+      if (classe != null){
+        return retorno + 'grafico_' + classe;
       }
+
       return ''
     },  
-
-    colorStatus(id){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        if (hospedagem.statusHospedagem == 'ABERTA'){
-          return '#00796B' // teal darken-2
-        } else if (hospedagem.statusHospedagem == 'ENCERRADA'){
-          return '#78909C' // blue-grey lighten-1
-        } else if (hospedagem.statusHospedagem == 'VENCIDA'){
-          return '#D50000' // red accent-4
-        } else if (hospedagem.baixado) {
-          return '#4DB6AC'
-        }
-      }
-      return 'blue'
-    },
 
     newColorStatusItem(status){
       if (status == 'ABERTA'){
@@ -691,10 +622,6 @@ export default {
       }
     },
 
-    getHospedagemById(id){
-      return _.find(this.dados.hospedagens,{identificador : id});
-    },
-
     getHospedagensByLeitoId(id){
       var hospedagensQuadro = []
       var quadroQuartoNumero = null
@@ -713,7 +640,6 @@ export default {
           const zeroOuUm = hospedagem.dias[diaIndex]
           if (zeroOuUm == 1){
             var retorno = v
-            ///////////retorno.leitos = undefined
             retorno.hospedagem = hospedagem
 
             quadroQuartoNumero = hospedagem.quartoNumero
@@ -723,14 +649,46 @@ export default {
           }
         }
 
-        //console.log(v)
       })
       this.hospedagensQuadro = hospedagensQuadro
       this.quadroQuartoNumero = quadroQuartoNumero
       this.quadroLeitoNumero = quadroLeitoNumero
 
-      //console.log(this.hospedagensQuadro)
       return this.hospedagensQuadro
+    },
+
+    getHospedagensByCidade(cidade){
+      var hospedagensCidade = []
+
+      var pessoas = this.dados.pessoas
+
+      var cidade = _.find(this.cidades, {nome:cidade})
+
+      if (cidade){
+
+        _.forEach(cidade.ids, function(id){
+          _.forEach(pessoas, function(v, k){
+            var lst = _.filter(v.leitos, {identificador : id})
+  
+            for (var i = 0; i < lst.length; i++){
+              var hospedagem = lst[i];
+  
+              //TODO OTIMIZAR. DEVE PROCURAR PELA LISTA DE LEITOS
+  
+              var retorno = v
+              ///////////retorno.leitos = undefined
+              retorno.hospedagem = hospedagem
+  
+              hospedagensCidade.push(retorno)
+              return
+            }
+          })
+        })
+
+      }
+      this.hospedagensCidade = hospedagensCidade
+
+      return this.hospedagensCidade
     },
 
     getPrimeiroNome(nome){
@@ -753,18 +711,11 @@ export default {
       this.refreshMapa()
     },
 
-		setShowDate(d) {
+    		setShowDate(d) {
 			this.message = `Changing calendar view to ${d.toLocaleDateString()}`
       this.showDate = d
       this.dataAtual = moment(d).format("YYYY-MM-DD")
     },
-    
-		onDrop(event, date) {
-			this.message = `You dropped ${event.id} on ${date.toLocaleDateString()}`
-			const eLength = this.dayDiff(event.startDate, date)
-			event.originalEvent.startDate = this.addDays(event.startDate, eLength)
-			event.originalEvent.endDate = this.addDays(event.endDate, eLength)
-		},
 
   }
 }
@@ -832,16 +783,6 @@ export default {
   border: 1px #bdbdbd solid;
 }
 
-/*
-.thebox2 {
-  box-sizing: border-box;
-  border-radius: 0px;
-  margin: 0px;
-  height: 30px;
-  border: 1px #bdbdbd dashed;
-}
-*/
-
 .thebox-circular {
   box-sizing: border-box;
   border-radius: 25px;
@@ -854,7 +795,6 @@ export default {
   border: 1px #bdbdbd solid;
   font-size: 10pt;
 }
-
 
 .h60 {
   height: 54px;
@@ -901,7 +841,7 @@ export default {
   margin-left: 3px;
 }
 
-.grafico_inicio_durante {
+.grafico_iniciodurante {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   width: calc(100% - 2px);
@@ -914,8 +854,20 @@ export default {
   width: calc(100% - 3px);
 }
 
+.grafico_durantefim {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  width: calc(100% - 3px);
+}
+
+.grafico_iniciofim {
+  border-radius : 10px;
+  margin-left: 3px;
+  width: calc(100% - 6px);
+}
+
 /*  https://css-tricks.com/the-shapes-of-css/ */
-.grafico_inicio_indo {
+.grafico_inicioindo {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   width: calc(100% - 6px);
@@ -926,7 +878,7 @@ export default {
   border-width: 0px 4px 0px 0px;
 }
 
-.grafico_inicio_baixado {
+.grafico_iniciobaixado {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
   width: calc(100% - 6px);
@@ -943,25 +895,31 @@ export default {
   border-width: 0px 4px 0px 0px;
 }
 
-.grafico_vindo_indo {
+.grafico_indovindo {
   border-color:#000;
   border-style: dotted;
   border-width: 0px 4px 0px 4px;
 }
 
-.grafico_durante_indo{
+.grafico_vindoindo {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 4px;
+}
+
+.grafico_duranteindo{
   border-color:#000;
   border-style: dotted;
   border-width: 0px 4px 0px 0px;
 }
 
-.grafico_fim_baixado {
+.grafico_baixado {
   border-color:#000;
   border-style: solid;
   border-width: 0px 4px 0px 0px;
 }
 
-.grafico_durante_baixado {
+.grafico_durantebaixado {
   border-color:#000;
   border-style: solid;
   border-width: 0px 4px 0px 0px;
@@ -973,13 +931,13 @@ export default {
   border-width: 0px 0px 0px 4px;
 }
 
-.grafico_vindo_durante {
+.grafico_vindodurante {
   border-color:#000;
   border-style: dotted;
   border-width: 0px 0px 0px 4px;
 }
 
-.grafico_vindo_fim {
+.grafico_vindofim {
   border-color:#000;
   border-style: dotted;
 
@@ -989,7 +947,6 @@ export default {
 
   border-width: 0px 0px 0px 4px;
 }
-
 
 .teal-darken-2 {
   background-color: #00796B;
@@ -1100,7 +1057,6 @@ export default {
   font-size:9pt;
 }
 
-
 /* ------------------------------------------------------------- */
 
 table {
@@ -1159,9 +1115,6 @@ th.active .arrow {
   border-right: 4px solid transparent;
   border-top: 4px solid #fff;
 }
-
-
-
 
 
 </style>

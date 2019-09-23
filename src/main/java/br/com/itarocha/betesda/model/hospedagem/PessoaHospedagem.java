@@ -4,13 +4,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({"destinacaoHospedagemId","cidade", "dataUltimaEntrada"})
 public class PessoaHospedagem {
 
-	private Long pessoaId;
-	private String pessoaNome;
+	private Long id;
+	private String nome;
 	private String cidade;
 	private String uf;
-	private String pessoaCidadeUfOrigem;
+	private String cidadeUf;
 	private Long hospedagemId;
 	private Long hospedeId;
 	private Long tipoHospedeId;
@@ -18,7 +21,7 @@ public class PessoaHospedagem {
 	private CellStatusHospedagem statusHospedagem;
 	private Boolean baixado;
 	private Long destinacaoHospedagemId;
-	private String	destinacaoHospedagemDescricao;
+	private String	destinacao;
 	private String tipoUtilizacao;
 	private String tipoUtilizacaoDescricao;
 	private LocalDate dataEntradaHospedagem;
@@ -33,20 +36,20 @@ public class PessoaHospedagem {
 	
 	public PessoaHospedagem() {}
 
-	public Long getPessoaId() {
-		return pessoaId;
+	public Long getId() {
+		return id;
 	}
 
-	public void setPessoaId(Long pessoaId) {
-		this.pessoaId = pessoaId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public String getPessoaNome() {
-		return pessoaNome;
+	public String getNome() {
+		return nome;
 	}
 
-	public void setPessoaNome(String pessoaNome) {
-		this.pessoaNome = pessoaNome;
+	public void setNome(String nome) {
+		this.nome = nome;
 	}
 
 	public String getCidade() {
@@ -65,12 +68,12 @@ public class PessoaHospedagem {
 		this.uf = uf;
 	}
 
-	public String getPessoaCidadeUfOrigem() {
-		return pessoaCidadeUfOrigem;
+	public String getCidadeUf() {
+		return cidadeUf;
 	}
 
-	public void setPessoaCidadeUfOrigem(String pessoaCidadeUfOrigem) {
-		this.pessoaCidadeUfOrigem = pessoaCidadeUfOrigem;
+	public void setCidadeUf(String cidadeUf) {
+		this.cidadeUf = cidadeUf;
 	}
 
 	public Long getHospedagemId() {
@@ -129,12 +132,12 @@ public class PessoaHospedagem {
 		this.destinacaoHospedagemId = destinacaoHospedagemId;
 	}
 
-	public String getDestinacaoHospedagemDescricao() {
-		return destinacaoHospedagemDescricao;
+	public String getDestinacao() {
+		return destinacao;
 	}
 
-	public void setDestinacaoHospedagemDescricao(String destinacaoHospedagemDescricao) {
-		this.destinacaoHospedagemDescricao = destinacaoHospedagemDescricao;
+	public void setDestinacao(String destinacao) {
+		this.destinacao = destinacao;
 	}
 
 	public String getTipoUtilizacao() {

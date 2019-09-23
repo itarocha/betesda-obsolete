@@ -19,9 +19,10 @@ public class MapaRetorno {
 	
 	private List<HospedagemHeaderInfo> hospedagens = new ArrayList<HospedagemHeaderInfo>();
 	
-	private Map<String, List<String>> porCidade = new TreeMap<>();
-	
 	private List<PessoaHospedagem> pessoas = new ArrayList<>();
+	
+	private List<CidadeHospedagens> cidades = new ArrayList<>(); 
+	
 	
 	private Quadro quadro;
 	
@@ -85,14 +86,6 @@ public class MapaRetorno {
 		this.dias = dias;
 	}
 
-	public Map<String, List<String>> getPorCidade() {
-		return porCidade;
-	}
-
-	public void setPorCidade(Map<String, List<String>> porCidade) {
-		this.porCidade = porCidade;
-	}
-
 	public void setQuadro(Quadro quadro) {
 		this.quadro = quadro;
 	}
@@ -123,6 +116,14 @@ public class MapaRetorno {
 
 	public void setPessoas(List<PessoaHospedagem> pessoas) {
 		this.pessoas = pessoas;
+	}
+
+	public List<CidadeHospedagens> getCidades() {
+		return cidades;
+	}
+
+	public void setCidades(List<CidadeHospedagens> cidades) {
+		this.cidades = cidades;
 	}
 
 	/*
