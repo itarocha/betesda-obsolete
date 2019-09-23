@@ -150,6 +150,14 @@
                           <el-col :span="24">
                           <div class="flex-container wrap">
                             <!-- COMPONENTIZAR!!!! -->
+
+                            <card-hospede v-for="(hq, idx) in hospedagensCidade" :key="idx" 
+                              :hospede=hq
+                              @onEditPessoa="handleEditPessoa" 
+                              @onShowHospedagemInfo="showHospedagemInfo">
+                            </card-hospede>
+
+                            <!--
                             <el-card class="flex-item" v-for="(hq, idx) in hospedagensCidade" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:350px; line-height:1.5em;" 
                             :style="{backgroundColor: colorStatusItem(hq.statusHospedagem)}"
                             >
@@ -177,6 +185,8 @@
                         
                               </div>                      
                             </el-card>
+                            -->
+
                           </div>
 
                           </el-col>    
@@ -206,7 +216,7 @@
 
                         <el-row type="flex" v-for="(quarto, index) in quadro.quartos" :key="index">
                           <el-col v-for="(leito, lid) in quarto.leitos" :key="lid">
-                            <div v-if="leito.id != 0" :class="quadroClass(0, index, lid)"  style="text-align:center; cursor:pointer;" @click="getHospedagensByLeitoId(leito.id)">
+                            <div v-if="leito.id != 0" :class="quadroClass(0, index, lid)" style="text-align:center; cursor:pointer;" @click="getHospedagensByLeitoId(leito.id)">
                               {{quarto.numero}}-{{leito.numero}}
                             </div>
                             <div class="thebox-circular cinza" v-if="leito.id == 0">
@@ -220,6 +230,15 @@
 
                           <div class="flex-container wrap">
                             <!-- COMPONENTIZAR!!!! -->
+
+                            <card-hospede v-for="(hq, idx) in hospedagensQuadro" :key="idx" 
+                              :hospede=hq
+                              @onEditPessoa="handleEditPessoa" 
+                              @onShowHospedagemInfo="showHospedagemInfo">
+                            </card-hospede>
+
+                            <!--
+                             Deprecated 
                             <el-card class="flex-item" v-for="(hq, idx) in hospedagensQuadro" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:350px; line-height:1.5em;" 
                             :style="{backgroundColor: colorStatusItem(hq.statusHospedagem)}"
                             >
@@ -234,7 +253,7 @@
                               </div>
                               <div>Cidade de Origem: <span style="font-weight:bold;">{{hq.cidadeUf}}</span></div>
                               <div>Fone: <span style="font-weight:bold;">9999-9999</span></div>
-                              <div>Utilização: <span style="font-weight:bold;">{{hq.tipoUtilizacaoDescricao}}</span>
+                              <div>Utilização: <span style="font-weight:bold;">{{hq.tipoUtilizacaoDescricao}}<l/span>
                                 <span v-if="hq.tipoUtilizacao == 'T'">Leito: <span style="font-weight:bold;">{{hq.hospedagem.quartoNumero}}-{{hq.hospedagem.leitoNumero}}</span></span> 
                               </div>                      
                               <div>Status: <span style="font-weight:bold;">{{hq.statusHospedagem}}</span>
@@ -247,6 +266,7 @@
                         
                               </div>                      
                             </el-card>
+                            -->
                           </div>
 
                       </el-col>
@@ -280,6 +300,7 @@
 <script>
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
   import FramePessoa from "../cadastros/FramePessoa"
+  import CardHospede from "./CardHospede"
 
 
 export default {
@@ -287,7 +308,8 @@ export default {
 
   components: {
     TelaHospedagem,
-    FramePessoa
+    FramePessoa,
+    CardHospede
 	},
 
   created(){
@@ -366,12 +388,10 @@ export default {
   watch: {
 
     activeTabName(val){
-      //console.log("activeTabName ",val)
       this.renderMapa = val == 'mapa'
       this.renderCidades = val == 'cidades'
       this.renderHospedes = val == 'hospedes'
       this.renderQuadro = val == 'quadro'
-      //console.log("activeTabName = " + val + " render = " + this.renderHospedes)
     },
 
     dataAtual(){
@@ -610,6 +630,7 @@ export default {
       return 'blue'
     },
 
+    /*
     colorStatusItem(status){
       if (status == 'ABERTA'){
         return '#FFF9C4' // teal darken-2
@@ -620,6 +641,7 @@ export default {
       }
       return 'blue'
     },
+    */
 
     calcularAlturaLeito(index){
       var qtd = 0
@@ -1012,6 +1034,7 @@ export default {
   background: gold;
 }
 
+/*
 .flex-item {
   background: #FFF9C4;
   color: #455A64;
@@ -1019,6 +1042,7 @@ export default {
   width: 300px;
   margin: 10px;
 }
+*/
 
 .texto-pq{
   font-size: 10pt;
