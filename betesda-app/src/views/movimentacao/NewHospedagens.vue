@@ -21,7 +21,7 @@
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
               <el-tab-pane label="New Mapa de Hospedagem" name="mapa">
 
-                <el-container style="margin:2px;">
+                <el-container style="margin:2px;" v-if="renderMapa">
                   <el-container :style="styleContainerMapa">
 
                     <el-header style="line-height:20px; height:54px;">
@@ -84,54 +84,60 @@
               <!-- :row-class-name="tableRowClassName"  -->
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 <el-row type="flex" justify="center" align="middle">
-                  <el-col :sm="24" :md="24" :lg="24">
+                  <el-col :sm="24" :md="24" :lg="24" v-if="renderHospedes">
 
-                  <table>
-                      <thead>
-                        <tr>
-                          <th>Nome</th>
-                          <th>Cidade</th>
-                          <th>Utilização</th>
-                          <th>Status Hosped.</th>
-                          <th>Entrada</th>
-                          <th>Prev.Saída</th>
-                          <th>Dt. Saída</th>
-                          <th>Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                          <tr v-for="(h, idxHpd) in hospedes" :key="idxHpd">
-                            <td>{{h.nome}}</td>
-                            <td>{{h.cidadeUf}}</td>
-                            <td>{{h.tipoUtilizacaoDescricao}}</td>
-                            <td>{{h.statusHospedagem}}</td>
-                            <td>{{formatDate(h.dataPrimeiraEntrada,'DD/MM')}}</td>
-                            <td>{{formatDate(h.dataPrevistaSaida,'DD/MM')}}</td>
-                            <td>{{formatDate(h.dataEfetivaSaida,'DD/MM')}}</td>
-                            <td>
 
-                            <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                              <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(h.hospedagemId)">
-                                <i class="fas fa-info"></i>
-                              </el-button>
-                            </el-tooltip>
+                    <el-table :data="hospedes" 
+                       style="width: 100%" border size="small" :default-sort="{prop: 'nome', order: 'ascending'}"
+                      :height="tableHeight"
+                      :row-class-name="tableRowClassName">
 
-                            <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
-                              <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(h.pessoaId)">
-                                <i class="fas fa-pencil-alt"></i>
-                              </el-button>
-                            </el-tooltip>
+                      <el-table-column fixed prop="nome" label="Nome" width="250" sortable></el-table-column>
 
-                            </td>
-                          </tr>
-                      </tbody>
-                    </table>                    
+                      <el-table-column prop="cidadeUf" label="Cidade Origem" width="200" sortable></el-table-column>
+
+                      <el-table-column prop="dataPrimeiraEntrada" :formatter="fmtDate" label="Entrada" width="120" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="120" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="120" sortable></el-table-column>
+                      <!--<el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="120" class-name="wordwrap" sortable></el-table-column>-->
+
+                      <el-table-column prop="tipoUtilizacaoDescricao" label="Utilização" width="120" sortable></el-table-column>
+                      <!--<el-table-column prop="leitoId" :formatter="fmtLeito" width="140" label="Quarto-Leito" sortable></el-table-column>-->
+                      <el-table-column prop="destinacao" width="120" label="Destinação" sortable></el-table-column>
+
+                      <el-table-column prop="statusHospedagem" label="Situação" width="120" sortable></el-table-column>
+
+                      <!--<el-table-column prop="dataEntradaHospedagem" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>-->
+
+                      <!--<el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>-->
+                      <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
+                      <el-table-column header-align="left" align="right" prop="id" label="CODPES" width="100"></el-table-column>
+
+                      <el-table-column label="Ações" fixed="right" align="center" width="120">
+                        <template slot-scope="scope">
+                          
+                          <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
+                            <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(scope.row.hospedagemId)">
+                              <i class="fas fa-info"></i>
+                            </el-button>
+                          </el-tooltip>
+
+                          <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
+                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.id)">
+                              <i class="fas fa-pencil-alt"></i>
+                            </el-button>
+                          </el-tooltip>
+
+                        </template>
+                      </el-table-column>
+                    </el-table>
+
                   </el-col>
                 </el-row>
               </el-tab-pane>
 
               <el-tab-pane label="Hóspedes por Cidade de Origem" name="cidades">
-                  <el-container :style="styleContainerMapa">
+                  <el-container :style="styleContainerMapa" v-if="renderCidades">
                     <el-main style="padding-top:0px;">          
                         <el-row :gutter="10">
                           <el-col :span="12">
@@ -180,7 +186,7 @@
               </el-tab-pane>
 
               <el-tab-pane label="Quadro de Hospedagens" name="quadro">
-                  <el-container :style="styleContainerMapa">
+                  <el-container :style="styleContainerMapa" v-if="renderQuadro">
 
                     <el-header style="line-height:20px; height:54px;">
                       <el-row type="flex">
@@ -311,6 +317,10 @@ export default {
     formCidade: null,
 
     activeTabName: 'mapa',
+    renderMapa: true, // Primeiro
+    renderHospedes: false,
+    renderCidades: false,
+    renderQuadro: false,
 
     showTelaHospedagem : false,
     state : "browse",
@@ -354,6 +364,15 @@ export default {
   }),
 
   watch: {
+
+    activeTabName(val){
+      //console.log("activeTabName ",val)
+      this.renderMapa = val == 'mapa'
+      this.renderCidades = val == 'cidades'
+      this.renderHospedes = val == 'hospedes'
+      this.renderQuadro = val == 'quadro'
+      //console.log("activeTabName = " + val + " render = " + this.renderHospedes)
+    },
 
     dataAtual(){
       this.hospedagensQuadro = []
@@ -499,6 +518,8 @@ export default {
             this.dados = response.data
             this.linhas = response.data.linhas;
             this.hospedes = response.data.pessoas;
+
+            console.log(this.hospedes)
 
             this.cidades = response.data.cidades;
 
