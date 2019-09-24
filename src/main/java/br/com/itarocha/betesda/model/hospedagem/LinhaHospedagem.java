@@ -10,6 +10,7 @@ public class LinhaHospedagem {
 	private Long hospedagemId;
 	private String identificador;
 	private String nome;
+	private String telefone;
 	private String statusHospedagem;
 	private Integer idxIni;
 	private Integer idxFim;
@@ -43,6 +44,14 @@ public class LinhaHospedagem {
 	}
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public String getTelefone() {
+		return telefone;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
 	public String getStatusHospedagem() {

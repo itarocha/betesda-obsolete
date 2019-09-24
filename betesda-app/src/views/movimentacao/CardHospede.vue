@@ -1,30 +1,38 @@
 <template>
-    <el-card shadow="never" :class="body" :style="{backgroundColor: colorStatusItem(hospede.statusHospedagem)}">
-
-        <div class="fw-bold titulo">{{hospede.nome}}
+    <el-card shadow="never" class="body" :style="{backgroundColor: colorStatusItem(model.hospedagem.statusHospedagem)}">
+        <div class="fw-bold titulo">{{model.hospedagem.nome}}
             <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                <el-button type="primary" plain size="mini" circle @click="onEditPessoa(hospede.pessoaId)">
+                <el-button type="primary" plain size="mini" circle @click="onEditPessoa(model.hospedagem.id)">
                 <i class="fas fa-pencil-alt"></i>
                 </el-button>
             </el-tooltip>
         </div>
 
-        <div>Cidade de Origem: <span class="fw-bold">{{hospede.cidadeUf}}</span></div>
-        <div>Fone: <span class="fw-bold">{{hospede.fone}}</span></div>
-        <div>Utilização: <span class="fw-bold">{{hospede.tipoUtilizacaoDescricao}}</span>
-        <span v-if="hospede.tipoUtilizacao == 'T'">Leito: <span class="fw-bold">{{hospede.quartoNumero}}-{{hospede.leitoNumero}}</span></span> 
-        </div>                      
-        <div>Status: <span class="fw-bold">{{hospede.statusHospedagem}}</span>
-        
+        <el-row type="flex">
+            <el-col>Fone: <span class="fw-bold">{{model.hospedagem.telefone}}</span></el-col>
+            <el-col>Cidade: <span class="fw-bold">{{model.hospedagem.cidadeUf}}</span></el-col>
+        </el-row>    
+
+        <el-row type="flex">
+            <el-col>Destinação: <span class="fw-bold">{{model.hospedagem.destinacao}}</span></el-col>
+            <el-col>Tipo Hóspede: <span class="fw-bold">{{model.hospedagem.tipoHospedeDescricao}}</span></el-col>
+        </el-row>    
+
+
+        <el-row type="flex">
+            <el-col>Utilização: <span class="fw-bold">{{model.hospedagem.tipoUtilizacaoDescricao}}</span></el-col>
+            <el-col><span v-if="model.hospedagem.tipoUtilizacao == 'T'">Leito: <span class="fw-bold">{{model.leito.quartoNumero}}-{{model.leito.leitoNumero}}</span></span></el-col>
+        </el-row>    
+
+
+        <div>Status: <span class="fw-bold">{{model.hospedagem.statusHospedagem}}</span>
             <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="toolTipDelay">
-                <el-button type="primary" plain size="mini" circle @click="onShowHospedagemInfo(hospede.hospedagemId)">
+                <el-button type="primary" plain size="mini" circle @click="onShowHospedagemInfo(model.hospedagem.hospedagemId)">
                 <i class="fas fa-info"></i>
                 </el-button>
             </el-tooltip>
-
-        </div>                      
+       </div>                      
     </el-card>
-
 </template>
 
 <script>
@@ -32,24 +40,26 @@
 export default {
     name: "CardHospede",
 
-    components: {
-        CardHospede
-    },
-
     props: {
-        hospede: {
+        model: {
             type: Object,
             default: {
-                pessoaId: 0,
-                hospedagemId: 0,
-                nome: 'Unknow',
-                cidadeUf: 'Unknow',
-                fone: '9999-9999',
-                statusHospedagem: 'Unknow',
-                tipoUtilizacaoDescricao: 'Unknow',
-                tipoUtilizacao: 'T',
-                quartoNumero: 0,
-                leitoNumero: 0,
+                hospedagem: {
+                    id: 0,
+                    hospedagemId: 0,
+                    nome: 'Unknow',
+                    cidadeUf: 'Unknow',
+                    telefone: '---',
+                    statusHospedagem: 'Unknow',
+                    tipoUtilizacaoDescricao: 'Unknow',
+                    tipoUtilizacao: 'T',
+                    tipoHospedeDescricao : 'Unknow',
+                    destinacao : 'Unknow'
+                },
+                leito: {
+                    quartoNumero: 0,
+                    leitoNumero: 0
+                }
             }
         }
     },
@@ -93,8 +103,8 @@ export default {
         color: #455A64;
         font-size: 10pt; 
         padding: 5px; 
-        margin: 10px;
-        width: 350px; 
+        margin: 8px;
+        width: 420px; 
         line-height: 1.5em;
     }
 

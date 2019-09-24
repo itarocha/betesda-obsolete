@@ -11,6 +11,7 @@ public class PessoaHospedagem {
 
 	private Long id;
 	private String nome;
+	private String telefone;
 	private String cidade;
 	private String uf;
 	private String cidadeUf;
@@ -50,6 +51,14 @@ public class PessoaHospedagem {
 
 	public void setNome(String nome) {
 		this.nome = nome;
+	}
+
+	public String getTelefone() {
+		return telefone;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
 	public String getCidade() {

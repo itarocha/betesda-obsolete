@@ -13,6 +13,7 @@ public class HospedeLeitoMapa {
 	private Integer leitoNumero;
 	private Long pessoaId;
 	private String pessoaNome;
+	private String pessoaTelefone;
 	private String cidade;
 	private String uf;
 	private String pessoaCidadeUfOrigem;
@@ -100,6 +101,14 @@ public class HospedeLeitoMapa {
 	public void setPessoaNome(String pessoaNome) {
 		this.pessoaNome = pessoaNome;
 	}
+	public String getPessoaTelefone() {
+		return pessoaTelefone;
+	}
+
+	public void setPessoaTelefone(String pessoaTelefone) {
+		this.pessoaTelefone = pessoaTelefone;
+	}
+
 	public String getCidade() {
 		return cidade;
 	}

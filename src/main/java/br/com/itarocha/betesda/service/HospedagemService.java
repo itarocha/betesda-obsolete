@@ -287,31 +287,35 @@ public class HospedagemService {
 			h.setLeitoNumero(recordToInteger(record[5]));
 			h.setPessoaId(recordBigIntegerToLong(record[6]));
 			h.setPessoaNome(recordToString(record[7]));
-			h.setCidade(recordToString(record[8]));
-			h.setUf(recordToString(record[9]));
+			h.setPessoaTelefone(recordToString(record[8]));
+			
+			
+			
+			h.setCidade(recordToString(record[9]));
+			h.setUf(recordToString(record[10]));
 			
 			h.setPessoaCidadeUfOrigem(String.format("%s - %s", h.getCidade(), h.getUf()));
 			
-			h.setDataEntradaHospedagem(recordSqlSqlDateToLocalDate(record[10]));
-			h.setDataSaidaHospedagem(recordSqlSqlDateToLocalDate(record[11]));
+			h.setDataEntradaHospedagem(recordSqlSqlDateToLocalDate(record[11]));
+			h.setDataSaidaHospedagem(recordSqlSqlDateToLocalDate(record[12]));
 			
-			h.setDataPrimeiraEntrada(recordSqlSqlDateToLocalDate(record[12]));
-			h.setDataUltimaEntrada(recordSqlSqlDateToLocalDate(record[13]));
+			h.setDataPrimeiraEntrada(recordSqlSqlDateToLocalDate(record[13]));
+			h.setDataUltimaEntrada(recordSqlSqlDateToLocalDate(record[14]));
 			
-			h.setDataEntradaLeito(recordSqlSqlDateToLocalDate(record[14]));
-			h.setDataSaidaLeito(recordSqlSqlDateToLocalDate(record[15]));
-			h.setDataIniNoPeriodo(LocalDate.parse(((String)record[16])));
-			h.setDataFimNoPeriodo(LocalDate.parse(((String)record[17])));
-			h.setHospedagemId(((BigInteger)record[18]).longValue());
-			h.setHospedeId(((BigInteger)record[19]).longValue());
-			h.setTipoHospedeId(((BigInteger)record[20]).longValue());
-			h.setBaixado("S".equals(recordToString(record[21])));
-			h.setTipoHospedeDescricao(recordToString(record[22]));
-			h.setDestinacaoHospedagemId(recordBigIntegerToLong(record[23]));
-			h.setDestinacaoHospedagemDescricao(recordToString(record[24]));
+			h.setDataEntradaLeito(recordSqlSqlDateToLocalDate(record[15]));
+			h.setDataSaidaLeito(recordSqlSqlDateToLocalDate(record[16]));
+			h.setDataIniNoPeriodo(LocalDate.parse(((String)record[17])));
+			h.setDataFimNoPeriodo(LocalDate.parse(((String)record[18])));
+			h.setHospedagemId(((BigInteger)record[19]).longValue());
+			h.setHospedeId(((BigInteger)record[20]).longValue());
+			h.setTipoHospedeId(((BigInteger)record[21]).longValue());
+			h.setBaixado("S".equals(recordToString(record[22])));
+			h.setTipoHospedeDescricao(recordToString(record[23]));
+			h.setDestinacaoHospedagemId(recordBigIntegerToLong(record[24]));
+			h.setDestinacaoHospedagemDescricao(recordToString(record[25]));
 			
-			h.setDataPrevistaSaida(recordSqlSqlDateToLocalDate(record[25]));
-			h.setDataEfetivaSaida(recordSqlSqlDateToLocalDate(record[26]));
+			h.setDataPrevistaSaida(recordSqlSqlDateToLocalDate(record[26]));
+			h.setDataEfetivaSaida(recordSqlSqlDateToLocalDate(record[27]));
 		
 			CellStatusHospedagem statusHospedagem = resolveStatusHospedagemNew(hoje, h.getDataPrevistaSaida(), h.getDataEfetivaSaida());
 			h.setStatusHospedagem(statusHospedagem);
@@ -415,6 +419,7 @@ public class HospedagemService {
 			linhaHospedagem.setStatusHospedagem(hospedeLeito.getStatusHospedagem().toString());
 			
 			linhaHospedagem.setNome(hospedeLeito.getPessoaNome());
+			linhaHospedagem.setTelefone(hospedeLeito.getPessoaTelefone());
 			linhaHospedagem.setClasses(classes);
 			linhaHospedagem.setDias(dias);
 			linhaHospedagem.setIdxIni(idxIni);
@@ -462,6 +467,7 @@ public class HospedagemService {
 				PessoaHospedagem ph = new PessoaHospedagem();
 				ph.setId(h.getPessoaId());
 				ph.setNome(h.getPessoaNome());
+				ph.setTelefone(h.getPessoaTelefone());
 				ph.setCidade(h.getCidade());
 				ph.setUf(h.getUf());
 				ph.setCidadeUf(h.getPessoaCidadeUfOrigem());

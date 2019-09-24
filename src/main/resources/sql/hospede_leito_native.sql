@@ -6,6 +6,7 @@ SELECT  tb.identificador
       , tb.leito_numero
       , p.id pessoa_id
       , p.nome AS pessoa_nome
+      , p.telefone AS pessoa_telefone
       , e.cidade
       , e.uf
       , hospedagem.data_entrada AS data_entrada_hospedagem
