@@ -19,9 +19,9 @@
           <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
-              <el-tab-pane label="Mapa de Hospedagem" name="mapa">
+              <el-tab-pane label="New Mapa de Hospedagem" name="mapa">
 
-                <el-container style="margin:2px;">
+                <el-container style="margin:2px;" v-if="renderMapa">
                   <el-container :style="styleContainerMapa">
 
                     <el-header style="line-height:20px; height:54px;">
@@ -47,37 +47,33 @@
                     <el-main style="padding-top:0px;">
 
                       <div :style="styleGrid" class="scroll-y p0">
-                        <el-row type="flex" v-for="(celula, index) in dados.leitos" :key="index">
-                          <el-col>
-                            <div class="thebox p4 laranja hleito" :style="{height:calcularAlturaLeito(index)}">
-                              <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
-                              <center v-if="celula.quartoNumero == '9999'">Parcial</center>
+                        <div class="container-mapa" v-for="(celula, index) in linhas" :key="index">
+                          <div class="titulo">
+                              <center v-if="celula.quartoNumero != '0'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                              <center v-if="celula.quartoNumero == '0'">Parcial</center>
+                          </div> 
+                          <div>
+                            <div class="container-linha" v-for="(h, idx) in celula.hospedagens" :key="idx">
+                              <div v-for="(classe, idxClasses) in h.classes" :key="idxClasses" class="celula-borda-cinza">
+
+                                <el-popover
+                                    v-if="h.identificador != null && classe != ''"
+                                    placement="top-start"
+                                    width="300"
+                                    :title="'HPD: '+ h.identificador"
+                                    trigger="hover"
+                                    :open-delay="1000"
+                                    :content="h.nome">
+                                    <div slot="reference" :class="newHospedagemClass(classe, h.statusHospedagem)" 
+                                          @click="showHospedagemInfo(h.hospedagemId)">
+                                          <p v-if="idxClasses == h.idxIni" class="texto-linha">{{getPrimeiroNome(h.nome)}}</p>
+                                    </div>
+                                </el-popover>
+
+                              </div>
                             </div>
-                          </el-col>
-
-                          <el-col sm12 v-for="(cell, indice) in dados.dias" :key="indice" style="background:#f5f5f5;" :class="{'grey-lighten-2':isIndiceDataAtual(indice)}">
-                            <div class="thebox hleito" v-if="celula.hospedagens.length == 0"></div>
-                            <div class="thebox hleito" v-for="(hospedagem, hIdx) in celula.hospedagens" :key="hIdx">
-
-                            <el-popover
-                                placement="top-start"
-                                width="300"
-                                :title="hospedagem.dias[indice].identificador"
-                                trigger="hover"
-                                :open-delay="1000"
-                                :content="getNome(hospedagem.dias[indice].identificador, true)">
-
-                                <div slot="reference" :class="hospedagemClass(hospedagem.dias[indice].identificador, hospedagem.dias[indice].classe, hospedagem.dias[indice])" 
-                                      v-if="hospedagem.dias[indice].identificador != '0'"
-                                      :style="{backgroundColor: colorStatus(hospedagem.dias[indice].identificador)}"
-                                      @click="showHospedagemInfoByIdentificador(hospedagem.dias[indice].identificador)">
-                                  <div class="chip" v-if="hospedagem.dias[indice].firstIndex">{{getNome(hospedagem.dias[indice].identificador)}}</div>
-                                </div>
-                            </el-popover>                                
-
-                            </div>
-                          </el-col>
-                        </el-row>
+                          </div>
+                        </div>  
                       </div>
 
                     </el-main>
@@ -85,34 +81,38 @@
                 </el-container>
               </el-tab-pane>
 
+              <!-- :row-class-name="tableRowClassName"  -->
               <el-tab-pane label="Hóspedes na Semana" name="hospedes">
                 <el-row type="flex" justify="center" align="middle">
-                  <el-col :sm="24" :md="24" :lg="24">
-                    <el-table :data="pessoas" 
-                       style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
+                  <el-col :sm="24" :md="24" :lg="24" v-if="renderHospedes">
+
+
+                    <el-table :data="hospedes" 
+                       style="width: 100%" border size="small" :default-sort="{prop: 'nome', order: 'ascending'}"
                       :height="tableHeight"
                       :row-class-name="tableRowClassName">
 
-                      <el-table-column fixed prop="pessoaNome" label="Nome" width="250" sortable></el-table-column>
+                      <el-table-column fixed prop="nome" label="Nome" width="250" sortable></el-table-column>
+                      <el-table-column prop="telefone" label="Telefone" width="120" ></el-table-column>
 
-                      <el-table-column prop="pessoaCidadeUfOrigem" label="Cidade Origem" width="200" sortable></el-table-column>
+                      <el-table-column prop="cidadeUf" label="Cidade Origem" width="200" sortable></el-table-column>
 
-                      <el-table-column prop="leitoDataEntrada" :formatter="fmtDate" label="Entrada" width="120" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="120" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column prop="dataPrimeiraEntrada" :formatter="fmtDate" label="Entrada" width="110" header-align="left" sortable></el-table-column>
+                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev.Saída" width="110" class-name="wordwrap" sortable></el-table-column>
+                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="110" sortable></el-table-column>
+                      <!--<el-table-column prop="leitoDataSaida" :formatter="fmtDate" label="Saída" width="110" class-name="wordwrap" sortable></el-table-column>-->
 
-                      <el-table-column prop="utilizacao" label="Utilização" width="120" sortable></el-table-column>
-                      <el-table-column prop="leitoId" :formatter="fmtLeito" width="140" label="Quarto-Leito" sortable></el-table-column>
-                      <el-table-column prop="destinacaoHospedagemDescricao" width="120" label="Destinação" sortable></el-table-column>
+                      <el-table-column prop="tipoUtilizacaoDescricao" label="Utilização" width="120" sortable></el-table-column>
+                      <!--<el-table-column prop="leitoId" :formatter="fmtLeito" width="140" label="Quarto-Leito" sortable></el-table-column>-->
+                      <el-table-column prop="destinacao" width="120" label="Destinação" sortable></el-table-column>
 
                       <el-table-column prop="statusHospedagem" label="Situação" width="120" sortable></el-table-column>
 
-                      <el-table-column prop="dataEntrada" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>
-                      <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev. Saída" width="120" class-name="wordwrap" sortable></el-table-column>
-                      <el-table-column prop="dataEfetivaSaida" :formatter="fmtDate" label="Hpd.Saída" width="120" sortable></el-table-column>
+                      <!--<el-table-column prop="dataEntradaHospedagem" :formatter="fmtDate" label="Hpd.Início" width="120" header-align="left" sortable></el-table-column>-->
 
-                      <el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>
+                      <!--<el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>-->
                       <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
-                      <el-table-column header-align="left" align="right" prop="pessoaId" label="CODPES" width="100" sortable></el-table-column>
+                      <el-table-column header-align="left" align="right" prop="id" label="CODPES" width="100"></el-table-column>
 
                       <el-table-column label="Ações" fixed="right" align="center" width="120">
                         <template slot-scope="scope">
@@ -124,7 +124,7 @@
                           </el-tooltip>
 
                           <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
-                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.pessoaId)">
+                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.id)">
                               <i class="fas fa-pencil-alt"></i>
                             </el-button>
                           </el-tooltip>
@@ -132,63 +132,43 @@
                         </template>
                       </el-table-column>
                     </el-table>
+
                   </el-col>
                 </el-row>
               </el-tab-pane>
 
               <el-tab-pane label="Hóspedes por Cidade de Origem" name="cidades">
-                  <el-container :style="styleContainerMapa">
+                  <el-container :style="styleContainerMapa" v-if="renderCidades">
                     <el-main style="padding-top:0px;">          
-                        <el-collapse accordion>
-                          <el-collapse-item :title="cidade.nome" v-for="(cidade, index) in cidades" :key="index">
-
+                        <el-row :gutter="10">
+                          <el-col :span="12">
+                              <el-select v-model="formCidade" style="margin: 8px; width:100%">
+                                <el-option v-for="(cidade, idxCidade) in cidades" :key="idxCidade" :label="cidade.nome" :value="cidade.nome"></el-option>
+                              </el-select>
+                          </el-col>
+                        </el-row>
+                        <el-row :gutter="10">
+                          <el-col :span="24">
                             <div class="flex-container wrap">
-                              <el-card class="flex-item" v-for="(hospedagem, idx) in cidade.hospedagens" :key="idx" shadow="never" style="padding:5px; width:250px; line-height:1.5em;" 
-                              :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
-                              >
-                                <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
 
-                                  <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                                    <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
-                                      <i class="fas fa-pencil-alt"></i>
-                                    </el-button>
-                                  </el-tooltip>
+                              <card-hospede v-for="(hq, idx) in hospedagensCidade" :key="idx" 
+                                :model=hq
+                                @editPessoa="handleEditPessoa" 
+                                @showHospedagemInfo="showHospedagemInfo">
+                              </card-hospede>
 
-                                </div>
-                                <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
-                                  <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
-                                </div>                      
-                                <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
-                                
-                                  <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                                    <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
-                                      <i class="fas fa-info"></i>
-                                    </el-button>
-                                  </el-tooltip>
-                          
-                                </div>                      
-                              </el-card>
                             </div>
-                            
-                          </el-collapse-item>
-                        </el-collapse>  
+                          </el-col>    
+                        </el-row>
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
 
               <el-tab-pane label="Quadro de Hospedagens" name="quadro">
-                  <el-container :style="styleContainerMapa">
+                  <el-container :style="styleContainerMapa" v-if="renderQuadro">
 
                     <el-header style="line-height:20px; height:54px;">
                       <el-row type="flex">
-                        <!--
-                        <el-col>
-                          <div class="thebox p4 laranja h60">
-                            <span style="font-size: 12pt; align:center;">Quarto/</span>
-                            <span style="font-size: 12pt; align:center;">Leito</span>
-                          </div>
-                        </el-col>
-                        -->
                         <el-col v-for="(dia, index) in dados.dias" :key="index" 
                           :class="{'white-text': isDataAtual(dia), 'teal-darken-2':isDataAtual(dia), 'amber-lighten-4':!isDataAtual(dia) }">
                           <div class="thebox p4 h60 " style="cursor:pointer; line-height:8px; text-align:center; font-size: 10pt;"  @click="selecionarDia(dia, index)">
@@ -196,26 +176,16 @@
                             <p>{{formatDate(dia,'DD/MMM')}}</p>
                           </div>
                         </el-col>
-                        <!--<div class="w15"></div>-->
                       </el-row>                      
                     </el-header>
-
 
                     <el-main style="padding-top:10px;">
 
                       <el-col :sm="10" :md="10" :lg="10">
 
                         <el-row type="flex" v-for="(quarto, index) in quadro.quartos" :key="index">
-                          <!--
-                          <el-col>
-                            <div class="thebox hleito laranja" style="text-align:center;">
-                              {{quarto.numero}}
-                            </div>
-                          </el-col>
-                          -->
-
                           <el-col v-for="(leito, lid) in quarto.leitos" :key="lid">
-                            <div v-if="leito.id != 0" :class="quadroClass(0, index, lid)"  style="text-align:center; cursor:pointer;" @click="getHospedagensByLeitoId(leito.id)">
+                            <div v-if="leito.id != 0" :class="quadroClass(0, index, lid)" style="text-align:center; cursor:pointer;" @click="getHospedagensByLeitoId(leito.id)">
                               {{quarto.numero}}-{{leito.numero}}
                             </div>
                             <div class="thebox-circular cinza" v-if="leito.id == 0">
@@ -227,41 +197,19 @@
                       <el-col :sm="14" :md="14" :lg="14">
                           <div class="subtitulo bg-purple">Quarto {{quadroQuartoNumero}} Leito {{quadroLeitoNumero}}</div>
 
-                          <div class="flex-container wrap">
-                            <el-card class="flex-item" v-for="(hospedagem, idx) in hospedagensQuadro" :key="idx" shadow="never" style="font-size:10pt; padding:5px; width:250px; line-height:1.5em;" 
-                            :style="{backgroundColor: colorStatusItem(hospedagem.statusHospedagem)}"
-                            >
-                              <div style="font-weight:bold; font-size:1.1em;">{{hospedagem.pessoaNome}}
-
-                                <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                                  <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(hospedagem.pessoaId)">
-                                    <i class="fas fa-pencil-alt"></i>
-                                  </el-button>
-                                </el-tooltip>
-
-                              </div>
-                              <div>Utilização: <span style="font-weight:bold;">{{hospedagem.utilizacao}}</span>
-                                <span v-if="hospedagem.utilizacao == 'TOTAL'">Leito: <span style="font-weight:bold;">{{hospedagem.quartoNumero}}-{{hospedagem.leitoNumero}}</span></span> 
-                              </div>                      
-                              <div>Status: <span style="font-weight:bold;">{{hospedagem.statusHospedagem}}</span>
-                              
-                                <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="300">
-                                  <el-button type="primary" plain size="mini" circle @click="showHospedagemInfo(hospedagem.hospedagemId)">
-                                    <i class="fas fa-info"></i>
-                                  </el-button>
-                                </el-tooltip>
-                        
-                              </div>                      
-                            </el-card>
+                          <div class="flex-container-center wrap">
+                            <card-hospede v-for="(hq, idx) in hospedagensQuadro" :key="idx" 
+                              :model=hq
+                              @editPessoa="handleEditPessoa" 
+                              @showHospedagemInfo="showHospedagemInfo">
+                            </card-hospede>
                           </div>
 
                       </el-col>
 
-
                     </el-main>  
                 </el-container>  
               </el-tab-pane>
-
             </el-tabs>
 
           </el-col>
@@ -270,7 +218,6 @@
     </el-container>
 
     <tela-hospedagem v-if="state=='info'" @close="onCloseInfo" :id="hospedagemSelecionada"></tela-hospedagem>
-
 
     <div>
       <el-dialog title="Detalhes da Pessoa" :visible.sync="editPessoa" width="800px">
@@ -289,6 +236,7 @@
 <script>
   import TelaHospedagem from "../hpd/TelaHospedagem.vue"
   import FramePessoa from "../cadastros/FramePessoa"
+  import CardHospede from "./CardHospede"
 
 
 export default {
@@ -296,7 +244,8 @@ export default {
 
   components: {
     TelaHospedagem,
-    FramePessoa
+    FramePessoa,
+    CardHospede
 	},
 
   created(){
@@ -323,12 +272,17 @@ export default {
 
     erros: [],
 
+    formCidade: null,
+
     activeTabName: 'mapa',
+    renderMapa: true, // Primeiro
+    renderHospedes: false,
+    renderCidades: false,
+    renderQuadro: false,
 
     showTelaHospedagem : false,
     state : "browse",
     hospedagemSelecionada : null,
-
 
     windowHeight: 0,
     styleGrid : 'max-height: 337px',
@@ -353,65 +307,45 @@ export default {
     pessoas:[],
     cidades:[],
     quadro:[],
+    hospedagensCidade: [],
     hospedagensQuadro: [],
+    hospedes:[],
 
-    dadosPlanilhaGeral:[],
-    dadosRankingCidades:[],
-    dadosRankingEncaminhamentos:[],
-
-		qtdLeitosTotais : 0,
-		qtdLeitosOcupados : 0,
-    qtdLeitosLivres : 0,
-
-		qtdTotais : 0,
-		qtdVencidos : 0,
-		qtdPendentes : 0,
-		qtdEncerrados : 0,
-
-		qtdParciaisTotais : 0,
-		qtdParciaisVencidos : 0,
-		qtdParciaisPendentes : 0,
-		qtdParciaisEncerrados : 0,
+    linhas:[],
 
     colorCache: {},
 
     toolTipDelay: 500,
 
-			showDate: null, 
-			message: "",
-			startingDayOfWeek: 0,
-			disablePast: false,
-			disableFuture: false,
-			displayPeriodUom: "month",
-			displayPeriodCount: 1,
-			showEventTimes: true,
-			newEventTitle: "",
-			newEventStartDate: "",
-			newEventEndDate: "",
-			useDefaultTheme: true,
-			useHolidayTheme: true,
-			useTodayIcons: false,    
+    showDate: null, 
 
   }),
 
   watch: {
 
+    activeTabName(val){
+      this.renderMapa = val == 'mapa'
+      this.renderCidades = val == 'cidades'
+      this.renderHospedes = val == 'hospedes'
+      this.renderQuadro = val == 'quadro'
+    },
+
     dataAtual(){
       this.hospedagensQuadro = []
+      this.hospedagensCidade = []
       this.quadroQuartoNumero = null
       this.quadroLeitoNumero = null
+      this.formCidade = null
 
       var d = moment(this.dataAtual).toDate()
       this.diaIndex = petraDateTime.getIndiceData(this.dataAtual)
-      //console.log("diaIndex = " + this.diaIndex)
 
       this.setShowDate(d)
       this.getDadosSemanaAtual()
-      this.showEstatisticas()
     },
 
-    estatisticaLeitos(){
-      this.showEstatisticas()
+    formCidade(){
+      this.getHospedagensByCidade(this.formCidade)
     },
 
     windowHeight(newHeight, oldHeight) {
@@ -427,10 +361,6 @@ export default {
   },
 
   computed: {
-
-    estatisticaLeitos(){
-      return this.dados.qtdLeitos
-    },
 
     imageHeight () {
       switch (this.$vuetify.breakpoint.name) {
@@ -449,7 +379,7 @@ export default {
         case 'md': return 'max-height: 337px'
         
         case 'lg': return 'max-height: 337px'
-        case 'xl': return 'max-height: 673px' //613
+        case 'xl': return 'max-height: 673px'
       }
     },
     
@@ -481,7 +411,6 @@ export default {
     onCancelPessoa(id) {
       this.pessoaId = null
       this.editPessoa = false
-      //this.doGetAll()
     },
 
     onSavePessoa(id) {
@@ -540,25 +469,21 @@ export default {
       var dados = {
         data : data
       }
-      petra.axiosPost("/app/hospedagem/mapa", dados)
+      petra.axiosPost("/app/hospedagem/mapa_new", dados)
         .then(response => {
             this.dados = response.data
-            console.log(this.dados)
-            this.pessoas = response.data.hospedagens
-            var cidades = []
-            for (var c in this.dados.porCidade){
-              var cidade = {
-                nome : c, 
-                hospedagens : []
-              }
-              for (var id in this.dados.porCidade[c]){
-                const identificador = this.dados.porCidade[c][id]
-                var hospedagem = this.getHospedagemById(identificador)
-                cidade.hospedagens.push(hospedagem)
-               }
-              cidades.push(cidade)
+            this.linhas = response.data.linhas;
+            this.hospedes = response.data.pessoas;
+
+            console.log(this.hospedes)
+
+            this.cidades = response.data.cidades;
+
+            if (this.cidades.length > 0){
+              this.formCidade = this.cidades[0].nome
             }
-            this.cidades = cidades
+
+            this.pessoas = response.data.hospedagens
 
             this.quadro = response.data.quadro
             
@@ -586,41 +511,6 @@ export default {
 
     fmtLeito(row, col){
       return (row.leitoId != 0 ? row.quartoNumero + "-" + row.leitoNumero : "")
-    },
-
-    showEstatisticas(){
-      var index = petraDateTime.getIndiceData(this.dataAtual) || 0
-
-      if (this.dados && this.dados.qtdLeitosTotais){
-        this.qtdLeitosTotais = this.dados.qtdLeitosTotais[index]
-        this.qtdLeitosOcupados = this.dados.qtdLeitosOcupados[index]
-        this.qtdLeitosLivres = this.dados.qtdLeitosLivres[index]
-
-        this.qtdTotais = this.dados.qtdTotais[index]
-        this.qtdVencidos = this.dados.qtdVencidos[index]
-        this.qtdPendentes = this.dados.qtdPendentes[index]
-        this.qtdEncerrados = this.dados.qtdEncerrados[index]
-
-        this.qtdParciaisTotais = this.dados.qtdParciaisTotais[index]
-        this.qtdParciaisVencidos = this.dados.qtdParciaisVencidos[index]
-        this.qtdParciaisPendentes = this.dados.qtdParciaisPendentes[index]
-        this.qtdParciaisEncerrados = this.dados.qtdParciaisEncerrados[index]
-      } else {
-        this.qtdLeitosTotais = 0
-        this.qtdLeitosOcupados = 0
-        this.qtdLeitosLivres = 0
-
-        this.qtdTotais = 0
-        this.qtdVencidos = 0
-        this.qtdPendentes = 0
-        this.qtdEncerrados = 0
-
-        this.qtdParciaisTotais = 0
-        this.qtdParciaisVencidos = 0
-        this.qtdParciaisPendentes = 0
-        this.qtdParciaisEncerrados = 0
-      }
-
     },
 
     recarregar(){
@@ -652,67 +542,26 @@ export default {
       return "thebox-circular";
     },
 
-    hospedagemClass(id, classe, dias){
-      var hospedagem = this.getHospedagemById(id);
+    // NOVO
+    newHospedagemClass(classe, status){
 
-      if (hospedagem){
-          if (classe == "BAIXADO"){
-            return 'grafico grafico_fim_baixado'
-          } else
-          if (classe == "INICIO") {
-            return 'grafico grafico_inicio'
-          } else 
-          if (classe == "INICIO_FIM") {
-            return 'grafico grafico_inicio grafico_fim'
-          } else 
-          if (classe == "INICIO_INDO") {
-            return 'grafico grafico_inicio_indo' // grafico_indo grafico_inicio
-          } else 
-          if (classe == "DURANTE") {
-            return 'grafico grafico_durante'
-          } else 
-          if (classe == "FIM") {
-            return 'grafico grafico_fim'
-          } else
-          if (classe == "INDO") {
-            return 'grafico grafico_indo'
-          } else      
-          if (classe == "VINDO") {
-            return 'grafico grafico_vindo'
-          } else
-          if (classe == "INDO_VINDO") {
-            return 'grafico grafico_indo grafico_vindo'
-          } else
-          if (classe == "VINDO_FIM") {
-            return 'grafico grafico_vindo grafico_fim'
-          }
+      var classeStatus =  this.newColorStatusItem(status)
+      var retorno = 'grafico ' + classeStatus + ' ';
+      
+      if (classe != null){
+        return retorno + 'grafico_' + classe;
       }
+
       return ''
     },  
 
-    colorStatus(id){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        if (hospedagem.statusHospedagem == 'ABERTA'){
-          return '#00796B' // teal darken-2
-        } else if (hospedagem.statusHospedagem == 'ENCERRADA'){
-          return '#78909C' // blue-grey lighten-1
-        } else if (hospedagem.statusHospedagem == 'VENCIDA'){
-          return '#D50000' // red accent-4
-        } else if (hospedagem.baixado) {
-          return '#4DB6AC'
-        }
-      }
-      return 'blue'
-    },
-
-    colorStatusItem(status){
+    newColorStatusItem(status){
       if (status == 'ABERTA'){
-        return '#FFF9C4' // teal darken-2
+        return 'bg-aberta' // '#FFF9C4' teal darken-2
       } else if (status == 'ENCERRADA'){
-        return '#d3dce6' //'#E0E0E0' // blue-grey lighten-1
+        return 'bg-encerrada' //'#d3dce6' // blue-grey lighten-1
       } else if (status == 'VENCIDA'){
-        return '#FFCCBC' // red accent-4
+        return 'bg-vencida' // '#FFCCBC' red accent-4
       }
       return 'blue'
     },
@@ -731,75 +580,100 @@ export default {
       }
     },
 
-    getHospedagemById(id){
-      return _.find(this.dados.hospedagens,{identificador : id});
+    newCalcularAlturaLeito(qtd){
+      if (qtd <= 1) {
+        return '28px'
+      } else {
+        return  (qtd*28)+'px'
+      }
     },
 
     getHospedagensByLeitoId(id){
-      this.hospedagensQuadro = []
+      var hospedagensQuadro = []
+      var quadroQuartoNumero = null
+      var quadroLeitoNumero = null
 
-      var obj = _.find(this.dados.leitos,{leitoId : id})
-      
-      if (!obj) return
-      
-      this.quadroQuartoNumero = obj.quartoNumero
-      this.quadroLeitoNumero = obj.leitoNumero
+      var diaIndex = this.diaIndex
 
-      //console.log(obj)
-      if (obj){
-        //console.log("hospedagens")
-        for (var h in obj.hospedagens){
-          var  dias = obj.hospedagens[h].dias
-          //console.log(dias)
-          //console.log("O índice é "+this.diaIndex)
+      _.forEach(this.dados.pessoas, function(hospedagem, k){
+        var lst = _.filter(hospedagem.leitos, {leitoId : id})
 
-          if (dias.length >= 0 && this.diaIndex <= dias.length){
-            //console.log(dias[this.diaIndex])
-            const identificador = dias[this.diaIndex].identificador
+        for (var i = 0; i < lst.length; i++){
+          var leito = lst[i];
 
-            if (identificador != "0"){
-              var hospedagem = this.getHospedagemById(identificador)
-              this.hospedagensQuadro.push(hospedagem)
+          //TODO OTIMIZAR. DEVE PROCURAR PELA LISTA DE LEITOS
+
+          const zeroOuUm = leito.dias[diaIndex]
+          if (zeroOuUm == 1){
+
+              const retorno = {
+                hospedagem,
+                leito
+              }
+
+            /*
+            var retorno = v
+            retorno.hospedagem = hospedagem
+            */
+            quadroQuartoNumero = leito.quartoNumero
+            quadroLeitoNumero = leito.leitoNumero
+
+            hospedagensQuadro.push(retorno)
+          }
+        }
+
+      })
+      this.hospedagensQuadro = hospedagensQuadro
+      this.quadroQuartoNumero = quadroQuartoNumero
+      this.quadroLeitoNumero = quadroLeitoNumero
+
+      return this.hospedagensQuadro
+    },
+
+    //TODO OTIMIZAR. DEVE PROCURAR PELA LISTA DE LEITOS
+    getHospedagensByCidade(cidade){
+      var hospedagensCidade = []
+
+      var pessoas = this.dados.pessoas
+
+      var cidade = _.find(this.cidades, {nome:cidade})
+
+      if (cidade){
+        _.forEach(cidade.ids, function(id){
+          for (var i = 0; i <= pessoas.length; i++){
+            var hospedagem = pessoas[i];
+
+            var leito = _.find(hospedagem.leitos, {identificador : id})
+            
+            if (leito){
+              const retorno = {
+                hospedagem,
+                leito
+              }
+              hospedagensCidade.push(retorno)
+              return
             }
-          }
-        }
-      }
-      //console.log(this.hospedagensQuadro)
 
-      return obj
+          }
+        })
+      }
+
+      this.hospedagensCidade = hospedagensCidade
+      console.log(hospedagensCidade)
+      return this.hospedagensCidade
     },
 
-    getNome(id, completo){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        if (completo)  {
-          return hospedagem.pessoaNome
-        } else {
-          //var nome = hospedagem.pessoaNome.split(" ")[0]
-          var nome = hospedagem.pessoaNome
-  
-          if (nome.length > 10){
-            nome = nome.substr(0,10) + "..."
-          }
-          return nome;
-        }
+    getPrimeiroNome(nome){
+      if (nome.length > 10){
+        nome = nome.substr(0,10) + "..."
       }
-      return '???';
-    },
-
-    showHospedagemInfoByIdentificador(id){
-      var hospedagem = this.getHospedagemById(id);
-      if (hospedagem){
-        this.showHospedagemInfo(hospedagem.hospedagemId)
-      }
+      return nome;
     },
 
     showHospedagemInfo(id){
       this.state = "info"
       this.hospedagemSelecionada = id;
       this.showTelaHospedagem = true;
-
-      //this.$refs.hospedagemInfo.openDialog(id);
     },
 
     onCloseInfo(){
@@ -809,41 +683,11 @@ export default {
       this.refreshMapa()
     },
 
-		setShowDate(d) {
+    		setShowDate(d) {
 			this.message = `Changing calendar view to ${d.toLocaleDateString()}`
       this.showDate = d
       this.dataAtual = moment(d).format("YYYY-MM-DD")
     },
-    
-		onDrop(event, date) {
-			this.message = `You dropped ${event.id} on ${date.toLocaleDateString()}`
-			// Determine the delta between the old start date and the date chosen,
-			// and apply that delta to both the start and end date to move the event.
-			const eLength = this.dayDiff(event.startDate, date)
-			event.originalEvent.startDate = this.addDays(event.startDate, eLength)
-			event.originalEvent.endDate = this.addDays(event.endDate, eLength)
-		},
-
-    exemplosMoment(){
-      /* 
-
-      https://tableless.com.br/trabalhando-com-moment/
-
-      const dia = moment("2018-25-02")
-      moment("abcxyz").isValid() // false
-      moment("2018-02-24").add(2, "days") // 2018-02-26
-      moment("2018-02-24").add(1, "year").subtract("1", "days") // 2019-02-23
-
-      moment().format("dd/MM/yyyy HH-mm") // 25/02/2018 13-35
-      moment("abcxyz").format('YYYY MM DD') // "Invalid date"
-
-      moment('2017-10-20').isBefore('2017-10-21'); // true
-      moment('2017-10-20').isBefore('2010-12-31', 'year'); // false
-      moment('2017-10-20').isBefore('2018-01-01', 'year'); // true
-
-      moment('2010-10-20').isBetween('2010-10-19', '2010-10-25'); // true
-      */      
-    }    
 
   }
 }
@@ -895,7 +739,6 @@ export default {
 }
 
 .grade {
-  /*padding: 10px;*/
   width: 100%;
 }
 
@@ -919,7 +762,7 @@ export default {
   height: 30px;
   margin-left: 3px;
   margin-right: 3px;
-  margin-bottom: 5px;
+  margin-bottom: 3px;
   padding-top:5px;
   border: 1px #bdbdbd solid;
   font-size: 10pt;
@@ -953,38 +796,67 @@ export default {
   background-color: #d3dce6;
 }
 
-
 .grafico{
-  background-color: #E57373;
+  margin-top: 1px;
+  margin-bottom:1px;
   margin-left:-1px;
   margin-right:-1px;
-  margin-top: 1px;
-  height: calc(100% - 2px);
+  margin-top: 0px;
   cursor:pointer;
   padding: 0px;
 }
 
 .grafico_inicio {
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  width: calc(100% - 2px);
+  margin-left: 3px;
+}
+
+.grafico_iniciodurante {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   width: calc(100% - 2px);
   margin-left: 3px;
 }
 
 .grafico_fim {
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
   width: calc(100% - 3px);
 }
 
+.grafico_durantefim {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  width: calc(100% - 3px);
+}
+
+.grafico_iniciofim {
+  border-radius : 10px;
+  margin-left: 3px;
+  width: calc(100% - 6px);
+}
+
 /*  https://css-tricks.com/the-shapes-of-css/ */
-.grafico_inicio_indo {
-  border-top-left-radius: 20px;
-  border-bottom-left-radius: 20px;
+.grafico_inicioindo {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
   width: calc(100% - 6px);
   margin-left: 3px;
 
   border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 0px;
+}
+
+.grafico_iniciobaixado {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  width: calc(100% - 6px);
+  margin-left: 3px;
+
+  border-color:green;
   border-style: dotted;
   border-width: 0px 4px 0px 0px;
 }
@@ -995,7 +867,31 @@ export default {
   border-width: 0px 4px 0px 0px;
 }
 
-.grafico_fim_baixado {
+.grafico_indovindo {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 4px;
+}
+
+.grafico_vindoindo {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 4px;
+}
+
+.grafico_duranteindo{
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 4px 0px 0px;
+}
+
+.grafico_baixado {
+  border-color:#000;
+  border-style: solid;
+  border-width: 0px 4px 0px 0px;
+}
+
+.grafico_durantebaixado {
   border-color:#000;
   border-style: solid;
   border-width: 0px 4px 0px 0px;
@@ -1004,6 +900,23 @@ export default {
 .grafico_vindo {
   border-color:#000;
   border-style: dotted;
+  border-width: 0px 0px 0px 4px;
+}
+
+.grafico_vindodurante {
+  border-color:#000;
+  border-style: dotted;
+  border-width: 0px 0px 0px 4px;
+}
+
+.grafico_vindofim {
+  border-color:#000;
+  border-style: dotted;
+
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  width: calc(100% - 6px);
+
   border-width: 0px 0px 0px 4px;
 }
 
@@ -1017,28 +930,6 @@ export default {
 .amber-lighten-4{
     background-color:#FFECB3;
 }
-/*
-.chip {
-  cursor:pointer;
-  margin:0px;
-  padding:1px;
-}
-*/
-.chip{
-  font-size:8pt;
-  margin-left:4px;
-  background-color:white;
-  width:88px;
-  text-align:center;
-  text-transform:uppercase;
-  line-height:1em;
-  margin-top:1px;
-  height: 10px;
-  padding-top:8px;
-  padding-bottom: 4px;
-  border: 1px solid #bbb;
-  border-radius: 16px;
-}
 
 .flex-container {
   padding: 0;
@@ -1046,7 +937,16 @@ export default {
   list-style: none;
   box-orient: horizontal;
   display: flex;
-  justify-content: space-around; /*center*/
+  justify-content: space-between;
+}
+
+.flex-container-center {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  box-orient: horizontal;
+  display: flex;
+  justify-content: center;
 }
 
 .wrap    { 
@@ -1057,12 +957,8 @@ export default {
   background: gold;
 }
 
-.flex-item {
-  background: #FFF9C4;
-  color: #455A64;
-  padding: 2px;
-  width: 300px;
-  margin: 10px;
+.texto-pq{
+  font-size: 10pt;
 }
 
 .subtitulo {
@@ -1074,6 +970,106 @@ export default {
 
 .bg-purple {
   background: #d3dce6;
+}
+
+.bg-aberta{
+    background: #4DB6AC;
+}
+
+.bg-encerrada {
+  background: #B0BEC5; /*#b0bec5;*/
+}
+
+.bg-vencida {
+  background: #FF8A80;
+}
+
+.container-mapa {
+  display: grid;
+  grid-template-columns: 1fr 7fr;
+}
+
+.container-linha {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 8pt;
+}
+
+.container-mapa .container-linha div{
+  height: 28px;
+}
+
+.container-mapa div.titulo {
+  display:grid;
+  border: 1px solid #CFD8DC;
+}
+
+.celula-borda-cinza {
+  border: 1px solid #CFD8DC;
+}
+
+.texto-linha{
+  margin:0; 
+  padding: 5px 10px;
+  color:#263238; 
+  font-size:9pt;
+}
+
+table {
+  font-size: 9pt;
+  border: 1px solid #CFD8DC;
+  border-radius: 3px;
+  background-color: #fff;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #42b983;
+  color: rgba(255,255,255,0.66);
+  border: 1px solid #CFD8DC;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+td {
+  background-color: #f9f9f9;
+  border: 1px solid #CFD8DC;
+}
+
+th, td {
+  padding: 8px 10px;
+}
+
+th.active {
+  color: #fff;
+}
+
+th.active .arrow {
+  opacity: 1;
+}
+
+.arrow {
+  display: inline-block;
+  vertical-align: middle;
+  width: 0;
+  height: 0;
+  margin-left: 5px;
+  opacity: 0.66;
+}
+
+.arrow.asc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 4px solid #fff;
+}
+
+.arrow.dsc {
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #fff;
 }
 
 

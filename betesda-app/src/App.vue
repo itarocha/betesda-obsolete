@@ -52,12 +52,8 @@
             <el-menu-item index="2-3" v-if="isRoot || isAdmin || isUser">
                 <router-link to="/checkin" tag="div"><i class="fas fa-sign-in-alt pr"></i>Checkin</router-link>
             </el-menu-item>
-            <el-menu-item index="2-4" v-if="isRoot || isAdmin || isUser">
-                <router-link to="/hospedagens" tag="div"><i class="fas fa-ban pr"></i>Old Hospedagens</router-link>
-            </el-menu-item>
-
             <el-menu-item index="2-5" v-if="isRoot || isAdmin || isUser">
-                <router-link to="/new_hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>New Hospedagens</router-link>
+                <router-link to="/hospedagens" tag="div"><i class="fas fa-suitcase pr"></i>Hospedagens</router-link>
             </el-menu-item>
 
             <el-menu-item index="2-6" v-if="isRoot || isAdmin || isUser">
