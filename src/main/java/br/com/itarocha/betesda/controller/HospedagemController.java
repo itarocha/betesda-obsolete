@@ -114,6 +114,7 @@ public class HospedagemController {
 		}
 	}
 	
+	/*
 	@Deprecated
 	@RequestMapping(value="/mapa", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
@@ -122,8 +123,9 @@ public class HospedagemController {
 		MapaRetorno retorno = service.buildMapaRetorno(model.data);
 		return retorno;
 	}
+	*/
 
-	@RequestMapping(value="/mapa_new", method = RequestMethod.POST)
+	@RequestMapping(value="/mapa", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaRetorno mapaNew(@RequestBody MapaHospedagemRequest model)
 	{

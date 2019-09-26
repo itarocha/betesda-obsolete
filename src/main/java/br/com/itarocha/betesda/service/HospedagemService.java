@@ -236,7 +236,7 @@ public class HospedagemService {
 		List<Object[]> rec =  q.getResultList();
 		List<LeitoHeader> lst = new ArrayList<>();
 		rec.stream().forEach(record -> {
-			lst.add(new LeitoHeader(((BigInteger)record[0]).longValue(), (Integer)record[1], ((BigInteger)record[2]).longValue(), (Integer)record[3]));
+			lst.add(new LeitoHeader( recordToLong(record[0]), (Integer)record[1], recordToLong(record[2]), (Integer)record[3]));
 		});
 		//lst.add(new LeitoHeader(888L, 888, 888L, 888));
 		return lst;
@@ -250,8 +250,8 @@ public class HospedagemService {
 		Query q = em.createNativeQuery(sb.toString());
 		List<Object[]> rec =  q.getResultList();
 		rec.stream().forEach(record -> {
-			Long leitoId = ((BigInteger)record[0]).longValue();
-			_mapLeitos.put(leitoId, new MicroLeito(leitoId, (Integer)record[1], ((BigInteger)record[2]).longValue(), (Integer)record[3]));
+			Long leitoId = recordToLong(record[0]); // ((BigInteger)record[0]).longValue();
+			_mapLeitos.put(leitoId, new MicroLeito(leitoId, (Integer)record[1], recordToLong(record[2]), (Integer)record[3]));
 		});
 		_mapLeitos.put(99999L, new MicroLeito(9999L, 0, 9999L, 0));
 		return _mapLeitos;
@@ -274,22 +274,20 @@ public class HospedagemService {
 			HospedeLeitoMapa h = new HospedeLeitoMapa();
 			
 			
-			Long id = recordBigIntegerToLong(record[0]);
+			Long id = recordToLong(record[0]);
 			String tipoUtilizacao = recordToString(record[1]);
 			String identificador =  String.format("%s%06d", tipoUtilizacao, id); // T000000 Total
 			
 			h.setIdentificador(identificador);
 			h.setTipoUtilizacao(tipoUtilizacao);
 			h.setTipoUtilizacaoDescricao("T".equalsIgnoreCase(tipoUtilizacao) ? "Total" : "Parcial");
-			h.setQuartoId(recordBigIntegerToLong(record[2]));
+			h.setQuartoId(recordToLong(record[2]));
 			h.setQuartoNumero(recordToInteger(record[3]));
-			h.setLeitoId(recordBigIntegerToLong(record[4]));
+			h.setLeitoId(recordToLong(record[4]));
 			h.setLeitoNumero(recordToInteger(record[5]));
-			h.setPessoaId(recordBigIntegerToLong(record[6]));
+			h.setPessoaId(recordToLong(record[6]));
 			h.setPessoaNome(recordToString(record[7]));
 			h.setPessoaTelefone(recordToString(record[8]));
-			
-			
 			
 			h.setCidade(recordToString(record[9]));
 			h.setUf(recordToString(record[10]));
@@ -306,12 +304,12 @@ public class HospedagemService {
 			h.setDataSaidaLeito(recordSqlSqlDateToLocalDate(record[16]));
 			h.setDataIniNoPeriodo(LocalDate.parse(((String)record[17])));
 			h.setDataFimNoPeriodo(LocalDate.parse(((String)record[18])));
-			h.setHospedagemId(((BigInteger)record[19]).longValue());
-			h.setHospedeId(((BigInteger)record[20]).longValue());
-			h.setTipoHospedeId(((BigInteger)record[21]).longValue());
+			h.setHospedagemId(recordToLong(record[19]));
+			h.setHospedeId(recordToLong(record[20]));
+			h.setTipoHospedeId(recordToLong(record[21]));
 			h.setBaixado("S".equals(recordToString(record[22])));
 			h.setTipoHospedeDescricao(recordToString(record[23]));
-			h.setDestinacaoHospedagemId(recordBigIntegerToLong(record[24]));
+			h.setDestinacaoHospedagemId(recordToLong(record[24]));
 			h.setDestinacaoHospedagemDescricao(recordToString(record[25]));
 			
 			h.setDataPrevistaSaida(recordSqlSqlDateToLocalDate(record[26]));
@@ -328,13 +326,28 @@ public class HospedagemService {
 	private String recordToString(Object value) {
 		return (String) value;
 	}
-	
-	private Long recordBigIntegerToLong(Object value) {
-		return ((BigInteger) value).longValue();
+
+	private Long recordToLong(Object value) {
+		if (value instanceof BigInteger) {
+			return ((BigInteger) value).longValue();
+		} else 
+		if (value instanceof Integer) {
+			return ((Integer) value).longValue();
+		} else {
+			throw new IllegalArgumentException("Não foi possível converter valor para Long. Value = "+value);
+		}
 	}
 	
 	private Integer recordToInteger(Object value) {
-		return (Integer) value;
+		//return (Integer) value;
+		if (value instanceof BigInteger) {
+			return ((BigInteger) value).intValue();
+		} else 
+		if (value instanceof Integer) {
+			return ((Integer) value).intValue();
+		} else {
+			throw new IllegalArgumentException("Não foi possível converter valor para Integer. Value = "+value);
+		}
 	}
 
 	private LocalDate recordStringToLocalDate(Object value) {
@@ -626,7 +639,7 @@ public class HospedagemService {
 		return pl;
 	}
 
-
+	/*
 	@Deprecated
 	public MapaRetorno buildMapaRetorno(LocalDate dataBase) {
 		MapaRetorno retorno = new MapaRetorno();
@@ -653,7 +666,7 @@ public class HospedagemService {
 			String firstClass = "???";
 			if (hm.getDataEntradaLeito().equals(hm.getDataIniNoPeriodo()) && hm.getDataEntradaLeito().isAfter(hm.getDataPrimeiraEntrada())) {
 				firstClass = "VINDO  ";
-			} else if (hm.getDataEntradaLeito().equals(hm.getDataIniNoPeriodo())/* && hm.getDataEntradaLeito().equals(hm.getDataEntradaHospedagem())*/) {
+			} else if (hm.getDataEntradaLeito().equals(hm.getDataIniNoPeriodo())) {
 				firstClass = "INICIO ";
 			} else if (hm.getDataEntradaLeito().isBefore(hm.getDataIniNoPeriodo())) {
 				firstClass = "DURANTE";
@@ -1009,6 +1022,7 @@ public class HospedagemService {
 		
 		return retorno;
 	}
+	*/
 
 	public List<OcupacaoLeito> getLeitosOcupadosNoPeriodo(Long hospedagemId, LocalDate dataIni, LocalDate dataFim){
 		

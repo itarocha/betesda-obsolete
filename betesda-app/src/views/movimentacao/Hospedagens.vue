@@ -19,7 +19,7 @@
           <el-col :sm="24" :md="24" :lg="24">
 
             <el-tabs type="border-card" v-model="activeTabName" @tab-click="handleTabClick">
-              <el-tab-pane label="New Mapa de Hospedagem" name="mapa">
+              <el-tab-pane label="Mapa de Hospedagem" name="mapa">
 
                 <el-container style="margin:2px;" v-if="renderMapa">
                   <el-container :style="styleContainerMapa">
@@ -469,13 +469,11 @@ export default {
       var dados = {
         data : data
       }
-      petra.axiosPost("/app/hospedagem/mapa_new", dados)
+      petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
             this.dados = response.data
             this.linhas = response.data.linhas;
             this.hospedes = response.data.pessoas;
-
-            console.log(this.hospedes)
 
             this.cidades = response.data.cidades;
 
@@ -659,7 +657,6 @@ export default {
       }
 
       this.hospedagensCidade = hospedagensCidade
-      console.log(hospedagensCidade)
       return this.hospedagensCidade
     },
 
