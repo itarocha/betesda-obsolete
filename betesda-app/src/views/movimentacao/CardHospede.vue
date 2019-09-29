@@ -1,33 +1,33 @@
 <template>
-    <el-card shadow="never" class="body" :style="{backgroundColor: colorStatusItem(model.hospedagem.statusHospedagem)}">
-        <div class="fw-bold titulo">{{model.hospedagem.nome}}
+    <el-card shadow="never" class="body" :style="{backgroundColor: colorStatusItem(model.statusHospedagem)}">
+        <div class="fw-bold titulo">{{model.pessoaNome}}
             <el-tooltip content="Editar" placement="bottom" :open-delay="toolTipDelay">
-                <el-button type="primary" plain size="mini" circle @click="onEditPessoa(model.hospedagem.id)">
+                <el-button type="primary" plain size="mini" circle @click="onEditPessoa(model.pessoaId)">
                 <i class="fas fa-pencil-alt"></i>
                 </el-button>
             </el-tooltip>
         </div>
 
         <el-row type="flex">
-            <el-col>Fone: <span class="fw-bold">{{model.hospedagem.telefone}}</span></el-col>
-            <el-col>Cidade: <span class="fw-bold">{{model.hospedagem.cidadeUf}}</span></el-col>
+            <el-col>Fone: <span class="fw-bold">{{model.pessoaTelefone}}</span></el-col>
+            <el-col>Cidade: <span class="fw-bold">{{model.pessoaCidadeUfOrigem}}</span></el-col>
         </el-row>    
 
         <el-row type="flex">
-            <el-col>Destinação: <span class="fw-bold">{{model.hospedagem.destinacao}}</span></el-col>
-            <el-col>Tipo Hóspede: <span class="fw-bold">{{model.hospedagem.tipoHospedeDescricao}}</span></el-col>
+            <el-col>Destinação: <span class="fw-bold">{{model.destinacaoHospedagemDescricao}}</span></el-col>
+            <el-col>Tipo Hóspede: <span class="fw-bold">{{model.tipoHospedeDescricao}}</span></el-col>
         </el-row>    
 
 
         <el-row type="flex">
-            <el-col>Utilização: <span class="fw-bold">{{model.hospedagem.tipoUtilizacaoDescricao}}</span></el-col>
-            <el-col><span v-if="model.hospedagem.tipoUtilizacao == 'T'">Leito: <span class="fw-bold">{{model.leito.quartoNumero}}-{{model.leito.leitoNumero}}</span></span></el-col>
+            <el-col>Utilização: <span class="fw-bold">{{model.tipoUtilizacaoDescricao}}</span></el-col>
+            <el-col><span v-if="model.tipoUtilizacao == 'T'">Leito: <span class="fw-bold">{{model.quartoNumero}}-{{model.leitoNumero}}</span></span></el-col>
         </el-row>    
 
 
-        <div>Status: <span class="fw-bold">{{model.hospedagem.statusHospedagem}}</span>
+        <div>Status: <span class="fw-bold">{{model.statusHospedagem}}</span>
             <el-tooltip content="Ver Detalhes" placement="bottom" :open-delay="toolTipDelay">
-                <el-button type="primary" plain size="mini" circle @click="onShowHospedagemInfo(model.hospedagem.hospedagemId)">
+                <el-button type="primary" plain size="mini" circle @click="onShowHospedagemInfo(model.hospedagemId)">
                 <i class="fas fa-info"></i>
                 </el-button>
             </el-tooltip>
@@ -44,22 +44,18 @@ export default {
         model: {
             type: Object,
             default: {
-                hospedagem: {
-                    id: 0,
-                    hospedagemId: 0,
-                    nome: 'Unknow',
-                    cidadeUf: 'Unknow',
-                    telefone: '---',
-                    statusHospedagem: 'Unknow',
-                    tipoUtilizacaoDescricao: 'Unknow',
-                    tipoUtilizacao: 'T',
-                    tipoHospedeDescricao : 'Unknow',
-                    destinacao : 'Unknow'
-                },
-                leito: {
-                    quartoNumero: 0,
-                    leitoNumero: 0
-                }
+                pessoaId: 0,
+                hospedagemId: 0,
+                pessoaNome: 'Unknow',
+                pessoaCidadeUfOrigem: 'Unknow',
+                pessoaTelefone: '---',
+                statusHospedagem: 'Unknow',
+                tipoUtilizacaoDescricao: 'Unknow',
+                tipoUtilizacao: 'T',
+                tipoHospedeDescricao : 'Unknow',
+                destinacaoHospedagemDescricao : 'Unknow',
+                quartoNumero: 0,
+                leitoNumero: 0
             }
         }
     },

@@ -2,21 +2,19 @@ package br.com.itarocha.betesda.model.hospedagem;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@JsonIgnoreProperties({"hospedagem", "classeIni", "classeFim", "idxFim", "dias"})
+@JsonIgnoreProperties({"hospedagem"}) 
 public class LinhaHospedagem {
 	
-	//private HospedeLeitoMapa hospedagem;
-
-	private Long hospedagemId;
+	private Long hpdId;
 	private String identificador;
 	private String nome;
 	private String telefone;
-	private String statusHospedagem;
+	private String status;
 	private Integer idxIni;
 	private Integer idxFim;
-	private String classeIni;
-	private String classeFim;
-	private String[] classes;
+	private Integer width;
+	private String clsIni;
+	private String clsFim;
 	private Integer[] dias;
 	
 	public LinhaHospedagem() {
@@ -31,17 +29,18 @@ public class LinhaHospedagem {
 		this.identificador = identificador;
 	}
 
-	public Long getHospedagemId() {
-		return hospedagemId;
+	public Long getHpdId() {
+		return hpdId;
 	}
 
-	public void setHospedagemId(Long hospedagemId) {
-		this.hospedagemId = hospedagemId;
+	public void setHpdId(Long hpdId) {
+		this.hpdId = hpdId;
 	}
 
 	public String getNome() {
 		return nome;
 	}
+	
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
@@ -54,12 +53,12 @@ public class LinhaHospedagem {
 		this.telefone = telefone;
 	}
 
-	public String getStatusHospedagem() {
-		return statusHospedagem;
+	public String getStatus() {
+		return status;
 	}
 
-	public void setStatusHospedagem(String statusHospedagem) {
-		this.statusHospedagem = statusHospedagem;
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 	public Integer getIdxIni() {
@@ -78,39 +77,30 @@ public class LinhaHospedagem {
 		this.idxFim = idxFim;
 	}
 	
-	public String getClasseIni() {
-		return classeIni;
-	}
-	
-	public void setClasseIni(String classeIni) {
-		this.classeIni = classeIni;
-	}
-	
-	public String getClasseFim() {
-		return classeFim;
-	}
-	
-	public void setClasseFim(String classeFim) {
-		this.classeFim = classeFim;
-	}
-	
-	public String[] getClasses() {
-		return classes;
+	public Integer getWidth() {
+		return width;
 	}
 
-	public void setClasses(String[] classes) {
-		this.classes = classes;
-	}
-	/*
-	public HospedeLeitoMapa getHospedagem() {
-		return hospedagem;
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 
-	public void setHospedagem(HospedeLeitoMapa hospedagem) {
-		this.hospedagem = hospedagem;
+	public String getClsIni() {
+		return clsIni;
 	}
-	*/
-
+	
+	public void setClsIni(String clsIni) {
+		this.clsIni = clsIni;
+	}
+	
+	public String getClsFim() {
+		return clsFim;
+	}
+	
+	public void setClsFim(String clsFim) {
+		this.clsFim = clsFim;
+	}
+	
 	public Integer[] getDias() {
 		return dias;
 	}

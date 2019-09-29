@@ -1,7 +1,8 @@
 package br.com.itarocha.betesda.service;
 
+@Deprecated
 public class DiaHospedeLeito {
-	
+	/*
 	private Integer indice;
 	private String tipo;
 	
@@ -22,5 +23,5 @@ public class DiaHospedeLeito {
 	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
-
+	*/
 }

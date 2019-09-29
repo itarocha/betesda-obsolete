@@ -53,7 +53,23 @@
                               <center v-if="celula.quartoNumero == '0'">Parcial</center>
                           </div> 
                           <div>
-                            <div class="container-linha" v-for="(h, idx) in celula.hospedagens" :key="idx">
+                            <div class="container-linha" v-if="celula.hospedagens.length == 0">
+                              <div v-for="(dia, idxDia) in dados.dias" :key="idxDia" class="celula-borda-cinza">
+                                
+                              </div>  
+                            </div>
+
+                            <div class="container-linha" v-for="(h, idx) in celula.hospedagens" :key="idx" >
+                              <div v-for="(dia, idxDia) in dados.dias" :key="idxDia" class="celula-borda-cinza">
+                                <div slot="reference" v-if="idxDia >= h.idxIni &&  idxDia <= h.idxFim" @click="showHospedagemInfo(h.hpdId)" style="cursor:pointer;"> 
+                                    <div  v-if="h.idxIni == idxDia" :class="hospedagemClass(h.clsIni, h.clsFim, h.status)" 
+                                          :style="calculateWidth(h.width, h.clsIni, h.clsFim)">
+                                          <p v-if="idxDia == h.idxIni" class="texto-linha">{{h.nome}}</p>
+                                    </div>
+                                </div>  
+                              </div>
+
+                              <!--
                               <div v-for="(classe, idxClasses) in h.classes" :key="idxClasses" class="celula-borda-cinza">
 
                                 <el-popover
@@ -71,6 +87,7 @@
                                 </el-popover>
 
                               </div>
+                              -->
                             </div>
                           </div>
                         </div>  
@@ -88,14 +105,14 @@
 
 
                     <el-table :data="hospedes" 
-                       style="width: 100%" border size="small" :default-sort="{prop: 'nome', order: 'ascending'}"
+                       style="width: 100%" border size="small" :default-sort="{prop: 'pessoaNome', order: 'ascending'}"
                       :height="tableHeight"
                       :row-class-name="tableRowClassName">
 
-                      <el-table-column fixed prop="nome" label="Nome" width="250" sortable></el-table-column>
-                      <el-table-column prop="telefone" label="Telefone" width="120" ></el-table-column>
+                      <el-table-column fixed prop="pessoaNome" label="Nome" width="250" sortable></el-table-column>
+                      <el-table-column prop="pessoaTelefone" label="Telefone" width="120" ></el-table-column>
 
-                      <el-table-column prop="cidadeUf" label="Cidade Origem" width="200" sortable></el-table-column>
+                      <el-table-column prop="pessoaCidadeUfOrigem" label="Cidade Origem" width="200" sortable></el-table-column>
 
                       <el-table-column prop="dataPrimeiraEntrada" :formatter="fmtDate" label="Entrada" width="110" header-align="left" sortable></el-table-column>
                       <el-table-column prop="dataPrevistaSaida" :formatter="fmtDate" label="Prev.Saída" width="110" class-name="wordwrap" sortable></el-table-column>
@@ -104,7 +121,7 @@
 
                       <el-table-column prop="tipoUtilizacaoDescricao" label="Utilização" width="120" sortable></el-table-column>
                       <!--<el-table-column prop="leitoId" :formatter="fmtLeito" width="140" label="Quarto-Leito" sortable></el-table-column>-->
-                      <el-table-column prop="destinacao" width="120" label="Destinação" sortable></el-table-column>
+                      <el-table-column prop="destinacaoHospedagemDescricao" width="120" label="Destinação" sortable></el-table-column>
 
                       <el-table-column prop="statusHospedagem" label="Situação" width="120" sortable></el-table-column>
 
@@ -112,7 +129,7 @@
 
                       <!--<el-table-column header-align="left" align="right" prop="id" label="CODMOV" width="100" sortable></el-table-column>-->
                       <el-table-column header-align="left" align="right" prop="hospedagemId" label="CODHPD" width="100" sortable></el-table-column>
-                      <el-table-column header-align="left" align="right" prop="id" label="CODPES" width="100"></el-table-column>
+                      <el-table-column header-align="left" align="right" prop="pessoaId" label="CODPES" width="100"></el-table-column>
 
                       <el-table-column label="Ações" fixed="right" align="center" width="120">
                         <template slot-scope="scope">
@@ -124,7 +141,7 @@
                           </el-tooltip>
 
                           <el-tooltip content="Editar Pessoa" placement="bottom" :open-delay="300">
-                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.id)">
+                            <el-button type="primary" plain size="mini" circle @click="handleEditPessoa(scope.row.pessoaId)">
                               <i class="fas fa-pencil-alt"></i>
                             </el-button>
                           </el-tooltip>
@@ -304,7 +321,7 @@ export default {
       dataBase: null
     },
     dados: [],
-    pessoas:[],
+    //pessoas:[],
     cidades:[],
     quadro:[],
     hospedagensCidade: [],
@@ -471,9 +488,11 @@ export default {
       }
       petra.axiosPost("/app/hospedagem/mapa", dados)
         .then(response => {
+
             this.dados = response.data
             this.linhas = response.data.linhas;
-            this.hospedes = response.data.pessoas;
+            //this.hospedes = response.data.pessoas;
+            this.hospedes = response.data.hospedes;
 
             this.cidades = response.data.cidades;
 
@@ -481,7 +500,7 @@ export default {
               this.formCidade = this.cidades[0].nome
             }
 
-            this.pessoas = response.data.hospedagens
+            //this.pessoas = response.data.hospedagens
 
             this.quadro = response.data.quadro
             
@@ -553,6 +572,13 @@ export default {
       return ''
     },  
 
+    hospedagemClass(classeIni, classeFim, status){
+      var classeStatus =  this.newColorStatusItem(status)
+      var retorno = 'grafico ' + classeStatus + ' ';
+      
+      return retorno + 'grafico_' + classeIni + classeFim;
+    },
+
     newColorStatusItem(status){
       if (status == 'ABERTA'){
         return 'bg-aberta' // '#FFF9C4' teal darken-2
@@ -593,35 +619,22 @@ export default {
 
       var diaIndex = this.diaIndex
 
-      _.forEach(this.dados.pessoas, function(hospedagem, k){
-        var lst = _.filter(hospedagem.leitos, {leitoId : id})
+      var lst = _.filter(this.dados.hospedes, {leitoId : id})
 
-        for (var i = 0; i < lst.length; i++){
-          var leito = lst[i];
+      for (var i = 0; i < lst.length; i++){
+        var hospedagem = lst[i];
 
-          //TODO OTIMIZAR. DEVE PROCURAR PELA LISTA DE LEITOS
+        const zeroOuUm = hospedagem.dias[diaIndex]
+        if (zeroOuUm == 1){
 
-          const zeroOuUm = leito.dias[diaIndex]
-          if (zeroOuUm == 1){
+          quadroQuartoNumero = hospedagem.quartoNumero
+          quadroLeitoNumero = hospedagem.leitoNumero
 
-              const retorno = {
-                hospedagem,
-                leito
-              }
-
-            /*
-            var retorno = v
-            retorno.hospedagem = hospedagem
-            */
-            quadroQuartoNumero = leito.quartoNumero
-            quadroLeitoNumero = leito.leitoNumero
-
-            hospedagensQuadro.push(retorno)
-          }
+          hospedagensQuadro.push(hospedagem)
         }
+      }
 
-      })
-      this.hospedagensQuadro = hospedagensQuadro
+this.hospedagensQuadro = hospedagensQuadro
       this.quadroQuartoNumero = quadroQuartoNumero
       this.quadroLeitoNumero = quadroLeitoNumero
 
@@ -632,27 +645,18 @@ export default {
     getHospedagensByCidade(cidade){
       var hospedagensCidade = []
 
-      var pessoas = this.dados.pessoas
+      var hospedes = this.dados.hospedes
 
       var cidade = _.find(this.cidades, {nome:cidade})
 
       if (cidade){
         _.forEach(cidade.ids, function(id){
-          for (var i = 0; i <= pessoas.length; i++){
-            var hospedagem = pessoas[i];
-
-            var leito = _.find(hospedagem.leitos, {identificador : id})
+            var hospedagem = _.find(hospedes, {identificador : id})
             
-            if (leito){
-              const retorno = {
-                hospedagem,
-                leito
-              }
-              hospedagensCidade.push(retorno)
+            if (hospedagem){
+              hospedagensCidade.push(hospedagem)
               return
-            }
-
-          }
+              }
         })
       }
 
@@ -660,17 +664,39 @@ export default {
       return this.hospedagensCidade
     },
 
-    getPrimeiroNome(nome){
-      if (nome.length > 10){
+    /*
+    // percent
+    getPrimeiroNome(nome, percent){
+      if (nome.length > 10 && percent <= 100){
         nome = nome.substr(0,10) + "..."
       }
       return nome;
     },
+    */
 
     showHospedagemInfo(id){
-      this.state = "info"
-      this.hospedagemSelecionada = id;
-      this.showTelaHospedagem = true;
+      if (id){
+        this.state = "info"
+        this.hospedagemSelecionada = id;
+        this.showTelaHospedagem = true;
+      }
+    },
+
+    calculateWidth(width, classeIni, classeFim){
+      var toReduce = 8
+
+      if (classeIni == "vindo"){
+        toReduce = toReduce + 4
+      }
+
+      if (classeFim == "indo" || classeFim == "baixado"){
+        toReduce = toReduce + 4
+      }
+
+      var w = width + ((width / 700) * 11)
+
+      var retorno = toReduce > 0 ? `width: calc(${w}% - ${toReduce}px);` : `width: ${w}%;`
+      return retorno
     },
 
     onCloseInfo(){
@@ -796,52 +822,66 @@ export default {
 .grafico{
   margin-top: 1px;
   margin-bottom:1px;
+  /*
   margin-left:-1px;
   margin-right:-1px;
+  */
   margin-top: 0px;
   cursor:pointer;
   padding: 0px;
+  margin-left:2px;
 }
 
 .grafico_inicio {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+  /*
   width: calc(100% - 2px);
   margin-left: 3px;
+  */
 }
 
 .grafico_iniciodurante {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+  /*
   width: calc(100% - 2px);
   margin-left: 3px;
+  */
 }
 
 .grafico_fim {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  /*
   width: calc(100% - 3px);
+  */
 }
 
 .grafico_durantefim {
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  /*
   width: calc(100% - 3px);
+  */
 }
 
 .grafico_iniciofim {
   border-radius : 10px;
+  /*
   margin-left: 3px;
   width: calc(100% - 6px);
+  */
 }
 
 /*  https://css-tricks.com/the-shapes-of-css/ */
 .grafico_inicioindo {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+  /*
   width: calc(100% - 6px);
   margin-left: 3px;
-
+  */  
   border-color:#000;
   border-style: dotted;
   border-width: 0px 4px 0px 0px;
@@ -850,10 +890,11 @@ export default {
 .grafico_iniciobaixado {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+  /*
   width: calc(100% - 6px);
   margin-left: 3px;
-
-  border-color:green;
+  */
+  border-color:#000;
   border-style: dotted;
   border-width: 0px 4px 0px 0px;
 }
@@ -912,7 +953,9 @@ export default {
 
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
+  /*
   width: calc(100% - 6px);
+  */
 
   border-width: 0px 0px 0px 4px;
 }
@@ -1010,6 +1053,9 @@ export default {
   padding: 5px 10px;
   color:#263238; 
   font-size:9pt;
+  height:1em;
+  overflow: hidden;
+  z-index:2;
 }
 
 table {
