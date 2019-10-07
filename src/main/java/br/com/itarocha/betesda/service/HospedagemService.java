@@ -230,7 +230,7 @@ public class HospedagemService {
 			Long leitoId = recordToLong(record[0]);
 			_mapLeitos.put(leitoId, new MicroLeito(leitoId, (Integer)record[1], recordToLong(record[2]), (Integer)record[3]));
 		});
-		_mapLeitos.put(99999L, new MicroLeito(9999L, 0, 9999L, 0));
+		_mapLeitos.put(99999L, new MicroLeito(9999L, 9999, 9999L, 9999));
 		return _mapLeitos;
 	}
 	
@@ -417,6 +417,8 @@ public class HospedagemService {
 			}
 			retorno.getLinhas().add(leito);
 		});
+		retorno.getLinhas().sort((a, b) -> String.format("%06d-%06d", a.getQuartoNumero(), a.getLeitoNumero())
+													.compareTo( String.format("%06d-%06d", b.getQuartoNumero(), b.getLeitoNumero()) ) );
 		
 		// 2 - HÓSPEDES
 		//TODO Criar estrutura pessoa+hospedagem, detalhes

@@ -49,8 +49,8 @@
                       <div :style="styleGrid" class="scroll-y p0">
                         <div class="container-mapa" v-for="(celula, index) in linhas" :key="index">
                           <div class="titulo">
-                              <center v-if="celula.quartoNumero != '0'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
-                              <center v-if="celula.quartoNumero == '0'">Parcial</center>
+                              <center v-if="celula.quartoNumero != '9999'">{{celula.quartoNumero}}-{{celula.leitoNumero}}</center>
+                              <center v-if="celula.quartoNumero == '9999'">Parcial</center>
                           </div> 
                           <div>
                             <div class="container-linha" v-if="celula.hospedagens.length == 0">
