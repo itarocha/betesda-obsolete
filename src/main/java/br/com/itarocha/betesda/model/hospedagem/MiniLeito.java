@@ -3,19 +3,19 @@ package br.com.itarocha.betesda.model.hospedagem;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MicroLeito {
+public class MiniLeito {
 	
 	private Long leitoId;
 	private Integer leitoNumero;
 	private Long quartoId;
 	private Integer quartoNumero;
-	private List<LinhaHospedagem> hospedagens = new ArrayList<>();
+	private List<Linha> linhas = new ArrayList<>();
 	
-	public MicroLeito() {
+	public MiniLeito() {
 		
 	}
 
-	public MicroLeito(Long leitoId, Integer leitoNumero, Long quartoId, Integer quartoNumero) {
+	public MiniLeito(Long leitoId, Integer leitoNumero, Long quartoId, Integer quartoNumero) {
 		this.leitoId = leitoId;
 		this.leitoNumero = leitoNumero;
 		this.quartoId = quartoId;
@@ -54,12 +54,12 @@ public class MicroLeito {
 		this.quartoNumero = quartoNumero;
 	}
 
-	public List<LinhaHospedagem> getHospedagens() {
-		return hospedagens;
+	public List<Linha> getLinhas() {
+		return linhas;
 	}
 
-	public void setHospedagens(List<LinhaHospedagem> hospedagens) {
-		this.hospedagens = hospedagens;
+	public void setLinhas(List<Linha> linhas) {
+		this.linhas = linhas;
 	}
 
 }

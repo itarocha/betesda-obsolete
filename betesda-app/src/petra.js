@@ -1,8 +1,8 @@
-var moment = require('moment')
+const moment = require('moment')
 
 moment.locale('pt-br');
 
-var base_uri = process.env.NODE_ENV == 'development' ? 'http://localhost:8088/api' : 'http://petrasistemas.com.br:8080/betesda/api'
+const base_uri = process.env.NODE_ENV == 'development' ? 'http://localhost:8088/api' : 'http://petrasistemas.com.br:8080/betesda/api'
 
 export default {
 
@@ -13,7 +13,7 @@ export default {
     },
 
     showMessageInfo(texto){
-      var mensagem = {
+      const mensagem = {
         title : 'Informação',
         message : texto,
         type : 'info',
@@ -23,7 +23,7 @@ export default {
     },
 
     showMessageWarning(texto){
-      var mensagem = {
+      const mensagem = {
         title : 'Atenção',
         message : texto,
         type : 'warning'
@@ -32,7 +32,7 @@ export default {
     },
 
     showMessageError(texto){
-      var mensagem = {
+      const mensagem = {
         title : 'Erro',
         message : texto,
         type : 'danger'
@@ -41,7 +41,7 @@ export default {
     },
 
     showMessageSuccess(texto){
-      var mensagem = {
+      const mensagem = {
         title : 'Sucesso',
         message : texto,
         type : 'success'

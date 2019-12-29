@@ -2,9 +2,7 @@ package br.com.itarocha.betesda.model.hospedagem;
 
 import java.time.LocalDate;
 
-// Substituído por HospedeMapa
-@Deprecated
-public class HospedeLeitoMapa {
+public class HospedeMapa {
 
 	private String identificador;
 	private String tipoUtilizacao;
@@ -39,11 +37,10 @@ public class HospedeLeitoMapa {
 	private String tipoHospedeDescricao;
 	private Long destinacaoHospedagemId;
 	private String	destinacaoHospedagemDescricao;
-	private Integer[] dias;
 	
 	private CellStatusHospedagem statusHospedagem;
 	
-	public HospedeLeitoMapa() {}
+	public HospedeMapa() {}
 	
 	public String getIdentificador() {
 		return identificador;
@@ -248,13 +245,5 @@ public class HospedeLeitoMapa {
 
 	public void setStatusHospedagem(CellStatusHospedagem statusHospedagem) {
 		this.statusHospedagem = statusHospedagem;
-	}
-
-	public Integer[] getDias() {
-		return dias;
-	}
-
-	public void setDias(Integer[] dias) {
-		this.dias = dias;
 	}
 }

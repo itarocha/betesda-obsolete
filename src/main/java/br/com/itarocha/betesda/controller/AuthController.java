@@ -53,7 +53,7 @@ public class AuthController {
     @RequestMapping(value="/hello", method = RequestMethod.GET) 
     public ResponseEntity<?> hello() {
 
-        return ResponseEntity.ok(new Hello("Hello Mundo"));
+        return ResponseEntity.ok(new Hello("Hello Mondo"));
     }
     
     @RequestMapping(value="/login", method = RequestMethod.POST) 

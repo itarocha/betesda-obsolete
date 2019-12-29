@@ -1,25 +1,20 @@
 package br.com.itarocha.betesda.model.hospedagem;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.time.LocalDate;
 
-@JsonIgnoreProperties({"hospedagem"}) 
-public class LinhaHospedagem {
+public class Linha {
 	
 	private Long hpdId;
 	private String identificador;
 	private String nome;
 	private String telefone;
 	private String status;
-	private Integer idxIni;
-	private Integer idxFim;
-	private Integer width;
+	private LocalDate dataIni;
+	private LocalDate dataFim;
 	private String clsIni;
 	private String clsFim;
-	private Integer[] dias;
 	
-	public LinhaHospedagem() {
-		
-	}
+	public Linha() {}
 	
 	public String getIdentificador() {
 		return identificador;
@@ -61,28 +56,20 @@ public class LinhaHospedagem {
 		this.status = status;
 	}
 
-	public Integer getIdxIni() {
-		return idxIni;
-	}
-	
-	public void setIdxIni(Integer idxIni) {
-		this.idxIni = idxIni;
-	}
-	
-	public Integer getIdxFim() {
-		return idxFim;
-	}
-	
-	public void setIdxFim(Integer idxFim) {
-		this.idxFim = idxFim;
-	}
-	
-	public Integer getWidth() {
-		return width;
+	public LocalDate getDataIni() {
+		return dataIni;
 	}
 
-	public void setWidth(Integer width) {
-		this.width = width;
+	public void setDataIni(LocalDate dataIni) {
+		this.dataIni = dataIni;
+	}
+
+	public LocalDate getDataFim() {
+		return dataFim;
+	}
+
+	public void setDataFim(LocalDate dataFim) {
+		this.dataFim = dataFim;
 	}
 
 	public String getClsIni() {
@@ -101,11 +88,4 @@ public class LinhaHospedagem {
 		this.clsFim = clsFim;
 	}
 	
-	public Integer[] getDias() {
-		return dias;
-	}
-
-	public void setDias(Integer[] dias) {
-		this.dias = dias;
-	}
 }

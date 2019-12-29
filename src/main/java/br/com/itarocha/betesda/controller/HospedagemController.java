@@ -1,34 +1,18 @@
 package br.com.itarocha.betesda.controller;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Timer;
 
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +22,10 @@ import br.com.itarocha.betesda.exception.ValidationException;
 import br.com.itarocha.betesda.model.HospedagemFullVO;
 import br.com.itarocha.betesda.model.HospedagemVO;
 import br.com.itarocha.betesda.model.HospedeVO;
+import br.com.itarocha.betesda.model.hospedagem.MapaCidades;
+import br.com.itarocha.betesda.model.hospedagem.MapaHospedes;
+import br.com.itarocha.betesda.model.hospedagem.MapaLinhas;
+import br.com.itarocha.betesda.model.hospedagem.MapaQuadro;
 import br.com.itarocha.betesda.model.hospedagem.MapaRetorno;
 import br.com.itarocha.betesda.model.hospedagem.OcupacaoLeito;
 import br.com.itarocha.betesda.report.RelatorioAtendimentos;
@@ -60,14 +48,6 @@ public class HospedagemController {
 	@RequestMapping(method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> gravar(@RequestBody HospedagemVO model) {
-		/*
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		*/
 		ItaValidator<HospedagemVO> v = new ItaValidator<HospedagemVO>(model);
 		v.validate();
 		
@@ -114,8 +94,6 @@ public class HospedagemController {
 		}
 	}
 	
-	/*
-	@Deprecated
 	@RequestMapping(value="/mapa", method = RequestMethod.POST)
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaRetorno mapa(@RequestBody MapaHospedagemRequest model)
@@ -123,13 +101,36 @@ public class HospedagemController {
 		MapaRetorno retorno = service.buildMapaRetorno(model.data);
 		return retorno;
 	}
-	*/
 
-	@RequestMapping(value="/mapa", method = RequestMethod.POST)
-	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
-	public MapaRetorno mapaNew(@RequestBody MapaHospedagemRequest model)
+	@RequestMapping(value="/mapa/linhas", method = RequestMethod.POST)
+	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public MapaLinhas mapaLinhas(@RequestBody MapaHospedagemRequest model)
 	{
-		MapaRetorno retorno = service.buildNewMapaRetorno(model.data);
+		MapaLinhas retorno = service.buildMapaLinhas(model.data);
+		return retorno;
+	}
+
+	@RequestMapping(value="/mapa/hospedes", method = RequestMethod.POST)
+	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public MapaHospedes mapaHospedes(@RequestBody MapaHospedagemRequest model)
+	{
+		MapaHospedes retorno = service.buildMapaHospedes(model.data);
+		return retorno;
+	}
+
+	@RequestMapping(value="/mapa/cidades", method = RequestMethod.POST)
+	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public MapaCidades mapaCidades(@RequestBody MapaHospedagemRequest model)
+	{
+		MapaCidades retorno = service.buildMapaCidades(model.data);
+		return retorno;
+	}
+
+	@RequestMapping(value="/mapa/quadro", method = RequestMethod.POST)
+	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	public MapaQuadro mapaQuadro(@RequestBody MapaHospedagemRequest model)
+	{
+		MapaQuadro retorno = service.buildMapaQuadro(model.data);
 		return retorno;
 	}
 
@@ -137,15 +138,6 @@ public class HospedagemController {
 	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public ResponseEntity<?> planilhaGeral(@RequestBody PeriodoRequest model)
 	{
-		/*
-		try {
-			PlanilhaGeralService.toExcel();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		*/
-		
 		ItaValidator<PeriodoRequest> v = new ItaValidator<PeriodoRequest>(model);
 		v.validate();
 		

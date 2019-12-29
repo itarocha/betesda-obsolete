@@ -15,11 +15,6 @@ public class MapaRetorno {
 	
 	private List<LocalDate> dias = new ArrayList<LocalDate>();	
 
-	/*
-	@Deprecated
-	private List<PessoaHospedagem> pessoas = new ArrayList<>();
-	*/
-	
 	private List<CidadeHospedagens> cidades = new ArrayList<>(); 
 	
 	
@@ -27,6 +22,8 @@ public class MapaRetorno {
 	
 	//TODO: Breve será chamado de leitos
 	private List<MicroLeito> linhas = new ArrayList<>();
+
+	private List<MicroLeito> leitos = new ArrayList<>();
 	
 	private List<HospedeLeitoMapa> hospedes = new ArrayList<>();
 	
@@ -68,6 +65,14 @@ public class MapaRetorno {
 
 	public void setLinhas(List<MicroLeito> linhas) {
 		this.linhas = linhas;
+	}
+	
+	public List<MicroLeito> getLeitos() {
+		return leitos;
+	}
+
+	public void setLeitos(List<MicroLeito> leitos) {
+		this.leitos = leitos;
 	}
 
 	public List<HospedeLeitoMapa> getHospedes() {

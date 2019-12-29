@@ -10,6 +10,16 @@
             "mainClass": "br.com.itarocha.betesda.service.HospedagemService",
             "args": "",
             "projectName": "betesda"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BetesdaApplication<betesda>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "br.com.itarocha.betesda.BetesdaApplication",
+            "projectName": "betesda",
+            "args": ""
         }
     ]
 }

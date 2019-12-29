@@ -3,6 +3,8 @@ package br.com.itarocha.betesda.model.hospedagem;
 import java.util.ArrayList;
 import java.util.List;
 
+//Utilize HospedagensPorCidade
+@Deprecated
 public class CidadeHospedagens {
 
 	private String nome;
