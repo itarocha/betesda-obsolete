@@ -103,7 +103,7 @@ public class HospedagemController {
 	}
 
 	@RequestMapping(value="/mapa/linhas", method = RequestMethod.POST)
-	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaLinhas mapaLinhas(@RequestBody MapaHospedagemRequest model)
 	{
 		MapaLinhas retorno = service.buildMapaLinhas(model.data);
@@ -111,7 +111,7 @@ public class HospedagemController {
 	}
 
 	@RequestMapping(value="/mapa/hospedes", method = RequestMethod.POST)
-	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaHospedes mapaHospedes(@RequestBody MapaHospedagemRequest model)
 	{
 		MapaHospedes retorno = service.buildMapaHospedes(model.data);
@@ -119,7 +119,7 @@ public class HospedagemController {
 	}
 
 	@RequestMapping(value="/mapa/cidades", method = RequestMethod.POST)
-	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaCidades mapaCidades(@RequestBody MapaHospedagemRequest model)
 	{
 		MapaCidades retorno = service.buildMapaCidades(model.data);
@@ -127,7 +127,7 @@ public class HospedagemController {
 	}
 
 	@RequestMapping(value="/mapa/quadro", method = RequestMethod.POST)
-	//@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
+	@PreAuthorize("hasAnyRole('USER','ADMIN','ROOT')")
 	public MapaQuadro mapaQuadro(@RequestBody MapaHospedagemRequest model)
 	{
 		MapaQuadro retorno = service.buildMapaQuadro(model.data);
