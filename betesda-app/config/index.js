@@ -40,13 +40,16 @@ module.exports = {
     // Template for index.html
     index: path.resolve(__dirname, '../dist/index.html'),
 
+
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: 'http://petrasistemas.com.br/betesda/',
+    //assetsPublicPath: 'http://betesda.itarocha.xyz/',
 
     // Various Dev Server settings
     host: 'petrasistemas.com.br', // can be overwritten by process.prod.HOST
+    //host: 'betesda.itarocha.xyz', // can be overwritten by process.prod.HOST
 
     /**
      * Source Maps
