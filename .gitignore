@@ -9,8 +9,8 @@ trash.txt
 
 betesdaclient/dist/**
 betesdaclient/node_modules/**
-betesdabuilder/output/**
-
+builder/output/**
+builder/upload\.sh
 
 *.sh
 
@@ -54,7 +54,6 @@ yarn-debug.log*
 yarn-error.log*
 
 
-betesdabuilder/upload\.sh
 betesda-app/package-lock.json
 *.xlsm
 *.xlsx
