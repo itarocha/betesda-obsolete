@@ -30,6 +30,7 @@ import br.com.itarocha.betesda.payload.SignUpRequest;
 import br.com.itarocha.betesda.repository.RoleRepository;
 import br.com.itarocha.betesda.repository.UserRepository;
 import br.com.itarocha.betesda.security.JwtTokenProvider;
+import br.com.itarocha.betesda.service.EmailService;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -49,6 +50,9 @@ public class AuthController {
 
     @Autowired
     JwtTokenProvider tokenProvider;
+    
+    @Autowired
+    EmailService emailService;
 
     @RequestMapping(value="/hello", method = RequestMethod.GET) 
     public ResponseEntity<?> hello() {
@@ -69,6 +73,10 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
+
+        // Deve sair
+        //emailService.redefinirSenha("somebody@gmail.com", "Some Name", jwt);
+        
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 

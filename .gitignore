@@ -55,6 +55,7 @@ yarn-error.log*
 
 
 betesda-app/package-lock.json
+mail.local*
 *.xlsm
 *.xlsx
 planilha/\.~lock\.betesda122018\.xlsm#

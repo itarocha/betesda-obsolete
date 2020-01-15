@@ -10,11 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.itarocha.betesda.model.Encaminhador;
-import br.com.itarocha.betesda.model.Entidade;
 import br.com.itarocha.betesda.model.SelectValueVO;
 import br.com.itarocha.betesda.repository.EncaminhadorRepository;
-import br.com.itarocha.betesda.repository.EnderecoRepository;
-import br.com.itarocha.betesda.repository.EntidadeRepository;
 
 @Service
 public class EncaminhadorService {
